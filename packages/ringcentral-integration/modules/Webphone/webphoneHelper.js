@@ -36,6 +36,7 @@ export function normalizeSession(session) {
     recordStatus: session.recordStatus || recordStatus.idle,
     contactMatch: session.contactMatch,
     minimized: !!session.minimized,
+    data: session.data || null
   };
 }
 

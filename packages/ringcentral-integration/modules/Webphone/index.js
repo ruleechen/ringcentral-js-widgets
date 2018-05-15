@@ -1,8 +1,11 @@
 import RingCentralWebphone from 'ringcentral-web-phone';
 import incomingAudio from 'ringcentral-web-phone/audio/incoming.ogg';
 import outgoingAudio from 'ringcentral-web-phone/audio/outgoing.ogg';
+import { camelize } from '../../lib/di/utils/utils';
 
-import { Module } from '../../lib/di';
+import {
+  Module
+} from '../../lib/di';
 import RcModule from '../../lib/RcModule';
 import sleep from '../../lib/sleep';
 import moduleStatuses from '../../enums/moduleStatuses';
@@ -38,13 +41,22 @@ const MAX_RETRIES_DELAY = 2 * 60 * 1000;
     'Auth',
     'Alert',
     'Client',
-    { dep: 'ContactMatcher', optional: true },
+    {
+      dep: 'ContactMatcher',
+      optional: true
+    },
     'ExtensionDevice',
     'NumberValidate',
     'RolesAndPermissions',
     'AudioSettings',
-    { dep: 'TabManager', optional: true },
-    { dep: 'WebphoneOptions', optional: true }
+    {
+      dep: 'TabManager',
+      optional: true
+    },
+    {
+      dep: 'WebphoneOptions',
+      optional: true
+    }
   ]
 })
 export default class Webphone extends RcModule {
@@ -110,7 +122,6 @@ export default class Webphone extends RcModule {
     this._webphone = null;
     this._remoteVideo = null;
     this._localVideo = null;
-
     this._sessions = new Map();
 
     this._reducer = getWebphoneReducer(this.actionTypes);
@@ -284,8 +295,7 @@ export default class Webphone extends RcModule {
 
   _shouldReset() {
     return (
-      (
-        !this._auth.loggedIn ||
+      (!this._auth.loggedIn ||
         !this._rolesAndPermissions.ready ||
         !this._numberValidate.ready ||
         !this._extensionDevice.ready ||
@@ -300,7 +310,9 @@ export default class Webphone extends RcModule {
   async _sipProvision() {
     const response = await this._client.service.platform()
       .post('/client-info/sip-provision', {
-        sipInfo: [{ transport: 'WSS' }]
+        sipInfo: [{
+          transport: 'WSS'
+        }]
       });
     return response.json();
   }
@@ -371,52 +383,59 @@ export default class Webphone extends RcModule {
       console.error('webphone register failed:', cause);
       // limit logic:
       /*
-      * Specialties of this flow are next:
-      *   6th WebRTC in another browser receives 6th ‘EndpointID’ and 1st ‘InstanceID’,
-      *   which has been given previously to the 1st ‘EndpointID’.
-      *   It successfully registers on WSX by moving 1st ‘EndpointID’ to a blacklist state.
-      *   When 1st WebRTC client re-registers on expiration timeout,
-      *   WSX defines that 1st ‘EndpointID’ is blacklisted and responds with ‘SIP/2.0 403 Forbidden,
-      *   instance id is intercepted by another registration’ and remove it from black list.
-      *   So if 1st WebRTC will send re-register again with the same ‘InstanceID’,
-      *   it will be accepted and 6th ‘EndpointID’ will be blacklisted.
-      *   (But the WebRTC client must logout on receiving SIP/2.0 403 Forbidden error and in case of login -
-      *   provision again via Platform API and receive new InstanceID)
-      */
+       * Specialties of this flow are next:
+       *   6th WebRTC in another browser receives 6th ‘EndpointID’ and 1st ‘InstanceID’,
+       *   which has been given previously to the 1st ‘EndpointID’.
+       *   It successfully registers on WSX by moving 1st ‘EndpointID’ to a blacklist state.
+       *   When 1st WebRTC client re-registers on expiration timeout,
+       *   WSX defines that 1st ‘EndpointID’ is blacklisted and responds with ‘SIP/2.0 403 Forbidden,
+       *   instance id is intercepted by another registration’ and remove it from black list.
+       *   So if 1st WebRTC will send re-register again with the same ‘InstanceID’,
+       *   it will be accepted and 6th ‘EndpointID’ will be blacklisted.
+       *   (But the WebRTC client must logout on receiving SIP/2.0 403 Forbidden error and in case of login -
+       *   provision again via Platform API and receive new InstanceID)
+       */
       const statusCode = response ? response.status_code : null;
       switch (statusCode) {
         // Webphone account overlimit
-        case 503: case 603: {
-          errorCode = webphoneErrors.webphoneCountOverLimit;
-          needToReconnect = true;
-          break;
-        }
-        case 403: {
-          errorCode = webphoneErrors.webphoneForbidden;
-          needToReconnect = true;
-          break;
-        }
-        // Request Timeout
-        case 408: {
-          errorCode = webphoneErrors.requestTimeout;
-          needToReconnect = true;
-          break;
-        }
-        // Internal server error
-        case 500: {
-          errorCode = webphoneErrors.internalServerError;
-          break;
-        }
-        // Timeout
-        case 504: {
-          errorCode = webphoneErrors.serverTimeout;
-          needToReconnect = true;
-          break;
-        }
-        default: {
-          errorCode = webphoneErrors.unknownError;
-          break;
-        }
+        case 503:
+        case 603:
+          {
+            errorCode = webphoneErrors.webphoneCountOverLimit;
+            needToReconnect = true;
+            break;
+          }
+        case 403:
+          {
+            errorCode = webphoneErrors.webphoneForbidden;
+            needToReconnect = true;
+            break;
+          }
+          // Request Timeout
+        case 408:
+          {
+            errorCode = webphoneErrors.requestTimeout;
+            needToReconnect = true;
+            break;
+          }
+          // Internal server error
+        case 500:
+          {
+            errorCode = webphoneErrors.internalServerError;
+            break;
+          }
+          // Timeout
+        case 504:
+          {
+            errorCode = webphoneErrors.serverTimeout;
+            needToReconnect = true;
+            break;
+          }
+        default:
+          {
+            errorCode = webphoneErrors.unknownError;
+            break;
+          }
       }
       this._alert.danger({
         message: errorCode,
@@ -483,7 +502,7 @@ export default class Webphone extends RcModule {
       this.store.dispatch({
         type: (
           reconnect ?
-            this.actionTypes.reconnect : this.actionTypes.connect
+          this.actionTypes.reconnect : this.actionTypes.connect
         )
       });
 
@@ -602,12 +621,35 @@ export default class Webphone extends RcModule {
   }
 
   _onAccepted(session) {
-    session.on('accepted', () => {
+    session.on('accepted', incomingResponse => {
+      // todo: log the response
       if (session.callStatus === sessionStatus.finished) {
         return;
       }
       console.log('accepted');
       session.callStatus = sessionStatus.connected;
+      if (
+        incomingResponse &&
+        (typeof incomingResponse.headers).toLowerCase() === 'object' &&
+        Array.isArray(incomingResponse.headers['P-Rc-Api-Ids']) &&
+        incomingResponse.headers['P-Rc-Api-Ids'].length &&
+        (typeof incomingResponse.headers['P-Rc-Api-Ids'][0]).toLowerCase() === 'object' &&
+        (typeof incomingResponse.headers['P-Rc-Api-Ids'][0]['raw']).toLowerCase() === 'string'
+      ) {
+        /**
+         * interface SessionData{
+         *  "party-id": String,
+         *  "session-id": String
+         * }
+         */
+        session.data = incomingResponse.headers['P-Rc-Api-Ids'][0]['raw'].split(';')
+          .map((sub) => sub.split('=').reduce((accum, el) => {
+            accum[camelize(el[0])] = el[1];
+            return accum;
+          }, {}));
+      } else {
+        session.data = null;
+      }
       this._onCallStart(session);
     });
     session.on('progress', () => {
@@ -737,8 +779,7 @@ export default class Webphone extends RcModule {
       return false;
     }
     try {
-      const validatedResult
-        = await this._numberValidate.validateNumbers([forwardNumber]);
+      const validatedResult = await this._numberValidate.validateNumbers([forwardNumber]);
       if (!validatedResult.result) {
         validatedResult.errors.forEach((error) => {
           this._alert.warning({
@@ -926,8 +967,7 @@ export default class Webphone extends RcModule {
     try {
       session.isOnTransfer = true;
       this._updateSessions();
-      const validatedResult
-        = await this._numberValidate.validateNumbers([transferNumber]);
+      const validatedResult = await this._numberValidate.validateNumbers([transferNumber]);
       if (!validatedResult.result) {
         validatedResult.errors.forEach((error) => {
           this._alert.warning({
@@ -1078,7 +1118,11 @@ export default class Webphone extends RcModule {
    * @param {homeCountryId} homeCountry Id
    */
   @proxify
-  async makeCall({ toNumber, fromNumber, homeCountryId }) {
+  async makeCall({
+    toNumber,
+    fromNumber,
+    homeCountryId,
+  }) {
     if (!this._webphone) {
       this._alert.warning({
         message: this.errorCode,
