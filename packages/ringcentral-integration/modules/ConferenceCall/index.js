@@ -1,9 +1,8 @@
-import {Module} from '../../lib/di';
+import { Module } from '../../lib/di';
 import callDirections from '../../enums/callDirections';
 import RcModule from '../../lib/RcModule';
-import createSimpleReducer from '../../lib/createSimpleReducer';
 import actionTypes from './actionTypes';
-import getConferenceCallReducer from './getCallReducer';
+import getConferenceCallReducer from './getConferenceCallReducer';
 import proxify from '../../lib/proxy/proxify';
 import permissionsMessages from '../RolesAndPermissions/permissionsMessages';
 import conferenceErrors from './conferenceCallErrors';
