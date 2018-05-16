@@ -1,6 +1,4 @@
-import {
-  combineReducers
-} from 'redux';
+import { combineReducers } from 'redux';
 import getModuleStatusReducer from '../../lib/getModuleStatusReducer';
 import confreenceCallStatus from './conferenceCallStatus';
 
