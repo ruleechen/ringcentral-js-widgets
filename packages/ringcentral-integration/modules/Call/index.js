@@ -1,10 +1,6 @@
-import {
-  combineReducers
-} from 'redux';
+import {combineReducers} from 'redux';
 import RcModule from '../../lib/RcModule';
-import {
-  Module
-} from '../../lib/di';
+import {Module} from '../../lib/di';
 import callingModes from '../CallingSettings/callingModes';
 import moduleStatuses from '../../enums/moduleStatuses';
 import proxify from '../../lib/proxy/proxify';
@@ -222,7 +218,6 @@ export default class Call extends RcModule {
           callSettingMode: this._callSettingMode // for Track
         });
         try {
-          let validatedNumbers = null;
           const validatedNumbers = await this._getValidatedNumbers({
             toNumber,
             isConference
@@ -235,11 +230,10 @@ export default class Call extends RcModule {
               callSettingMode: this._callSettingMode // for Track
             });
             return session;
-          } else {
-            this.store.dispatch({
-              type: this.actionTypes.connectError
-            });
           }
+          this.store.dispatch({
+            type: this.actionTypes.connectError
+          });
         } catch (error) {
           if (!error.message && error.type && callErrors[error.type]) {
             // validate format error
