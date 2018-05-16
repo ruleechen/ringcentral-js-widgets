@@ -322,6 +322,7 @@ export default class Conference extends RcModule {
         type: this.actionTypes.removeFromConferenceFailed,
       });
     }
+    return this.state.conferences[id];
   }
 
   /**
