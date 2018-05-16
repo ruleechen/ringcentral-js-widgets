@@ -91,10 +91,11 @@ export default class Conference extends RcModule {
         {
           const conference = Object.assign({}, this.state.conferences[response.id]);
           conference.parties = response.parties;
-
+          const { session } = this.state.conferences[id];
           this.store.dispatch({
             type: this.actionTypes.updateConferenceSucceeded,
             conference,
+            session
           });
           return this.state.conferences[id];
         }
@@ -356,6 +357,7 @@ export default class Conference extends RcModule {
         {
           const conference = response.json().session;
           const phoneNumber = conference.voiceCallToken;
+          // whether to mutate the session to mark the conference?
           const session = await this._call.call({
             phoneNumber
           });
@@ -368,6 +370,7 @@ export default class Conference extends RcModule {
             this.store.dispatch({
               type: this.actionTypes.makeConferenceSucceeded,
               conference,
+              session
             });
           } else {
             this.store.dispatch({

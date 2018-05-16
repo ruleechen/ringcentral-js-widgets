@@ -36,7 +36,8 @@ export function getConferenceCallStatusReducer(types) {
 export function getMakeConferenceCallReducer(types) {
   return (state = {}, {
     type,
-    conference
+    conference, // platform conference session data
+    session, // SIP.inviteClientContext instance
   }) => {
     const res = {
       ...state
@@ -44,7 +45,7 @@ export function getMakeConferenceCallReducer(types) {
     switch (type) {
       case types.makeConferenceSucceeded:
       case types.updateConferenceSucceeded:
-        res[conference.id] = conference;
+        res[conference.id] = { conference, session };
         return res;
       case types.terminateConferenceSucceeded:
         delete res[conference.id];
