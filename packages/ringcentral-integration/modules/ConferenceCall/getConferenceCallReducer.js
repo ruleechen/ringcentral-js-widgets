@@ -1,5 +1,39 @@
-import { combineReducers } from 'redux';
+import {
+  combineReducers
+} from 'redux';
 import getModuleStatusReducer from '../../lib/getModuleStatusReducer';
+import confreenceCallStatus from './conferenceCallStatus';
+
+export function getConferenceCallStatusReducer(types) {
+  return (state = confreenceCallStatus.idle, {
+    type
+  }) => {
+    switch (type) {
+      case types.makeConference:
+      case types.terminateConference:
+      case types.updateConference:
+      case types.bringInConference:
+      case types.removeFromConference:
+        return confreenceCallStatus.requesting;
+
+      case types.makeConferenceSucceeded:
+      case types.makeConferenceFailed:
+      case types.terminateConferenceSucceeded:
+      case types.terminateConferenceFailed:
+      case types.updateConferenceSucceeded:
+      case types.updateConferenceFailed:
+      case types.bringInConferenceSucceeded:
+      case types.bringInConferenceFailed:
+      case types.removeFromConferenceSucceeded:
+      case types.removeFromConferenceFailed:
+        return confreenceCallStatus.idle;
+
+      default:
+        return state;
+    }
+  };
+}
+
 
 export function getMakeConferenceCallReducer(types) {
   return (state = {}, {
@@ -26,6 +60,7 @@ export function getMakeConferenceCallReducer(types) {
 export default function getConferenceCallReducer(types) {
   return combineReducers({
     status: getModuleStatusReducer(types),
-    conferences: getMakeConferenceCallReducer(types)
+    conferences: getMakeConferenceCallReducer(types),
+    confreenceCallStatus: getConferenceCallStatusReducer(types),
   });
 }

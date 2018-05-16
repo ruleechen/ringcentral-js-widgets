@@ -8,7 +8,7 @@ import actionTypes from './actionTypes';
 import getConferenceCallReducer from './getCallReducer';
 import proxify from '../../lib/proxy/proxify';
 import permissionsMessages from '../RolesAndPermissions/permissionsMessages';
-import conferenceErrors from './ConferenceCallErrors';
+import conferenceErrors from './conferenceCallErrors';
 import webphoneErrors from '../Webphone/webphoneErrors';
 
 /**
