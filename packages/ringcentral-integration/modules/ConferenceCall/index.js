@@ -1,6 +1,4 @@
-import {
-  Module
-} from '../../lib/di';
+import {Module} from '../../lib/di';
 import callDirections from '../../enums/callDirections';
 import RcModule from '../../lib/RcModule';
 import createSimpleReducer from '../../lib/createSimpleReducer';
@@ -74,7 +72,7 @@ export default class Conference extends RcModule {
   }
 
   /**
-   * 
+   *
    * @param {string} id: conference id
    */
   @proxify
@@ -91,34 +89,34 @@ export default class Conference extends RcModule {
 
       switch (statusCode) {
         case 200:
-          {
-            const conference = Object.assign({}, this.state.conferences[response.id]);
-            conference.parties = response.parties;
+        {
+          const conference = Object.assign({}, this.state.conferences[response.id]);
+          conference.parties = response.parties;
 
-            this.store.dispatch({
-              type: this.actionTypes.updateConferenceSucceeded,
-              conference,
-            });
-            return this.state.conferences[id];
-          }
+          this.store.dispatch({
+            type: this.actionTypes.updateConferenceSucceeded,
+            conference,
+          });
+          return this.state.conferences[id];
+        }
         case 403:
-          {
-            errorCode = conferenceErrors.conferenceForbidden;
-            break;
-          }
+        {
+          errorCode = conferenceErrors.conferenceForbidden;
+          break;
+        }
         case 404:
-          {
-            errorCode = conferenceErrors.conferenceNotFound;
-            break;
-          }
+        {
+          errorCode = conferenceErrors.conferenceNotFound;
+          break;
+        }
         case 500:
         default:
-          {
-            errorCode = conferenceErrors.internalServerError;
-            break;
-          }
+        {
+          errorCode = conferenceErrors.internalServerError;
+          break;
+        }
       }
-      // TODO: alert      
+      // TODO: alert
       this.store.dispatch({
         type: this.actionTypes.terminateConferenceFailed,
         statusCode,
@@ -153,29 +151,29 @@ export default class Conference extends RcModule {
 
       switch (statusCode) {
         case 204:
-          {
-            this.store.dispatch({
-              type: this.actionTypes.terminateConferenceSucceeded,
-              conference: this.state.conferences[id],
-            });
-            return this.state.conferences[id];
-          }
+        {
+          this.store.dispatch({
+            type: this.actionTypes.terminateConferenceSucceeded,
+            conference: this.state.conferences[id],
+          });
+          return this.state.conferences[id];
+        }
         case 403:
-          {
-            errorCode = conferenceErrors.conferenceForbidden;
-            break;
-          }
+        {
+          errorCode = conferenceErrors.conferenceForbidden;
+          break;
+        }
         case 404:
-          {
-            errorCode = conferenceErrors.conferenceNotFound;
-            break;
-          }
+        {
+          errorCode = conferenceErrors.conferenceNotFound;
+          break;
+        }
         case 500:
         default:
-          {
-            errorCode = conferenceErrors.internalServerError;
-            break;
-          }
+        {
+          errorCode = conferenceErrors.internalServerError;
+          break;
+        }
       }
       this.store.dispatch({
         type: this.actionTypes.terminateConferenceFailed,
@@ -219,41 +217,41 @@ export default class Conference extends RcModule {
 
       switch (statusCode) {
         case 201:
-          {
-            await this.updateConferenceStatus(id);
-            // let the contact match to do the matching of the parties.
-            this.store.dispatch({
-              type: this.actionTypes.bringInConferenceSucceeded,
-              conference: this.state.conferences[id],
-            });
-            return this.state.conferences[id];
-          }
+        {
+          await this.updateConferenceStatus(id);
+          // let the contact match to do the matching of the parties.
+          this.store.dispatch({
+            type: this.actionTypes.bringInConferenceSucceeded,
+            conference: this.state.conferences[id],
+          });
+          return this.state.conferences[id];
+        }
         case 400:
-          {
-            errorCode = conferenceErrors.conferenceBadRequest;
-            break;
-          }
+        {
+          errorCode = conferenceErrors.conferenceBadRequest;
+          break;
+        }
         case 403:
-          {
-            errorCode = conferenceErrors.conferenceForbidden;
-            break;
-          }
+        {
+          errorCode = conferenceErrors.conferenceForbidden;
+          break;
+        }
         case 404:
-          {
-            errorCode = conferenceErrors.conferenceNotFound;
-            break;
-          }
+        {
+          errorCode = conferenceErrors.conferenceNotFound;
+          break;
+        }
         case 409:
-          {
-            errorCode = conferenceErrors.conferenceConflict;
-            break;
-          }
+        {
+          errorCode = conferenceErrors.conferenceConflict;
+          break;
+        }
         case 500:
         default:
-          {
-            errorCode = conferenceErrors.internalServerError;
-            break;
-          }
+        {
+          errorCode = conferenceErrors.internalServerError;
+          break;
+        }
       }
       this.store.dispatch({
         type: this.actionTypes.terminateConferenceFailed,
@@ -289,30 +287,30 @@ export default class Conference extends RcModule {
 
       switch (statusCode) {
         case 204:
-          {
-            await this.updateConferenceStatus(id);
-            this.store.dispatch({
-              type: this.actionTypes.removeFromConferenceSucceeded,
-              conference: this.state.conferences[id],
-            });
-            return this.state.conferences[id];
-          }
+        {
+          await this.updateConferenceStatus(id);
+          this.store.dispatch({
+            type: this.actionTypes.removeFromConferenceSucceeded,
+            conference: this.state.conferences[id],
+          });
+          return this.state.conferences[id];
+        }
         case 403:
-          {
-            errorCode = conferenceErrors.conferenceForbidden;
-            break;
-          }
+        {
+          errorCode = conferenceErrors.conferenceForbidden;
+          break;
+        }
         case 404:
-          {
-            errorCode = conferenceErrors.conferenceNotFound;
-            break;
-          }
+        {
+          errorCode = conferenceErrors.conferenceNotFound;
+          break;
+        }
         case 500:
         default:
-          {
-            errorCode = conferenceErrors.internalServerError;
-            break;
-          }
+        {
+          errorCode = conferenceErrors.internalServerError;
+          break;
+        }
       }
       this.store.dispatch({
         type: this.actionTypes.removeFromConferenceFailed,
@@ -351,58 +349,58 @@ export default class Conference extends RcModule {
       const response = await this._client.service.platform()
         .post('/account/~/telephony/conference', {});
       const statusCode = response ? response.status_code : null;
-      const errorCode = null;
+      let errorCode = null;
 
       switch (statusCode) {
         case 201:
-          {
-            const conference = response.json().session;
-            const phoneNumber = conference.voiceCallToken;
-            const session = await this._call.call({
-              phoneNumber
-            });
+        {
+          const conference = response.json().session;
+          const phoneNumber = conference.voiceCallToken;
+          const session = await this._call.call({
+            phoneNumber
+          });
 
-            if (typeof session === 'object' &&
+          if (typeof session === 'object' &&
               Object.prototype.toString.call(session.on).toLowerCase() === '[object function]') {
-              conference.session = session;
-              this._hookConference(conference);
+            conference.session = session;
+            this._hookConference(conference);
 
-              this.store.dispatch({
-                type: this.actionTypes.makeConferenceSucceeded,
-                conference,
-              });
-            } else {
-              this.store.dispatch({
-                type: this.actionTypes.makeConferenceFailed,
-              });
-            }
+            this.store.dispatch({
+              type: this.actionTypes.makeConferenceSucceeded,
+              conference,
+            });
+          } else {
+            this.store.dispatch({
+              type: this.actionTypes.makeConferenceFailed,
+            });
           }
           return conference;
+        }
         case 403:
-          {
-            errorCode = conferenceErrors.conferenceForbidden;
-            break;
-          }
+        {
+          errorCode = conferenceErrors.conferenceForbidden;
+          break;
+        }
         case 404:
-          {
-            errorCode = conferenceErrors.conferenceNotFound;
-            break;
-          }
+        {
+          errorCode = conferenceErrors.conferenceNotFound;
+          break;
+        }
         case 409:
-          {
-            errorCode = conferenceErrors.conferenceNotFound;
-            break;
-          }
+        {
+          errorCode = conferenceErrors.conferenceNotFound;
+          break;
+        }
         case 500:
-          {
-            errorCode = webphoneErrors.internalServerError;
-            break;
-          }
+        {
+          errorCode = webphoneErrors.internalServerError;
+          break;
+        }
         default:
-          {
-            errorCode = webphoneErrors.unknownError;
-            break;
-          }
+        {
+          errorCode = webphoneErrors.unknownError;
+          break;
+        }
       }
       this._alert.danger({
         message: errorCode,
@@ -475,9 +473,8 @@ export default class Conference extends RcModule {
         ttl: 0,
       });
       return false;
-    } else {
-      return true;
     }
+    return true;
   }
 
   _hookConference(conference) {
