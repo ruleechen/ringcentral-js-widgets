@@ -7,10 +7,11 @@ import proxify from '../../lib/proxy/proxify';
 import permissionsMessages from '../RolesAndPermissions/permissionsMessages';
 import conferenceErrors from './conferenceCallErrors';
 import webphoneErrors from '../Webphone/webphoneErrors';
+import ensureExist from '../../lib/ensureExist';
 
 /**
  * @class
- * @description Conference managing module
+ * @description ConferenceCall managing module
  */
 @Module({
   deps: [
@@ -24,7 +25,7 @@ import webphoneErrors from '../Webphone/webphoneErrors';
     'Storage',
   ]
 })
-export default class Conference extends RcModule {
+export default class ConferenceCall extends RcModule {
   /**
    * @constructor
    * @param {Object} params - params object
@@ -63,7 +64,6 @@ export default class Conference extends RcModule {
     this._webphone = this::ensureExist(webphone, 'webphone');
     this._rolesAndPermissions = this::ensureExist(rolesAndPermissions, 'rolesAndPermissions');
     this._reducer = getConferenceCallReducer(actionTypes);
-    this.actionTypes = actionTypes;
   }
 
   initialize() {
@@ -426,32 +426,32 @@ export default class Conference extends RcModule {
     return null;
   }
 
-  _resetConferenceCallModule() {
-    this._conference = null;
+  async _onStateChange() {
+    if (this._shouldInit()) {
+      this._init();
+    } else if (this._shouldReset()) {
+      this._reset();
+    }
   }
 
-  _onStateChange() {
-    if (this._shouldInit()) {
-      // this.store.dispatch({
-      //   type: this.actionTypes.init,
-      // });
-      this.store.dispatch({
-        type: this.actionTypes.initSuccess,
-      });
-    } else if (this._shouldReset()) {
-      this._resetConferenceCallModule();
-      this.store.dispatch({
-        type: this.actionTypes.resetSuccess,
-        cleanOnReset: this._cleanOnReset,
-      });
-    }
+  _init() {
+    this.store.dispatch({
+      type: this.actionTypes.initSuccess
+    });
+  }
+
+  _reset() {
+    this.store.dispatch({
+      type: this.actionTypes.resetSuccess
+    });
   }
 
   _shouldInit() {
     return (
-      this._callingSettings.ready &&
+      this._auth.loggedIn &&
+      this._alert.ready &&
+      (!this._call || this._call.ready) &&
       this._storage.ready &&
-      (!this._webphone || this._webphone.ready) &&
       this._rolesAndPermissions.ready &&
       this.pending
     );
@@ -459,10 +459,12 @@ export default class Conference extends RcModule {
 
   _shouldReset() {
     return (
-      (!this._callingSettings.ready ||
-        (!!this._webphone && !this._webphone.ready) ||
-        !this._rolesAndPermissions.ready ||
-        !this._storage.ready
+      (
+        !this._auth.loggedIn ||
+        !this._alert.ready ||
+        (this._call && !this._call.ready) ||
+        !this._storage.ready ||
+        !this._rolesAndPermissions.ready
       ) &&
       this.ready
     );
@@ -485,5 +487,17 @@ export default class Conference extends RcModule {
       type: this.actionTypes.terminateConferenceSucceeded,
       conference,
     }));
+  }
+
+  get status() {
+    return this.state.status;
+  }
+
+  get conferences() {
+    return this.state.conferences;
+  }
+
+  get confreenceCallStatus() {
+    return this.state.confreenceCallStatus;
   }
 }

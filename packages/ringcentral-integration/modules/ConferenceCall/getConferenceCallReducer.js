@@ -43,6 +43,8 @@ export function getMakeConferenceCallReducer(types) {
       ...state
     };
     switch (type) {
+      case types.resetSuccess:
+        return {};
       case types.makeConferenceSucceeded:
       case types.updateConferenceSucceeded:
         res[conference.id] = { conference, session };
