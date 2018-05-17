@@ -8,6 +8,7 @@ import permissionsMessages from '../RolesAndPermissions/permissionsMessages';
 import conferenceErrors from './conferenceCallErrors';
 import webphoneErrors from '../Webphone/webphoneErrors';
 import ensureExist from '../../lib/ensureExist';
+import callingModes from '../CallingSettings/callingModes';
 
 /**
  * @class
@@ -17,12 +18,10 @@ import ensureExist from '../../lib/ensureExist';
   deps: [
     'Auth',
     'Alert',
-    'Call',
+    { dep: 'Call', optional: true },
     'CallingSettings',
     'Client',
-    'Webphone',
     'RolesAndPermissions',
-    'Storage',
   ]
 })
 export default class ConferenceCall extends RcModule {
@@ -38,9 +37,7 @@ export default class ConferenceCall extends RcModule {
     call,
     callingSettings,
     client,
-    webphone,
     rolesAndPermissions,
-    storage,
     ...options
   }) {
     super({
@@ -49,25 +46,18 @@ export default class ConferenceCall extends RcModule {
       call,
       callingSettings,
       client,
-      webphone,
       rolesAndPermissions,
-      storage,
       ...options,
       actionTypes,
     });
-    this._storage = this::ensureExist(storage, 'storage');
     this._auth = this::ensureExist(auth, 'auth');
     this._alert = this::ensureExist(alert, 'alert');
     this._call = this::ensureExist(call, 'call');
     this._callingSettings = this::ensureExist(callingSettings, 'callingSettings');
     this._client = this::ensureExist(client, 'client');
-    this._webphone = this::ensureExist(webphone, 'webphone');
     this._rolesAndPermissions = this::ensureExist(rolesAndPermissions, 'rolesAndPermissions');
-    this._reducer = getConferenceCallReducer(actionTypes);
-  }
-
-  initialize() {
-    this.store.subscribe(() => this._onStateChange());
+    // we need the constructed actions
+    this._reducer = getConferenceCallReducer(this.actionTypes);
   }
 
   /**
@@ -341,6 +331,13 @@ export default class ConferenceCall extends RcModule {
       });
       return null;
     }
+    if (!this._callingSettings.callingMode === callingModes.webphone) {
+      this._alert.danger({
+        message: conferenceErrors.modeError,
+        ttl: 0,
+      });
+      return null;
+    }
     try {
       this.store.dispatch({
         type: this.actionTypes.makeConference,
@@ -426,6 +423,10 @@ export default class ConferenceCall extends RcModule {
     return null;
   }
 
+  initialize() {
+    this.store.subscribe(() => this._onStateChange());
+  }
+
   async _onStateChange() {
     if (this._shouldInit()) {
       this._init();
@@ -448,10 +449,10 @@ export default class ConferenceCall extends RcModule {
 
   _shouldInit() {
     return (
-      this._auth.loggedIn &&
+      (this._auth.loggedIn && this._auth.ready) &&
       this._alert.ready &&
-      (!this._call || this._call.ready) &&
-      this._storage.ready &&
+      this._callingSettings.ready &&
+      this._call.ready &&
       this._rolesAndPermissions.ready &&
       this.pending
     );
@@ -460,10 +461,10 @@ export default class ConferenceCall extends RcModule {
   _shouldReset() {
     return (
       (
-        !this._auth.loggedIn ||
+        (!this._auth.loggedIn || !this._auth.ready) ||
         !this._alert.ready ||
-        (this._call && !this._call.ready) ||
-        !this._storage.ready ||
+        !this._callingSettings.ready ||
+        !this._call.ready ||
         !this._rolesAndPermissions.ready
       ) &&
       this.ready

@@ -5,5 +5,6 @@ export default new Enum([
   'conferenceForbidden',
   'conferenceBadRequest',
   'conferenceNotFound',
-  'conferenceConflict'
-], 'ConferenceCall');
+  'conferenceConflict',
+  'modeError',
+], 'conferenceCall');

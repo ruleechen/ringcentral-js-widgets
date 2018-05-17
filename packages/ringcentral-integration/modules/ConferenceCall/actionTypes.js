@@ -23,4 +23,4 @@ export default new Enum([
   'removeFromConference',
   'removeFromConferenceSucceeded',
   'removeFromConferenceFailed',
-], 'ConferenceCall');
+], 'conferenceCall');

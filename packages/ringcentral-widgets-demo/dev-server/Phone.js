@@ -113,7 +113,6 @@ import ProxyFrameOAuth from 'ringcentral-widgets/modules/ProxyFrameOAuth';
     MessageStore,
     Conversation,
     Conference,
-    // ConferenceCall,
     RouterInteraction,
     CallLog,
     CallHistory,
@@ -141,6 +140,7 @@ import ProxyFrameOAuth from 'ringcentral-widgets/modules/ProxyFrameOAuth';
     DialerUI,
     Feedback,
     UserGuide,
+    ConferenceCall,    
   ]
 })
 export default class BasePhone extends RcModule {
