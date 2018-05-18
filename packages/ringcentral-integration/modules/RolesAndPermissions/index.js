@@ -1,6 +1,4 @@
-import {
-  Module
-} from '../../lib/di';
+import {Module} from '../../lib/di';
 import DataFetcher from '../../lib/DataFetcher';
 import permissionsMessages from './permissionsMessages';
 import loginStatus from '../Auth/loginStatus';
@@ -254,15 +252,6 @@ export default class RolesAndPermissions extends DataFetcher {
       this.serviceFeatures && (
         this.serviceFeatures.Conferencing &&
         this.serviceFeatures.Conferencing.enabled
-      )
-    );
-  }
-
-  get hasTelephonySessionsPermission() {
-    return !!(
-      this.serviceFeatures && (
-        this.serviceFeatures.TelephonySessions &&
-        this.serviceFeatures.TelephonySessions.enabled
       )
     );
   }

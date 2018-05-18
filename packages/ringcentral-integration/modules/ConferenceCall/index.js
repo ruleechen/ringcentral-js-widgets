@@ -71,9 +71,10 @@ export default class ConferenceCall extends RcModule {
       conference: this.state.conferences[id],
     });
     try {
-      const response = await this._client.service.platform()
+      const rawResponse = await this._client.service.platform()
         .get(`/account/~/telephony/sessions/${id}`);
-      const statusCode = response ? response.status_code : null;
+      const response = rawResponse.json();
+      const statusCode = rawResponse ? rawResponse._response.status : null;
       let errorCode;
 
       switch (statusCode) {
@@ -134,9 +135,9 @@ export default class ConferenceCall extends RcModule {
     });
 
     try {
-      const response = await this._client.service.platform()
-        .delete(`/account/~/telephony/sessions/${conferenceId}`, {});
-      const statusCode = response ? response.status_code : null;
+      const rawResponse = await this._client.service.platform()
+        .delete(`/account/~/telephony/sessions/${id}`);
+      const statusCode = rawResponse ? rawResponse._response.status : null;
       let errorCode;
 
       switch (statusCode) {
@@ -200,9 +201,9 @@ export default class ConferenceCall extends RcModule {
     });
     const sessionData = partyCall.webphoneSession.data;
     try {
-      const response = await this._client.service.platform()
+      const rawResponse = await this._client.service.platform()
         .post(`/account/~/telephony/sessions/${id}/parties/bring-in`, sessionData);
-      const statusCode = response ? response.status_code : null;
+      const statusCode = rawResponse ? rawResponse._response.status : null;
       let errorCode;
 
       switch (statusCode) {
@@ -270,9 +271,9 @@ export default class ConferenceCall extends RcModule {
     });
 
     try {
-      const response = await this._client.service.platform()
+      const rawResponse = await this._client.service.platform()
         .delete(`/account/~/telephony/sessions/${id}/parties/${partyId}`);
-      const statusCode = response ? response.status_code : null;
+      const statusCode = rawResponse ? rawResponse._response.status : null;
       let errorCode;
 
       switch (statusCode) {
@@ -344,20 +345,21 @@ export default class ConferenceCall extends RcModule {
       });
 
       // TODO: replace with SDK function chaining calls
-      const response = await this._client.service.platform()
+      const rawResponse = await this._client.service.platform()
         .post('/account/~/telephony/conference', {});
-      const statusCode = response ? response.status_code : null;
+      const response = rawResponse.json();
+      const statusCode = rawResponse ? rawResponse._response.status : null;
       let errorCode = null;
 
       switch (statusCode) {
         case 201:
         {
-          const conference = response.json().session;
+          const conference = response.session;
           const phoneNumber = conference.voiceCallToken;
           // whether to mutate the session to mark the conference?
           const session = await this._call.call({
             phoneNumber
-          });
+          }, true);
 
           if (typeof session === 'object' &&
               Object.prototype.toString.call(session.on).toLowerCase() === '[object function]') {
@@ -472,7 +474,7 @@ export default class ConferenceCall extends RcModule {
   }
 
   _checkPermission() {
-    if (!this._rolesAndPermissions.hasTelephonySessionsPermission ||
+    if (!this._rolesAndPermissions.callingEnabled ||
       !this._rolesAndPermissions.webphoneEnabled) {
       this._alert.danger({
         message: permissionsMessages.insufficientPrivilege,
