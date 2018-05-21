@@ -3,9 +3,7 @@ import incomingAudio from 'ringcentral-web-phone/audio/incoming.ogg';
 import outgoingAudio from 'ringcentral-web-phone/audio/outgoing.ogg';
 import { camelize } from '../../lib/di/utils/utils';
 
-import {
-  Module
-} from '../../lib/di';
+import { Module } from '../../lib/di';
 import RcModule from '../../lib/RcModule';
 import sleep from '../../lib/sleep';
 import moduleStatuses from '../../enums/moduleStatuses';
@@ -400,42 +398,42 @@ export default class Webphone extends RcModule {
         // Webphone account overlimit
         case 503:
         case 603:
-          {
-            errorCode = webphoneErrors.webphoneCountOverLimit;
-            needToReconnect = true;
-            break;
-          }
+        {
+          errorCode = webphoneErrors.webphoneCountOverLimit;
+          needToReconnect = true;
+          break;
+        }
         case 403:
-          {
-            errorCode = webphoneErrors.webphoneForbidden;
-            needToReconnect = true;
-            break;
-          }
-          // Request Timeout
+        {
+          errorCode = webphoneErrors.webphoneForbidden;
+          needToReconnect = true;
+          break;
+        }
+        // Request Timeout
         case 408:
-          {
-            errorCode = webphoneErrors.requestTimeout;
-            needToReconnect = true;
-            break;
-          }
-          // Internal server error
+        {
+          errorCode = webphoneErrors.requestTimeout;
+          needToReconnect = true;
+          break;
+        }
+        // Internal server error
         case 500:
-          {
-            errorCode = webphoneErrors.internalServerError;
-            break;
-          }
-          // Timeout
+        {
+          errorCode = webphoneErrors.internalServerError;
+          break;
+        }
+        // Timeout
         case 504:
-          {
-            errorCode = webphoneErrors.serverTimeout;
-            needToReconnect = true;
-            break;
-          }
+        {
+          errorCode = webphoneErrors.serverTimeout;
+          needToReconnect = true;
+          break;
+        }
         default:
-          {
-            errorCode = webphoneErrors.unknownError;
-            break;
-          }
+        {
+          errorCode = webphoneErrors.unknownError;
+          break;
+        }
       }
       this._alert.danger({
         message: errorCode,
@@ -502,7 +500,7 @@ export default class Webphone extends RcModule {
       this.store.dispatch({
         type: (
           reconnect ?
-          this.actionTypes.reconnect : this.actionTypes.connect
+            this.actionTypes.reconnect : this.actionTypes.connect
         )
       });
 
@@ -621,7 +619,7 @@ export default class Webphone extends RcModule {
   }
 
   _onAccepted(session) {
-    session.on('accepted', incomingResponse => {
+    session.on('accepted', (incomingResponse) => {
       // todo: log the response
       if (session.callStatus === sessionStatus.finished) {
         return;
@@ -634,7 +632,7 @@ export default class Webphone extends RcModule {
         Array.isArray(incomingResponse.headers['P-Rc-Api-Ids']) &&
         incomingResponse.headers['P-Rc-Api-Ids'].length &&
         (typeof incomingResponse.headers['P-Rc-Api-Ids'][0]).toLowerCase() === 'object' &&
-        (typeof incomingResponse.headers['P-Rc-Api-Ids'][0]['raw']).toLowerCase() === 'string'
+        (typeof incomingResponse.headers['P-Rc-Api-Ids'][0].raw).toLowerCase() === 'string'
       ) {
         /**
          * interface SessionData{
@@ -642,11 +640,11 @@ export default class Webphone extends RcModule {
          *  "session-id": String
          * }
          */
-        session.data = incomingResponse.headers['P-Rc-Api-Ids'][0]['raw'].split(';')
-          .map((sub) => sub.split('=').reduce((accum, el) => {
-            accum[camelize(el[0])] = el[1];
+        session.data = incomingResponse.headers['P-Rc-Api-Ids'][0].raw.split(';')
+          .map(sub => sub.split('=')).reduce((accum, [key, value]) => {
+            accum[camelize(key)] = value;
             return accum;
-          }, {}));
+          }, {});
       } else {
         session.data = null;
       }

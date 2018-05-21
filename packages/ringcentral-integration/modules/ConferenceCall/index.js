@@ -80,9 +80,10 @@ export default class ConferenceCall extends RcModule {
       switch (statusCode) {
         case 200:
         {
-          const conference = Object.assign({}, this.state.conferences[response.id]);
+          const storedconference = this.state.conferences[response.id];
+          const conference = Object.assign({}, storedconference.conference);
           conference.parties = response.parties;
-          const { session } = this.state.conferences[id];
+          const { session } = storedconference;
           this.store.dispatch({
             type: this.actionTypes.updateConferenceSucceeded,
             conference,
