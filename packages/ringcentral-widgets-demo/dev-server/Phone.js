@@ -44,6 +44,7 @@ import Conversation from 'ringcentral-integration/modules/Conversation';
 import ContactSearch from 'ringcentral-integration/modules/ContactSearch';
 import DateTimeFormat from 'ringcentral-integration/modules/DateTimeFormat';
 import Conference from 'ringcentral-integration/modules/Conference';
+import ConferenceCall from 'ringcentral-integration/modules/ConferenceCall';
 
 import ActiveCalls from 'ringcentral-integration/modules/ActiveCalls';
 import DetailedPresence from 'ringcentral-integration/modules/DetailedPresence';
@@ -139,6 +140,7 @@ import ProxyFrameOAuth from 'ringcentral-widgets/modules/ProxyFrameOAuth';
     DialerUI,
     Feedback,
     UserGuide,
+    ConferenceCall,    
   ]
 })
 export default class BasePhone extends RcModule {

@@ -4,8 +4,7 @@ import webpack from 'webpack';
 
 const base = {
   module: {
-    rules: [
-      {
+    rules: [{
         enforce: 'pre',
         test: /\.js$/,
         use: 'source-map-loader'
@@ -88,8 +87,8 @@ const config = [{
   ...base,
   resolve: {
     alias: {
-      'ringcentral-integration': path.resolve(__dirname, '../packages/ringcentral-integration'),
-      'ringcentral-widgets': path.resolve(__dirname, '../packages/ringcentral-widgets')
+      'ringcentral-integration': path.resolve(__dirname, '../../ringcentral-integration'),
+      'ringcentral-widgets': path.resolve(__dirname, '../../packages/ringcentral-widgets')
     },
   },
   entry: {
