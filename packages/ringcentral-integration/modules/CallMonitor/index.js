@@ -24,6 +24,16 @@ function matchWephoneSessionWithAcitveCall(sessions, callItem) {
     if (session.direction !== callItem.direction) {
       return false;
     }
+
+    /**
+     * Hack: for conference call, the `to` field is Conference,
+     * and the callItem's id won't change. According to `sip.js/src/session.js`
+     * the `InviteClientContext`'s id will always begin with callItem's id.
+     */
+    if (callItem.toName && callItem.toName.toLowerCase() === 'conference') {
+      return session.id.indexOf(callItem.id) === 0;
+    }
+
     if (
       session.direction === callDirections.inbound &&
       callItem.sipData.remoteUri.indexOf(session.from) === -1
