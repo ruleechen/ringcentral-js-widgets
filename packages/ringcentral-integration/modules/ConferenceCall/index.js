@@ -60,6 +60,10 @@ export default class ConferenceCall extends RcModule {
     this._reducer = getConferenceCallReducer(this.actionTypes);
   }
 
+  isConferenceSession(sessionId) {
+    return !!Object.values(this.conferences).find(c => c.session.id === sessionId);
+  }
+
   /**
    *
    * @param {string} id: conference id
