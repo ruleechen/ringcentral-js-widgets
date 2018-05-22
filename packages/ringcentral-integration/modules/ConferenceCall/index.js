@@ -78,51 +78,22 @@ export default class ConferenceCall extends RcModule {
       const rawResponse = await this._client.service.platform()
         .get(`/account/~/telephony/sessions/${id}`);
       const response = rawResponse.json();
-      const statusCode = rawResponse ? rawResponse._response.status : null;
-      let errorCode;
-
-      switch (statusCode) {
-        case 200:
-        {
-          const storedconference = this.state.conferences[response.id];
-          const conference = Object.assign({}, storedconference.conference);
-          conference.parties = response.parties;
-          const { session } = storedconference;
-          this.store.dispatch({
-            type: this.actionTypes.updateConferenceSucceeded,
-            conference,
-            session
-          });
-          return this.state.conferences[id];
-        }
-        case 403:
-        {
-          errorCode = conferenceErrors.conferenceForbidden;
-          break;
-        }
-        case 404:
-        {
-          errorCode = conferenceErrors.conferenceNotFound;
-          break;
-        }
-        case 500:
-        default:
-        {
-          errorCode = conferenceErrors.internalServerError;
-          break;
-        }
-      }
-      // TODO: alert
+      const storedconference = this.state.conferences[response.id];
+      const conference = Object.assign({}, storedconference.conference);
+      conference.parties = response.parties;
+      const { session } = storedconference;
       this.store.dispatch({
-        type: this.actionTypes.terminateConferenceFailed,
-        statusCode,
-        errorCode,
+        type: this.actionTypes.updateConferenceSucceeded,
+        conference,
+        session
       });
+      return this.state.conferences[id];
     } catch (e) {
       // TODO: alert
       this.store.dispatch({
         type: this.actionTypes.updateConferenceFailed,
         conference: this.state.conferences[id],
+        message: e.toString()
       });
     }
     return this.state.conferences[id];
@@ -140,46 +111,18 @@ export default class ConferenceCall extends RcModule {
     });
 
     try {
-      const rawResponse = await this._client.service.platform()
+      await this._client.service.platform()
         .delete(`/account/~/telephony/sessions/${id}`);
-      const statusCode = rawResponse ? rawResponse._response.status : null;
-      let errorCode;
-
-      switch (statusCode) {
-        case 204:
-        {
-          this.store.dispatch({
-            type: this.actionTypes.terminateConferenceSucceeded,
-            conference: this.state.conferences[id],
-          });
-          return this.state.conferences[id];
-        }
-        case 403:
-        {
-          errorCode = conferenceErrors.conferenceForbidden;
-          break;
-        }
-        case 404:
-        {
-          errorCode = conferenceErrors.conferenceNotFound;
-          break;
-        }
-        case 500:
-        default:
-        {
-          errorCode = conferenceErrors.internalServerError;
-          break;
-        }
-      }
       this.store.dispatch({
-        type: this.actionTypes.terminateConferenceFailed,
-        statusCode,
-        errorCode,
+        type: this.actionTypes.terminateConferenceSucceeded,
+        conference: this.state.conferences[id],
       });
+      return this.state.conferences[id];
     } catch (e) {
       // TODO:this._alert.warning
       this.store.dispatch({
         type: this.actionTypes.terminateConferenceFailed,
+        message: e.toString()
       });
     }
     return this.state.conferences[id];
@@ -206,58 +149,20 @@ export default class ConferenceCall extends RcModule {
     });
     const sessionData = partyCall.webphoneSession.data;
     try {
-      const rawResponse = await this._client.service.platform()
+      await this._client.service.platform()
         .post(`/account/~/telephony/sessions/${id}/parties/bring-in`, sessionData);
-      const statusCode = rawResponse ? rawResponse._response.status : null;
-      let errorCode;
-
-      switch (statusCode) {
-        case 201:
-        {
-          await this.updateConferenceStatus(id);
-          // let the contact match to do the matching of the parties.
-          this.store.dispatch({
-            type: this.actionTypes.bringInConferenceSucceeded,
-            conference: this.state.conferences[id],
-          });
-          return this.state.conferences[id];
-        }
-        case 400:
-        {
-          errorCode = conferenceErrors.conferenceBadRequest;
-          break;
-        }
-        case 403:
-        {
-          errorCode = conferenceErrors.conferenceForbidden;
-          break;
-        }
-        case 404:
-        {
-          errorCode = conferenceErrors.conferenceNotFound;
-          break;
-        }
-        case 409:
-        {
-          errorCode = conferenceErrors.conferenceConflict;
-          break;
-        }
-        case 500:
-        default:
-        {
-          errorCode = conferenceErrors.internalServerError;
-          break;
-        }
-      }
+      await this.updateConferenceStatus(id);
+      // let the contact match to do the matching of the parties.
       this.store.dispatch({
-        type: this.actionTypes.terminateConferenceFailed,
-        statusCode,
-        errorCode,
+        type: this.actionTypes.bringInConferenceSucceeded,
+        conference: this.state.conferences[id],
       });
+      return this.state.conferences[id];
     } catch (e) {
       // TODO:this._alert.warning
       this.store.dispatch({
-        type: this.actionTypes.terminateConferenceFailed,
+        type: this.actionTypes.bringInConferenceFailed,
+        message: e.toString()
       });
     }
     return this.state.conferences[id];
@@ -276,47 +181,19 @@ export default class ConferenceCall extends RcModule {
     });
 
     try {
-      const rawResponse = await this._client.service.platform()
+      await this._client.service.platform()
         .delete(`/account/~/telephony/sessions/${id}/parties/${partyId}`);
-      const statusCode = rawResponse ? rawResponse._response.status : null;
-      let errorCode;
-
-      switch (statusCode) {
-        case 204:
-        {
-          await this.updateConferenceStatus(id);
-          this.store.dispatch({
-            type: this.actionTypes.removeFromConferenceSucceeded,
-            conference: this.state.conferences[id],
-          });
-          return this.state.conferences[id];
-        }
-        case 403:
-        {
-          errorCode = conferenceErrors.conferenceForbidden;
-          break;
-        }
-        case 404:
-        {
-          errorCode = conferenceErrors.conferenceNotFound;
-          break;
-        }
-        case 500:
-        default:
-        {
-          errorCode = conferenceErrors.internalServerError;
-          break;
-        }
-      }
+      await this.updateConferenceStatus(id);
       this.store.dispatch({
-        type: this.actionTypes.removeFromConferenceFailed,
-        statusCode,
-        errorCode,
+        type: this.actionTypes.removeFromConferenceSucceeded,
+        conference: this.state.conferences[id],
       });
+      return this.state.conferences[id];
     } catch (e) {
       // TODO:this._alert.warning
       this.store.dispatch({
         type: this.actionTypes.removeFromConferenceFailed,
+        message: e.toString()
       });
     }
     return this.state.conferences[id];
@@ -353,77 +230,33 @@ export default class ConferenceCall extends RcModule {
       const rawResponse = await this._client.service.platform()
         .post('/account/~/telephony/conference', {});
       const response = rawResponse.json();
-      const statusCode = rawResponse ? rawResponse._response.status : null;
-      let errorCode = null;
+      const conference = response.session;
+      const phoneNumber = conference.voiceCallToken;
+      // whether to mutate the session to mark the conference?
+      const session = await this._call.call({
+        phoneNumber
+      }, true);
 
-      switch (statusCode) {
-        case 201:
-        {
-          const conference = response.session;
-          const phoneNumber = conference.voiceCallToken;
-          // whether to mutate the session to mark the conference?
-          const session = await this._call.call({
-            phoneNumber
-          }, true);
+      if (typeof session === 'object' &&
+          Object.prototype.toString.call(session.on).toLowerCase() === '[object function]') {
+        conference.session = session;
+        this._hookConference(conference);
 
-          if (typeof session === 'object' &&
-              Object.prototype.toString.call(session.on).toLowerCase() === '[object function]') {
-            conference.session = session;
-            this._hookConference(conference);
-
-            this.store.dispatch({
-              type: this.actionTypes.makeConferenceSucceeded,
-              conference,
-              session
-            });
-          } else {
-            this.store.dispatch({
-              type: this.actionTypes.makeConferenceFailed,
-            });
-          }
-          return conference;
-        }
-        case 403:
-        {
-          errorCode = conferenceErrors.conferenceForbidden;
-          break;
-        }
-        case 404:
-        {
-          errorCode = conferenceErrors.conferenceNotFound;
-          break;
-        }
-        case 409:
-        {
-          errorCode = conferenceErrors.conferenceNotFound;
-          break;
-        }
-        case 500:
-        {
-          errorCode = webphoneErrors.internalServerError;
-          break;
-        }
-        default:
-        {
-          errorCode = webphoneErrors.unknownError;
-          break;
-        }
+        this.store.dispatch({
+          type: this.actionTypes.makeConferenceSucceeded,
+          conference,
+          session
+        });
+      } else {
+        this.store.dispatch({
+          type: this.actionTypes.makeConferenceFailed,
+        });
       }
-      this._alert.danger({
-        message: errorCode,
-        allowDuplicates: false,
-        payload: {
-          statusCode
-        }
-      });
-      this.store.dispatch({
-        type: this.actionTypes.makeConferenceFailed,
-        errorCode,
-        statusCode,
-      });
+      return conference;
     } catch (e) {
       this.store.dispatch({
         type: this.actionTypes.makeConferenceFailed,
+        message: e.toString()
       });
       // TODO:this._alert.warning
     }
