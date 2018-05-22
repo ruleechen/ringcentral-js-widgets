@@ -18,7 +18,10 @@ import callingModes from '../CallingSettings/callingModes';
   deps: [
     'Auth',
     'Alert',
-    { dep: 'Call', optional: true },
+    {
+      dep: 'Call',
+      optional: true
+    },
     'CallingSettings',
     'Client',
     'RolesAndPermissions',
@@ -81,13 +84,14 @@ export default class ConferenceCall extends RcModule {
       const storedconference = this.state.conferences[response.id];
       const conference = Object.assign({}, storedconference.conference);
       conference.parties = response.parties;
-      const { session } = storedconference;
+      const {
+        session
+      } = storedconference;
       this.store.dispatch({
         type: this.actionTypes.updateConferenceSucceeded,
         conference,
         session
       });
-      return this.state.conferences[id];
     } catch (e) {
       // TODO: alert
       this.store.dispatch({
@@ -95,8 +99,12 @@ export default class ConferenceCall extends RcModule {
         conference: this.state.conferences[id],
         message: e.toString()
       });
+      // need to propagate to out side try...catch block
+      throw e;
+    } finally {
+      // eslint-disable-next-line no-unsafe-finally
+      return this.state.conferences[id];
     }
-    return this.state.conferences[id];
   }
 
   /**
@@ -117,15 +125,16 @@ export default class ConferenceCall extends RcModule {
         type: this.actionTypes.terminateConferenceSucceeded,
         conference: this.state.conferences[id],
       });
-      return this.state.conferences[id];
     } catch (e) {
       // TODO:this._alert.warning
       this.store.dispatch({
         type: this.actionTypes.terminateConferenceFailed,
         message: e.toString()
       });
+    } finally {
+      // eslint-disable-next-line no-unsafe-finally
+      return this.state.conferences[id];
     }
-    return this.state.conferences[id];
   }
 
   /**
@@ -152,20 +161,22 @@ export default class ConferenceCall extends RcModule {
       await this._client.service.platform()
         .post(`/account/~/telephony/sessions/${id}/parties/bring-in`, sessionData);
       await this.updateConferenceStatus(id);
+
       // let the contact match to do the matching of the parties.
       this.store.dispatch({
         type: this.actionTypes.bringInConferenceSucceeded,
         conference: this.state.conferences[id],
       });
-      return this.state.conferences[id];
     } catch (e) {
       // TODO:this._alert.warning
       this.store.dispatch({
         type: this.actionTypes.bringInConferenceFailed,
         message: e.toString()
       });
+    } finally {
+      // eslint-disable-next-line no-unsafe-finally
+      return this.state.conferences[id];
     }
-    return this.state.conferences[id];
   }
 
   /**
@@ -188,15 +199,16 @@ export default class ConferenceCall extends RcModule {
         type: this.actionTypes.removeFromConferenceSucceeded,
         conference: this.state.conferences[id],
       });
-      return this.state.conferences[id];
     } catch (e) {
       // TODO:this._alert.warning
       this.store.dispatch({
         type: this.actionTypes.removeFromConferenceFailed,
         message: e.toString()
       });
+    } finally {
+      // eslint-disable-next-line no-unsafe-finally
+      return this.state.conferences[id];
     }
-    return this.state.conferences[id];
   }
 
   /**
@@ -238,7 +250,7 @@ export default class ConferenceCall extends RcModule {
       }, true);
 
       if (typeof session === 'object' &&
-          Object.prototype.toString.call(session.on).toLowerCase() === '[object function]') {
+        Object.prototype.toString.call(session.on).toLowerCase() === '[object function]') {
         conference.session = session;
         this._hookConference(conference);
 
@@ -301,19 +313,18 @@ export default class ConferenceCall extends RcModule {
   _shouldReset() {
     return (
       (
-        (!this._auth.loggedIn || !this._auth.ready) ||
-        !this._alert.ready ||
-        !this._callingSettings.ready ||
-        !this._call.ready ||
-        !this._rolesAndPermissions.ready
+        (!this._auth.loggedIn || !this._auth.ready)
+        || !this._alert.ready
+        || !this._callingSettings.ready
+        || !this._call.ready
+        || !this._rolesAndPermissions.ready
       ) &&
       this.ready
     );
   }
 
   _checkPermission() {
-    if (!this._rolesAndPermissions.callingEnabled ||
-      !this._rolesAndPermissions.webphoneEnabled) {
+    if (!this._rolesAndPermissions.callingEnabled || !this._rolesAndPermissions.webphoneEnabled) {
       this._alert.danger({
         message: permissionsMessages.insufficientPrivilege,
         ttl: 0,
