@@ -12,6 +12,7 @@ import styles from './styles.scss';
 
 function CallInfo(props) {
   let avatar;
+  // todo: conference avatars
   if (props.avatarUrl) {
     avatar = (<img src={props.avatarUrl} alt="avatar" />);
   } else {
@@ -94,6 +95,7 @@ function ActiveCallPanel({
   isOnMute,
   isOnHold,
   isOnConference,
+  conferenceData,
   recordStatus,
   onMute,
   onUnmute,
@@ -189,6 +191,7 @@ ActiveCallPanel.propTypes = {
   isOnMute: PropTypes.bool,
   isOnHold: PropTypes.bool,
   isOnConference: PropTypes.bool,
+  conferenceData: PropTypes.object,
   recordStatus: PropTypes.string.isRequired,
   onMute: PropTypes.func.isRequired,
   onUnmute: PropTypes.func.isRequired,
@@ -224,6 +227,7 @@ ActiveCallPanel.defaultProps = {
   isOnMute: false,
   isOnHold: false,
   isOnConference: false,
+  conferenceData: null,
   phoneNumber: null,
   children: undefined,
   avatarUrl: null,
