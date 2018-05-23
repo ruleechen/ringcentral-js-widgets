@@ -64,7 +64,11 @@ export default class ConferenceCall extends RcModule {
   }
 
   isConferenceSession(sessionId) {
-    return !!Object.values(this.conferences).find(c => c.session.id === sessionId);
+    return !!this.findConferenceWithSession(sessionId);
+  }
+
+  findConferenceWithSession(sessionId) {
+    return Object.values(this.conferences).find(c => c.session.id === sessionId);
   }
 
   /**
