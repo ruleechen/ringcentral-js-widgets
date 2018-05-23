@@ -10,6 +10,8 @@ import webphoneErrors from '../Webphone/webphoneErrors';
 import ensureExist from '../../lib/ensureExist';
 import callingModes from '../CallingSettings/callingModes';
 
+const DEFAULT_TTL = 2000;
+
 /**
  * @class
  * @description ConferenceCall managing module
@@ -61,10 +63,16 @@ export default class ConferenceCall extends RcModule {
     this._rolesAndPermissions = this::ensureExist(rolesAndPermissions, 'rolesAndPermissions');
     // we need the constructed actions
     this._reducer = getConferenceCallReducer(this.actionTypes);
+    this._ttl = DEFAULT_TTL;
+    this._timers = {};
   }
 
   isConferenceSession(sessionId) {
-    return !!Object.values(this.conferences).find(c => c.session.id === sessionId);
+    return !!this.findConferenceWithSession(sessionId);
+  }
+
+  findConferenceWithSession(sessionId) {
+    return Object.values(this.conferences).find(c => c.session.id === sessionId);
   }
 
   /**
@@ -335,10 +343,37 @@ export default class ConferenceCall extends RcModule {
   }
 
   _hookConference(conference) {
-    ['terminated', 'failed', 'rejected'].map(evt => conference.session.on(evt, () => this.store.dispatch({
-      type: this.actionTypes.terminateConferenceSucceeded,
-      conference,
-    })));
+    ['accepted'].forEach(
+      evt => conference.session.on(
+        evt,
+        () => this.startPollingConferenceStatus(conference.id)
+      )
+    );
+    ['terminated', 'failed', 'rejected'].forEach(
+      evt => conference.session.on(evt, () => {
+        this.store.dispatch({
+          type: this.actionTypes.terminateConferenceSucceeded,
+          conference,
+        });
+        this.stopPollingConferenceStatus(conference.id);
+      })
+    );
+  }
+
+  startPollingConferenceStatus(id) {
+    this._timers[id] = setTimeout(
+      async () => {
+        await this.updateConferenceStatus(id);
+        this.stopPollingConferenceStatus(id);
+        if (this.conferences[id]) {
+          this.startPollingConferenceStatus(id);
+        }
+      },
+      this._ttl);
+  }
+
+  stopPollingConferenceStatus(id) {
+    clearTimeout(this._timers[id]);
   }
 
   get status() {

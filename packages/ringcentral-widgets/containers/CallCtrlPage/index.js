@@ -132,6 +132,7 @@ class CallCtrlPage extends Component {
     return (
       <CallCtrlPanel
         isOnConference={this.props.isOnConference}
+        conferenceData={this.props.conferenceData}
         backButtonLabel={backButtonLabel}
         currentLocale={this.props.currentLocale}
         formatPhone={this.props.formatPhone}
@@ -196,6 +197,7 @@ CallCtrlPage.propTypes = {
     contactMatch: PropTypes.object,
   }).isRequired,
   isOnConference: PropTypes.bool.isRequired,
+  conferenceData: PropTypes.object,
   currentLocale: PropTypes.string.isRequired,
   onMute: PropTypes.func.isRequired,
   onUnmute: PropTypes.func.isRequired,
@@ -237,6 +239,7 @@ CallCtrlPage.defaultProps = {
   phoneTypeRenderer: undefined,
   recipientsContactInfoRenderer: undefined,
   recipientsContactPhoneRenderer: undefined,
+  conferenceData: null,
 };
 
 function mapToProps(_, {
@@ -258,6 +261,11 @@ function mapToProps(_, {
   const toMatches = (contactMapping && contactMapping[currentSession.to]) || [];
   const nameMatches =
     currentSession.direction === callDirections.outbound ? toMatches : fromMatches;
+  const isOnConference = conferenceCall.isConferenceSession(currentSession.id);
+  const conferenceData = isOnConference
+    ? conferenceCall.findConferenceWithSession(currentSession.id)
+    : null;
+
   return {
     brand: brand.fullName,
     nameMatches,
@@ -268,7 +276,8 @@ function mapToProps(_, {
     flipNumbers: forwardingNumber.flipNumbers,
     calls: callMonitor.calls,
     searchContactList: contactSearch.sortedResult,
-    isOnConference: conferenceCall.isConferenceSession(currentSession.id)
+    isOnConference,
+    conferenceData,
   };
 }
 
@@ -330,6 +339,7 @@ CallCtrlContainer.propTypes = {
   showContactDisplayPlaceholder: PropTypes.bool,
   sourceIcons: PropTypes.object,
   isOnConference: PropTypes.bool,
+  conferenceData: PropTypes.object,
 };
 
 CallCtrlContainer.defaultProps = {
@@ -338,6 +348,7 @@ CallCtrlContainer.defaultProps = {
   children: undefined,
   sourceIcons: undefined,
   isOnConference: false,
+  conferenceData: null,
 };
 
 export default CallCtrlContainer;

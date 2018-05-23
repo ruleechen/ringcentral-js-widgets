@@ -87,6 +87,7 @@ class CallCtrlPanel extends Component {
     }
     return (
       <ActiveCallPanel
+        conferenceData={this.props.conferenceData}
         isOnConference={this.props.isOnConference}
         backButtonLabel={this.props.backButtonLabel}
         currentLocale={this.props.currentLocale}
@@ -138,6 +139,7 @@ CallCtrlPanel.propTypes = {
   fallBackName: PropTypes.string.isRequired,
   currentLocale: PropTypes.string.isRequired,
   startTime: PropTypes.number,
+  conferenceData: PropTypes.object,
   isOnMute: PropTypes.bool,
   isOnHold: PropTypes.bool,
   isOnFlip: PropTypes.bool,
@@ -179,6 +181,7 @@ CallCtrlPanel.propTypes = {
 
 CallCtrlPanel.defaultProps = {
   startTime: null,
+  conferenceData: null,
   isOnConference: false,
   isOnMute: false,
   isOnHold: false,

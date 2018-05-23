@@ -31,6 +31,7 @@ export default function ActiveCallPad(props) {
   const isRecordButtonActive = props.recordStatus === recordStatus.recording;
   const isRecordDisabled = props.recordStatus === recordStatus.pending;
   const { isOnConference } = props;
+  const time = +new Date();
   const btnClassName = isOnConference ? styles.conferenceCallButton : styles.callButton;
   const muteButton = props.isOnMute ?
     (
@@ -139,7 +140,7 @@ export default function ActiveCallPad(props) {
     <div className={classnames(styles.root, props.className)}>
       <div className={styles.callCtrlButtonGroup}>
         <div className={styles.buttonRow}>
-          {buttons}
+          {buttons.map((c, idx) => React.cloneElement(c, { key: `${idx}_${time}` }))}
         </div>
       </div>
       <div className={classnames(styles.buttonRow, styles.stopButtonGroup)}>
