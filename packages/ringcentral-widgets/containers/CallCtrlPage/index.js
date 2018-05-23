@@ -17,26 +17,28 @@ class CallCtrlPage extends Component {
       avatarUrl: null,
     };
 
-    this.onSelectMatcherName = (option) => {
-      const nameMatches = this.props.nameMatches || [];
-      let selectedMatcherIndex = nameMatches.findIndex(
-        match => match.id === option.id
-      );
-      if (selectedMatcherIndex < 0) {
-        selectedMatcherIndex = 0;
-      }
-      this.setState({
-        selectedMatcherIndex,
-        avatarUrl: null,
-      });
-      const contact = nameMatches[selectedMatcherIndex];
-      if (contact) {
-        this.props.updateSessionMatchedContact(this.props.session.id, contact);
-        this.props.getAvatarUrl(contact).then((avatarUrl) => {
-          this.setState({ avatarUrl });
+    this.onSelectMatcherName = this.props.isOnConference
+      ? (option) => {
+        const nameMatches = this.props.nameMatches || [];
+        let selectedMatcherIndex = nameMatches.findIndex(
+          match => match.id === option.id
+        );
+        if (selectedMatcherIndex < 0) {
+          selectedMatcherIndex = 0;
+        }
+        this.setState({
+          selectedMatcherIndex,
+          avatarUrl: null,
         });
+        const contact = nameMatches[selectedMatcherIndex];
+        if (contact) {
+          this.props.updateSessionMatchedContact(this.props.session.id, contact);
+          this.props.getAvatarUrl(contact).then((avatarUrl) => {
+            this.setState({ avatarUrl });
+          });
+        }
       }
-    };
+      : () => {};
 
     this.onMute = () =>
       this.props.onMute(this.props.session.id);
@@ -115,13 +117,21 @@ class CallCtrlPage extends Component {
     if (!fallbackUserName) {
       fallbackUserName = i18n.getString('unknown', this.props.currentLocale);
     }
-    // The label of back button is customizable
-    // the property `backButtonLabel` should be internationalizational
-    const backButtonLabel = this.props.backButtonLabel
-      ? this.props.backButtonLabel
-      : i18n.getString('activeCalls', this.props.currentLocale);
+
+    let backButtonLabel;
+    if (this.props.isOnConference) {
+      backButtonLabel = i18n.getString('conferenceCall', this.props.currentLocale);
+    } else {
+      // The label of back button is customizable
+      // the property `backButtonLabel` should be internationalizational
+      backButtonLabel = this.props.backButtonLabel
+        ? this.props.backButtonLabel
+        : i18n.getString('activeCalls', this.props.currentLocale);
+    }
+
     return (
       <CallCtrlPanel
+        isOnConference={this.props.isOnConference}
         backButtonLabel={backButtonLabel}
         currentLocale={this.props.currentLocale}
         formatPhone={this.props.formatPhone}
@@ -185,6 +195,7 @@ CallCtrlPage.propTypes = {
     from: PropTypes.string,
     contactMatch: PropTypes.object,
   }).isRequired,
+  isOnConference: PropTypes.bool.isRequired,
   currentLocale: PropTypes.string.isRequired,
   onMute: PropTypes.func.isRequired,
   onUnmute: PropTypes.func.isRequired,
@@ -238,6 +249,7 @@ function mapToProps(_, {
     forwardingNumber,
     callMonitor,
     contactSearch,
+    conferenceCall,
   },
 }) {
   const currentSession = webphone.activeSession || {};
@@ -256,6 +268,7 @@ function mapToProps(_, {
     flipNumbers: forwardingNumber.flipNumbers,
     calls: callMonitor.calls,
     searchContactList: contactSearch.sortedResult,
+    isOnConference: conferenceCall.isConferenceSession(currentSession.id)
   };
 }
 
@@ -316,6 +329,7 @@ CallCtrlContainer.propTypes = {
   children: PropTypes.node,
   showContactDisplayPlaceholder: PropTypes.bool,
   sourceIcons: PropTypes.object,
+  isOnConference: PropTypes.bool,
 };
 
 CallCtrlContainer.defaultProps = {
@@ -323,6 +337,7 @@ CallCtrlContainer.defaultProps = {
   showContactDisplayPlaceholder: false,
   children: undefined,
   sourceIcons: undefined,
+  isOnConference: false,
 };
 
 export default CallCtrlContainer;
