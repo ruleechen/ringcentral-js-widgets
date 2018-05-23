@@ -93,6 +93,7 @@ function ActiveCallPanel({
   avatarUrl,
   isOnMute,
   isOnHold,
+  isOnConference,
   recordStatus,
   onMute,
   onUnmute,
@@ -119,7 +120,7 @@ function ActiveCallPanel({
         <DurationCounter startTime={startTime} offset={startTimeOffset} />
       </span>
     ) : null;
-  const backHeader = calls.length > 1 ? (
+  const backHeader = (calls.length > 1 || isOnConference) ? (
     <BackHeader
       onBackClick={onBackButtonClick}
       backButton={(
@@ -156,6 +157,7 @@ function ActiveCallPanel({
           currentLocale={currentLocale}
           isOnMute={isOnMute}
           isOnHold={isOnHold}
+          isOnConference={isOnConference}
           recordStatus={recordStatus}
           onMute={onMute}
           onUnmute={onUnmute}
@@ -186,6 +188,7 @@ ActiveCallPanel.propTypes = {
   startTimeOffset: PropTypes.number,
   isOnMute: PropTypes.bool,
   isOnHold: PropTypes.bool,
+  isOnConference: PropTypes.bool,
   recordStatus: PropTypes.string.isRequired,
   onMute: PropTypes.func.isRequired,
   onUnmute: PropTypes.func.isRequired,
@@ -220,6 +223,7 @@ ActiveCallPanel.defaultProps = {
   startTimeOffset: 0,
   isOnMute: false,
   isOnHold: false,
+  isOnConference: false,
   phoneNumber: null,
   children: undefined,
   avatarUrl: null,

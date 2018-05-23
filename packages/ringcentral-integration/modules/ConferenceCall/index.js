@@ -335,10 +335,10 @@ export default class ConferenceCall extends RcModule {
   }
 
   _hookConference(conference) {
-    conference.session.on('terminated', () => this.store.dispatch({
+    ['terminated', 'failed', 'rejected'].map(evt => conference.session.on(evt, () => this.store.dispatch({
       type: this.actionTypes.terminateConferenceSucceeded,
       conference,
-    }));
+    })));
   }
 
   get status() {

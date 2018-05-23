@@ -211,12 +211,15 @@ export default class Call extends RcModule {
           message: callErrors.noToNumber,
         });
       } else {
-        this.store.dispatch({
-          type: this.actionTypes.connect,
-          phoneNumber,
-          recipient,
-          callSettingMode: this._callSettingMode // for Track
-        });
+        // don't record the conference token as last call
+        if (!isConference) {
+          this.store.dispatch({
+            type: this.actionTypes.connect,
+            phoneNumber,
+            recipient,
+            callSettingMode: this._callSettingMode, // for Track
+          });
+        }
         try {
           const validatedNumbers = await this._getValidatedNumbers({
             toNumber,
