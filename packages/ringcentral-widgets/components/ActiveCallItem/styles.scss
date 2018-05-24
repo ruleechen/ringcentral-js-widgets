@@ -93,22 +93,34 @@
   position: absolute;
   right: 20px;
   bottom: 15px;
+  .webphoneButton + .webphoneButton{
+    margin-left: 10px;
+  }
 }
 
-.rejectButton {
+.mergeButton,
+.rejectButton,
+.answerButton {
   width: 26px;
-  circle {
-    fill: #ff4646;
-  }
   g,
   path {
     fill: #ffffff;
   }
 }
 
+.mergeButton {
+  circle {
+    fill: #ff8800;
+  }
+}
+
+.rejectButton {
+  circle {
+    fill: #ff4646;
+  }
+}
+
 .answerButton {
-  composes: rejectButton;
-  margin-left: 10px;
   circle {
     fill: $call-btn-color;
   }

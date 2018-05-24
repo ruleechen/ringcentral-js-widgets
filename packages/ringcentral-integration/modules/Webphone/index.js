@@ -116,7 +116,7 @@ export default class Webphone extends RcModule {
     this._tabManager = tabManager;
     this._onCallEndFunc = onCallEnd;
     this._onCallRingFunc = onCallRing;
-    this._onBeforeCallStartFunc = onCallStart;
+    this._onCallStartFunc = onCallStart;
     this._webphone = null;
     this._remoteVideo = null;
     this._localVideo = null;
@@ -1192,8 +1192,8 @@ export default class Webphone extends RcModule {
     if (this._contactMatcher) {
       this._contactMatcher.triggerMatch();
     }
-    if (typeof this._onBeforeCallStartFunc === 'function') {
-      this._onBeforeCallStartFunc(normalizedSession, this.activeSession);
+    if (typeof this._onCallStartFunc === 'function') {
+      this._onCallStartFunc(normalizedSession, this.activeSession);
     }
   }
 

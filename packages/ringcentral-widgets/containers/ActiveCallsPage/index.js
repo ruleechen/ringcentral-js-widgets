@@ -13,6 +13,7 @@ function mapToProps(_, {
     regionSettings,
     rolesAndPermissions,
     conferenceCall,
+    callingSettings: { callingMode }
   },
   showContactDisplayPlaceholder = false,
 }) {
@@ -21,6 +22,7 @@ function mapToProps(_, {
     // only one conference can exist for now
     conference: conferenceList.length ? conferenceList[0] : null,
     currentLocale: locale.currentLocale,
+    callingMode,
     activeRingCalls: callMonitor.activeRingCalls,
     activeOnHoldCalls: callMonitor.activeOnHoldCalls,
     activeCurrentCalls: callMonitor.activeCurrentCalls,
@@ -62,16 +64,17 @@ function mapToFunctions(_, {
   onViewContact,
   showViewContact = true,
 }) {
-  const onMergeToConference = async (sessionIds = []) => {
+  const mergeToConference = async (sessionIds = []) => {
     const conference = Object.values(conferenceCall.conferences)[0];
     if (conference) {
       await Promise.all(
         sessionIds.map(
-          sessionId => conferenceCall.bringInToConference(conference.id, sessionId))
+          sessionId => conferenceCall.bringInToConference(conference.id, sessionId)
+        )
       );
     } else {
       await conferenceCall.makeConference();
-      await onMergeToConference(sessionIds);
+      await mergeToConference(sessionIds);
     }
   };
 
@@ -141,7 +144,7 @@ function mapToFunctions(_, {
      * else make one and merge into it;
      * @param {[string]} sessionIds
      */
-    onMergeToConference,
+    mergeToConference,
   };
 }
 

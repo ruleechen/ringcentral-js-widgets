@@ -6,7 +6,7 @@ import getConferenceCallReducer from './getConferenceCallReducer';
 import proxify from '../../lib/proxy/proxify';
 import permissionsMessages from '../RolesAndPermissions/permissionsMessages';
 import conferenceErrors from './conferenceCallErrors';
-import webphoneErrors from '../Webphone/webphoneErrors';
+// import webphoneErrors from '../Webphone/webphoneErrors';
 import ensureExist from '../../lib/ensureExist';
 import callingModes from '../CallingSettings/callingModes';
 
