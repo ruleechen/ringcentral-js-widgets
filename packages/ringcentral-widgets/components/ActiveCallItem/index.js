@@ -15,6 +15,7 @@ import EndIcon from '../../assets/images/End.svg';
 import AnswerIcon from '../../assets/images/Answer.svg';
 import VoicemailIcon from '../../assets/images/Voicemail.svg';
 import ConferenceCallIcon from '../../assets/images/ConferenceCallIcon.svg';
+import MergeIntoConferenceIcon from '../../assets/images/MergeIntoConferenceIcon.svg';
 
 import styles from './styles.scss';
 
@@ -71,6 +72,8 @@ function WebphoneButtons({
   webphoneReject,
   webphoneHangup,
   webphoneResume,
+  showMergeButton,
+  onClickMergeBtn
 }) {
   if (!session || !webphoneAnswer || !webphoneHangup) {
     return null;
@@ -78,8 +81,10 @@ function WebphoneButtons({
   let hangupFunc = webphoneHangup;
   let resumeFunc = webphoneResume;
   let endIcon = EndIcon;
+  const mergeIcon = MergeIntoConferenceIcon;
   let rejectTitle = i18n.getString('hangup');
   const acceptTitle = i18n.getString('accept');
+  const mergeTitle = i18n.getString('addToConference');
   if (
     session.direction === callDirections.inbound &&
     session.callStatus === sessionStatus.connecting
@@ -91,7 +96,25 @@ function WebphoneButtons({
   }
   return (
     <div className={styles.webphoneButtons}>
-      <span title={rejectTitle}>
+      {
+        showMergeButton
+        ?
+          <span title={mergeTitle} className={styles.webphoneButton}>
+            <CircleButton
+              className={styles.mergeButton}
+              onClick={(e) => {
+                e.stopPropagation();
+                onClickMergeBtn();
+              }}
+              iconWidth={260}
+              iconX={120}
+              icon={mergeIcon}
+              showBorder={false}
+            />
+          </span>
+        : null
+      }
+      <span title={rejectTitle} className={styles.webphoneButton}>
         <CircleButton
           className={styles.rejectButton}
           onClick={(e) => {
@@ -104,7 +127,7 @@ function WebphoneButtons({
           showBorder={false}
         />
       </span>
-      <span title={acceptTitle}>
+      <span title={acceptTitle} className={styles.webphoneButton}>
         <CircleButton
           className={styles.answerButton}
           onClick={(e) => {
@@ -125,6 +148,8 @@ WebphoneButtons.propTypes = {
   webphoneReject: PropTypes.func,
   webphoneHangup: PropTypes.func,
   webphoneResume: PropTypes.func,
+  onClickMergeBtn: PropTypes.func,
+  showMergeButton: PropTypes.bool,
 };
 
 WebphoneButtons.defaultProps = {
@@ -133,6 +158,8 @@ WebphoneButtons.defaultProps = {
   webphoneReject: undefined,
   webphoneHangup: undefined,
   webphoneResume: undefined,
+  showMergeButton: false,
+  onClickMergeBtn: undefined,
 };
 
 export default class ActiveCallItem extends Component {
@@ -359,7 +386,6 @@ export default class ActiveCallItem extends Component {
         activityMatches,
         webphoneSession,
       },
-      conference,
       isOnConferenceCall,
       disableLinks,
       currentLocale,
@@ -382,6 +408,8 @@ export default class ActiveCallItem extends Component {
       renderContactName,
       renderExtraButton,
       contactDisplayStyle,
+      showMergeButton,
+      onClickMergeBtn
     } = this.props;
     const phoneNumber = this.getPhoneNumber();
     const parsedInfo = parseNumber(phoneNumber);
@@ -405,6 +433,7 @@ export default class ActiveCallItem extends Component {
     const extraButton = typeof renderExtraButton === 'function' ?
       renderExtraButton(this.props.call) :
       undefined;
+
     return (
       <div className={styles.root} onClick={this.toggleExtended}>
         <div className={styles.callInfo}>
@@ -446,11 +475,13 @@ export default class ActiveCallItem extends Component {
           />
           {isOnConferenceCall ? null : callDetail}
           <WebphoneButtons
+            showMergeButton={showMergeButton}
             session={webphoneSession}
             webphoneAnswer={webphoneAnswer}
             webphoneReject={this.webphoneToVoicemail}
             webphoneHangup={webphoneHangup}
             webphoneResume={webphoneResume}
+            onClickMergeBtn={onClickMergeBtn}
           />
           {extraButton}
         </div>
@@ -507,16 +538,6 @@ ActiveCallItem.propTypes = {
     }),
     webphoneSession: PropTypes.object,
   }).isRequired,
-  conference: PropTypes.shape({
-    conference: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      creationTime: PropTypes.string.isRequired,
-      parties: PropTypes.array.isRequired,
-    }),
-    session: PropTypes.shape({
-      id: PropTypes.string.isRequired
-    })
-  }),
   isOnConferenceCall: PropTypes.bool,
   areaCode: PropTypes.string.isRequired,
   countryCode: PropTypes.string.isRequired,
@@ -534,12 +555,13 @@ ActiveCallItem.propTypes = {
   autoLog: PropTypes.bool,
   brand: PropTypes.string,
   showContactDisplayPlaceholder: PropTypes.bool,
+  showMergeButton: PropTypes.bool,
   formatPhone: PropTypes.func.isRequired,
   onClickToSms: PropTypes.func,
   onCreateContact: PropTypes.func,
   onLogCall: PropTypes.func,
   onViewContact: PropTypes.func,
-  onMergeToConference: PropTypes.func,
+  onClickMergeBtn: PropTypes.func,
   sourceIcons: PropTypes.object,
   renderContactName: PropTypes.func,
   renderExtraButton: PropTypes.func,
@@ -551,7 +573,7 @@ ActiveCallItem.defaultProps = {
   onClickToSms: undefined,
   onViewContact: undefined,
   onCreateContact: undefined,
-  onMergeToConference: undefined,
+  onClickMergeBtn: undefined,
   isLogging: false,
   outboundSmsPermission: false,
   internalSmsPermission: false,
@@ -565,10 +587,10 @@ ActiveCallItem.defaultProps = {
   autoLog: false,
   brand: 'RingCentral',
   showContactDisplayPlaceholder: true,
+  showMergeButton: false,
   sourceIcons: undefined,
   renderContactName: undefined,
   renderExtraButton: undefined,
   contactDisplayStyle: undefined,
-  conference: null,
   isOnConferenceCall: false,
 };

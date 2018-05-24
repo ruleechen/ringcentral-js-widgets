@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import callDirections from 'ringcentral-integration/enums/callDirections';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import SpinnerOverlay from '../SpinnerOverlay';
@@ -10,6 +11,7 @@ import i18n from './i18n';
 function ActiveCallList({
   calls,
   conference,
+  currentCall,
   isCurrentCallList,
   className,
   currentLocale,
@@ -41,46 +43,66 @@ function ActiveCallList({
   if (calls.length === 0) {
     return null;
   }
+  const outboundCalls = calls.filter(call => call.direction === callDirections.outbound);
   return (
     <div className={classnames(styles.list, className)}>
       <div className={styles.listTitle}>
         {title}
       </div>
       {
-        calls.map(call => (
-          <ActiveCallItem
-            call={call}
-            key={call.id}
-            isCurrentCallList={isCurrentCallList}
-            conference={conference}
-            isOnConferenceCall={call.webphoneSession
-              ? isConferenceCall(call.webphoneSession.id)
-              : false}
-            currentLocale={currentLocale}
-            areaCode={areaCode}
-            countryCode={countryCode}
-            brand={brand}
-            showContactDisplayPlaceholder={showContactDisplayPlaceholder}
-            formatPhone={formatPhone}
-            onClickToSms={onClickToSms}
-            internalSmsPermission={internalSmsPermission}
-            outboundSmsPermission={outboundSmsPermission}
-            isLoggedContact={isLoggedContact}
-            onLogCall={onLogCall}
-            onViewContact={onViewContact}
-            onCreateContact={onCreateContact}
-            onMergeToConference={onMergeToConference}
-            loggingMap={loggingMap}
-            webphoneAnswer={webphoneAnswer}
-            webphoneReject={webphoneReject}
-            webphoneHangup={webphoneHangup}
-            webphoneResume={webphoneResume}
-            webphoneToVoicemail={webphoneToVoicemail}
-            enableContactFallback={enableContactFallback}
-            autoLog={autoLog}
-            sourceIcons={sourceIcons}
+        calls.map((call) => {
+          const isOnConferenceCall = call.webphoneSession
+          ? isConferenceCall(call.webphoneSession.id)
+          : false;
+
+          let showMergeButton;
+          let onClickMergeBtn = () => {};
+          if (call.direction === callDirections.inbound || isCurrentCallList) {
+            showMergeButton = false;
+          } else if (outboundCalls.length > 2) {
+            showMergeButton = true;
+            if (isOnConferenceCall) {
+              onClickMergeBtn = () => {};// todo
+            } else {
+              onClickMergeBtn = () => {};// todo
+            }
+          } else {
+            showMergeButton = false;
+          }
+
+          return (
+            <ActiveCallItem
+              call={call}
+              key={call.id}
+              showMergeButton={showMergeButton}
+              conference={conference}
+              isOnConferenceCall={isOnConferenceCall}
+              currentLocale={currentLocale}
+              areaCode={areaCode}
+              countryCode={countryCode}
+              brand={brand}
+              showContactDisplayPlaceholder={showContactDisplayPlaceholder}
+              formatPhone={formatPhone}
+              onClickToSms={onClickToSms}
+              internalSmsPermission={internalSmsPermission}
+              outboundSmsPermission={outboundSmsPermission}
+              isLoggedContact={isLoggedContact}
+              onLogCall={onLogCall}
+              onViewContact={onViewContact}
+              onCreateContact={onCreateContact}
+              onClickMergeBtn={onClickMergeBtn}
+              loggingMap={loggingMap}
+              webphoneAnswer={webphoneAnswer}
+              webphoneReject={webphoneReject}
+              webphoneHangup={webphoneHangup}
+              webphoneResume={webphoneResume}
+              webphoneToVoicemail={webphoneToVoicemail}
+              enableContactFallback={enableContactFallback}
+              autoLog={autoLog}
+              sourceIcons={sourceIcons}
           />
-        ))
+          );
+        })
       }
     </div>
   );
@@ -104,6 +126,7 @@ ActiveCallList.propTypes = {
   isLoggedContact: PropTypes.func,
   isConferenceCall: PropTypes.func.isRequired,
   isCurrentCallList: PropTypes.bool,
+  currentCall: PropTypes.object,
   onLogCall: PropTypes.func,
   loggingMap: PropTypes.object,
   webphoneAnswer: PropTypes.func,
@@ -111,6 +134,7 @@ ActiveCallList.propTypes = {
   webphoneHangup: PropTypes.func,
   webphoneResume: PropTypes.func,
   webphoneToVoicemail: PropTypes.func,
+  onMergeToConference: PropTypes.func.isRequired,
   enableContactFallback: PropTypes.bool,
   autoLog: PropTypes.bool,
   sourceIcons: PropTypes.object,
@@ -148,6 +172,7 @@ ActiveCallList.defaultProps = {
   sourceIcons: undefined,
   isCurrentCallList: false,
   conference: null,
+  currentCall: null,
 };
 
 export default class ActiveCallsPanel extends Component {
@@ -206,6 +231,7 @@ export default class ActiveCallsPanel extends Component {
       conference,
       isConferenceCall,
       onMergeToConference,
+      activeCurrentCalls,
     } = this.props;
 
     return (
@@ -238,6 +264,7 @@ export default class ActiveCallsPanel extends Component {
         webphoneToVoicemail={webphoneToVoicemail}
         enableContactFallback={enableContactFallback}
         sourceIcons={sourceIcons}
+        currentCall={activeCurrentCalls[0]}
       />
     );
   }
