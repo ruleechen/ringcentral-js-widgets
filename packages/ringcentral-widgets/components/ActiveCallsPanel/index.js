@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
+import callingModes from 'ringcentral-integration/modules/CallingSettings/callingModes';
 import callDirections from 'ringcentral-integration/enums/callDirections';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import SpinnerOverlay from '../SpinnerOverlay';
 import ActiveCallItem from '../ActiveCallItem';
-
 import styles from './styles.scss';
 import i18n from './i18n';
 
@@ -27,7 +27,7 @@ function ActiveCallList({
   internalSmsPermission,
   isLoggedContact,
   isConferenceCall,
-  onMergeToConference,
+  mergeToConference,
   onLogCall,
   autoLog,
   loggingMap,
@@ -39,6 +39,7 @@ function ActiveCallList({
   enableContactFallback,
   title,
   sourceIcons,
+  isOnWebRTC,
 }) {
   if (calls.length === 0) {
     return null;
@@ -57,14 +58,26 @@ function ActiveCallList({
 
           let showMergeButton;
           let onClickMergeBtn = () => {};
-          if (call.direction === callDirections.inbound || isCurrentCallList) {
+          if (
+            call.direction === callDirections.inbound
+            || isCurrentCallList
+            || !isOnWebRTC
+          ) {
             showMergeButton = false;
-          } else if (outboundCalls.length > 2) {
-            showMergeButton = true;
+          } else if (outboundCalls.length > 1) {
             if (isOnConferenceCall) {
-              onClickMergeBtn = () => {};// todo
+              showMergeButton = true;
+
+              onClickMergeBtn = () => {
+                mergeToConference([currentCall.webphoneSession.id]);
+              };// todo
             } else {
-              onClickMergeBtn = () => {};// todo
+              onClickMergeBtn = () => {
+                mergeToConference([
+                  call.webphoneSession.id,
+                  currentCall.webphoneSession.id
+                ]);
+              };
             }
           } else {
             showMergeButton = false;
@@ -109,6 +122,7 @@ function ActiveCallList({
 }
 
 ActiveCallList.propTypes = {
+  isOnWebRTC: PropTypes.bool.isRequired,
   currentLocale: PropTypes.string.isRequired,
   className: PropTypes.string,
   title: PropTypes.string.isRequired,
@@ -134,7 +148,7 @@ ActiveCallList.propTypes = {
   webphoneHangup: PropTypes.func,
   webphoneResume: PropTypes.func,
   webphoneToVoicemail: PropTypes.func,
-  onMergeToConference: PropTypes.func.isRequired,
+  mergeToConference: PropTypes.func.isRequired,
   enableContactFallback: PropTypes.bool,
   autoLog: PropTypes.bool,
   sourceIcons: PropTypes.object,
@@ -230,12 +244,14 @@ export default class ActiveCallsPanel extends Component {
       sourceIcons,
       conference,
       isConferenceCall,
-      onMergeToConference,
+      mergeToConference,
       activeCurrentCalls,
+      callingMode,
     } = this.props;
 
     return (
       <ActiveCallList
+        isOnWebRTC={callingMode === callingModes.webphone}
         isConferenceCall={isConferenceCall}
         isCurrentCallList={isCurrentCallList}
         conference={conference}
@@ -250,7 +266,7 @@ export default class ActiveCallsPanel extends Component {
         onClickToSms={onClickToSms}
         onCreateContact={onCreateContact}
         onViewContact={onViewContact}
-        onMergeToConference={onMergeToConference}
+        mergeToConference={mergeToConference}
         outboundSmsPermission={outboundSmsPermission}
         internalSmsPermission={internalSmsPermission}
         isLoggedContact={isLoggedContact}
@@ -304,6 +320,7 @@ export default class ActiveCallsPanel extends Component {
 }
 
 ActiveCallsPanel.propTypes = {
+  callingMode: PropTypes.string.isRequired,
   currentLocale: PropTypes.string.isRequired,
   className: PropTypes.string,
   activeRingCalls: PropTypes.array.isRequired,
@@ -322,7 +339,7 @@ ActiveCallsPanel.propTypes = {
   internalSmsPermission: PropTypes.bool,
   isLoggedContact: PropTypes.func,
   isConferenceCall: PropTypes.func.isRequired,
-  onMergeToConference: PropTypes.func.isRequired,
+  mergeToConference: PropTypes.func.isRequired,
   onLogCall: PropTypes.func,
   webphoneAnswer: PropTypes.func,
   webphoneReject: PropTypes.func,
