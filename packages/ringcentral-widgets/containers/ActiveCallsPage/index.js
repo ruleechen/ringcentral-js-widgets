@@ -12,10 +12,14 @@ function mapToProps(_, {
     locale,
     regionSettings,
     rolesAndPermissions,
+    conferenceCall,
   },
   showContactDisplayPlaceholder = false,
 }) {
+  const conferenceList = Object.values(conferenceCall.conferences);
   return {
+    // only one conference can exist for now
+    conference: conferenceList.length ? conferenceList[0] : null,
     currentLocale: locale.currentLocale,
     activeRingCalls: callMonitor.activeRingCalls,
     activeOnHoldCalls: callMonitor.activeOnHoldCalls,
@@ -47,6 +51,7 @@ function mapToFunctions(_, {
     regionSettings,
     routerInteraction,
     webphone,
+    conferenceCall,
   },
   composeTextRoute = '/composeText',
   callCtrlRoute = '/calls/active',
@@ -57,17 +62,31 @@ function mapToFunctions(_, {
   onViewContact,
   showViewContact = true,
 }) {
+  const onMergeToConference = async (sessionIds = []) => {
+    const conference = Object.values(conferenceCall.conferences)[0];
+    if (conference) {
+      await Promise.all(
+        sessionIds.map(
+          sessionId => conferenceCall.bringInToConference(conference.id, sessionId))
+      );
+    } else {
+      await conferenceCall.makeConference();
+      await onMergeToConference(sessionIds);
+    }
+  };
+
   return {
     formatPhone: phoneNumber => formatNumber({
       phoneNumber,
       areaCode: regionSettings.areaCode,
       countryCode: regionSettings.countryCode,
     }),
+    isConferenceCall: sessionId => conferenceCall.isConferenceSession(sessionId),
     webphoneAnswer: (...args) => (webphone && webphone.answer(...args)),
     webphoneToVoicemail: (...args) => (webphone && webphone.toVoiceMail(...args)),
     webphoneReject: (...args) => (webphone && webphone.reject(...args)),
     webphoneHangup: (...args) => (webphone && webphone.hangup(...args)),
-    webphoneResume: async (...args) => {
+    async webphoneResume(...args) {
       if (!webphone) {
         return;
       }
@@ -117,6 +136,12 @@ function mapToFunctions(_, {
         });
       })),
     onCallsEmpty,
+    /**
+     * if there is a existing conference, merge into it
+     * else make one and merge into it;
+     * @param {[string]} sessionIds
+     */
+    onMergeToConference,
   };
 }
 

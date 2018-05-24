@@ -9,6 +9,8 @@ import i18n from './i18n';
 
 function ActiveCallList({
   calls,
+  conference,
+  isCurrentCallList,
   className,
   currentLocale,
   areaCode,
@@ -22,6 +24,8 @@ function ActiveCallList({
   outboundSmsPermission,
   internalSmsPermission,
   isLoggedContact,
+  isConferenceCall,
+  onMergeToConference,
   onLogCall,
   autoLog,
   loggingMap,
@@ -32,7 +36,7 @@ function ActiveCallList({
   webphoneToVoicemail,
   enableContactFallback,
   title,
-  sourceIcons
+  sourceIcons,
 }) {
   if (calls.length === 0) {
     return null;
@@ -47,6 +51,11 @@ function ActiveCallList({
           <ActiveCallItem
             call={call}
             key={call.id}
+            isCurrentCallList={isCurrentCallList}
+            conference={conference}
+            isOnConferenceCall={call.webphoneSession
+              ? isConferenceCall(call.webphoneSession.id)
+              : false}
             currentLocale={currentLocale}
             areaCode={areaCode}
             countryCode={countryCode}
@@ -60,6 +69,7 @@ function ActiveCallList({
             onLogCall={onLogCall}
             onViewContact={onViewContact}
             onCreateContact={onCreateContact}
+            onMergeToConference={onMergeToConference}
             loggingMap={loggingMap}
             webphoneAnswer={webphoneAnswer}
             webphoneReject={webphoneReject}
@@ -92,6 +102,8 @@ ActiveCallList.propTypes = {
   outboundSmsPermission: PropTypes.bool,
   internalSmsPermission: PropTypes.bool,
   isLoggedContact: PropTypes.func,
+  isConferenceCall: PropTypes.func.isRequired,
+  isCurrentCallList: PropTypes.bool,
   onLogCall: PropTypes.func,
   loggingMap: PropTypes.object,
   webphoneAnswer: PropTypes.func,
@@ -102,6 +114,16 @@ ActiveCallList.propTypes = {
   enableContactFallback: PropTypes.bool,
   autoLog: PropTypes.bool,
   sourceIcons: PropTypes.object,
+  conference: PropTypes.shape({
+    conference: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      creationTime: PropTypes.string.isRequired,
+      parties: PropTypes.array.isRequired,
+    }),
+    session: PropTypes.shape({
+      id: PropTypes.string.isRequired
+    })
+  }),
 };
 
 ActiveCallList.defaultProps = {
@@ -124,6 +146,8 @@ ActiveCallList.defaultProps = {
   onViewContact: undefined,
   webphoneToVoicemail: undefined,
   sourceIcons: undefined,
+  isCurrentCallList: false,
+  conference: null,
 };
 
 export default class ActiveCallsPanel extends Component {
@@ -155,14 +179,8 @@ export default class ActiveCallsPanel extends Component {
     );
   }
 
-  render() {
+  getCallList(calls, title, isCurrentCallList) {
     const {
-      activeRingCalls,
-      activeOnHoldCalls,
-      activeCurrentCalls,
-      otherDeviceCalls,
-      showSpinner,
-      className,
       currentLocale,
       areaCode,
       countryCode,
@@ -185,21 +203,16 @@ export default class ActiveCallsPanel extends Component {
       enableContactFallback,
       webphoneToVoicemail,
       sourceIcons,
+      conference,
+      isConferenceCall,
+      onMergeToConference,
     } = this.props;
-    if (showSpinner) {
-      return (<SpinnerOverlay />);
-    }
-    if (!this.hasCalls()) {
-      return (
-        <div className={classnames(styles.root, className)}>
-          <p className={styles.noCalls}>
-            {i18n.getString('noActiveCalls', currentLocale)}
-          </p>
-        </div>
-      );
-    }
-    const getCallList = (calls, title) => (
+
+    return (
       <ActiveCallList
+        isConferenceCall={isConferenceCall}
+        isCurrentCallList={isCurrentCallList}
+        conference={conference}
         title={title}
         calls={calls}
         currentLocale={currentLocale}
@@ -211,6 +224,7 @@ export default class ActiveCallsPanel extends Component {
         onClickToSms={onClickToSms}
         onCreateContact={onCreateContact}
         onViewContact={onViewContact}
+        onMergeToConference={onMergeToConference}
         outboundSmsPermission={outboundSmsPermission}
         internalSmsPermission={internalSmsPermission}
         isLoggedContact={isLoggedContact}
@@ -226,12 +240,37 @@ export default class ActiveCallsPanel extends Component {
         sourceIcons={sourceIcons}
       />
     );
+  }
+
+  render() {
+    const {
+      activeRingCalls,
+      activeOnHoldCalls,
+      activeCurrentCalls,
+      otherDeviceCalls,
+      showSpinner,
+      className,
+      currentLocale
+    } = this.props;
+
+    if (showSpinner) {
+      return (<SpinnerOverlay />);
+    }
+    if (!this.hasCalls()) {
+      return (
+        <div className={classnames(styles.root, className)}>
+          <p className={styles.noCalls}>
+            {i18n.getString('noActiveCalls', currentLocale)}
+          </p>
+        </div>
+      );
+    }
     return (
       <div className={classnames(styles.root, className)}>
-        {getCallList(activeRingCalls, i18n.getString('ringCall', currentLocale))}
-        {getCallList(activeCurrentCalls, i18n.getString('currentCall', currentLocale))}
-        {getCallList(activeOnHoldCalls, i18n.getString('onHoldCall', currentLocale))}
-        {getCallList(otherDeviceCalls, i18n.getString('otherDeviceCall', currentLocale))}
+        {this.getCallList(activeRingCalls, i18n.getString('ringCall', currentLocale))}
+        {this.getCallList(activeCurrentCalls, i18n.getString('currentCall', currentLocale), true)}
+        {this.getCallList(activeOnHoldCalls, i18n.getString('onHoldCall', currentLocale))}
+        {this.getCallList(otherDeviceCalls, i18n.getString('otherDeviceCall', currentLocale))}
       </div>
     );
   }
@@ -255,6 +294,8 @@ ActiveCallsPanel.propTypes = {
   outboundSmsPermission: PropTypes.bool,
   internalSmsPermission: PropTypes.bool,
   isLoggedContact: PropTypes.func,
+  isConferenceCall: PropTypes.func.isRequired,
+  onMergeToConference: PropTypes.func.isRequired,
   onLogCall: PropTypes.func,
   webphoneAnswer: PropTypes.func,
   webphoneReject: PropTypes.func,
@@ -267,6 +308,7 @@ ActiveCallsPanel.propTypes = {
   loggingMap: PropTypes.object,
   onCallsEmpty: PropTypes.func,
   sourceIcons: PropTypes.object,
+  conference: PropTypes.object,
 };
 
 ActiveCallsPanel.defaultProps = {
@@ -290,4 +332,5 @@ ActiveCallsPanel.defaultProps = {
   autoLog: false,
   onCallsEmpty: undefined,
   sourceIcons: undefined,
+  conference: null,
 };

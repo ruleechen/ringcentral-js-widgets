@@ -79,6 +79,7 @@ ContactDisplayItem.propTypes = {
 };
 
 export default function ContactDisplay({
+  isOnConferenceCall,
   reference,
   className,
   contactMatches,
@@ -103,7 +104,14 @@ export default function ContactDisplay({
   contactName,
 }) {
   let contentEl;
-  if (contactName) {
+  if (isOnConferenceCall) {
+    const confStr = i18n.getString('conferenceCall', currentLocale);
+    contentEl = (
+      <div title={confStr} className={styles.currentName}>
+        {confStr}
+      </div>
+    );
+  } else if (contactName) {
     contentEl = (
       <div title={contactName} className={styles.currentName}>
         {contactName}
@@ -242,6 +250,7 @@ ContactDisplay.propTypes = {
   sourceIcons: PropTypes.object,
   showGroupNumberName: PropTypes.bool,
   contactName: PropTypes.any,
+  isOnConferenceCall: PropTypes.bool,
 };
 ContactDisplay.defaultProps = {
   reference: undefined,
@@ -259,4 +268,5 @@ ContactDisplay.defaultProps = {
   sourceIcons: undefined,
   showGroupNumberName: false,
   contactName: undefined,
+  isOnConferenceCall: false,
 };
