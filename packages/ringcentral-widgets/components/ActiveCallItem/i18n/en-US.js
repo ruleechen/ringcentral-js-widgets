@@ -16,6 +16,8 @@ export default {
   call: 'Call',
   addContact: 'Add Contact',
   addToConference: 'Add to Conference',
+  confirmation: 'Confirmation',
+  confirmMergeToConference: 'Add to conference call?',
   missedCall: 'Missed',
   inboundCall: 'Inbound',
   outboundCall: 'Outbound',

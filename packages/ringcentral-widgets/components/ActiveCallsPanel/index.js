@@ -57,7 +57,7 @@ function ActiveCallList({
           : false;
 
           let showMergeButton;
-          let onClickMergeBtn = () => {};
+          let onConfirmMerge;
           if (
             call.direction === callDirections.inbound
             || isCurrentCallList
@@ -68,11 +68,11 @@ function ActiveCallList({
             if (isOnConferenceCall) {
               showMergeButton = true;
 
-              onClickMergeBtn = () => {
+              onConfirmMerge = () => {
                 mergeToConference([currentCall.webphoneSession.id]);
               };// todo
             } else {
-              onClickMergeBtn = () => {
+              onConfirmMerge = () => {
                 mergeToConference([
                   call.webphoneSession.id,
                   currentCall.webphoneSession.id
@@ -103,7 +103,7 @@ function ActiveCallList({
               onLogCall={onLogCall}
               onViewContact={onViewContact}
               onCreateContact={onCreateContact}
-              onClickMergeBtn={onClickMergeBtn}
+              onConfirmMerge={onConfirmMerge}
               loggingMap={loggingMap}
               webphoneAnswer={webphoneAnswer}
               webphoneReject={webphoneReject}
@@ -190,6 +190,12 @@ ActiveCallList.defaultProps = {
 };
 
 export default class ActiveCallsPanel extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      showSpinner: false
+    };
+  }
   componentDidMount() {
     if (
       !this.hasCalls(this.props) &&
@@ -266,7 +272,11 @@ export default class ActiveCallsPanel extends Component {
         onClickToSms={onClickToSms}
         onCreateContact={onCreateContact}
         onViewContact={onViewContact}
-        mergeToConference={mergeToConference}
+        mergeToConference={async (...args) => {
+          this.setState({ showSpinner: true });
+          await mergeToConference.call(this, args);
+          this.setState({ showSpinner: false });
+        }}
         outboundSmsPermission={outboundSmsPermission}
         internalSmsPermission={internalSmsPermission}
         isLoggedContact={isLoggedContact}
@@ -291,12 +301,11 @@ export default class ActiveCallsPanel extends Component {
       activeOnHoldCalls,
       activeCurrentCalls,
       otherDeviceCalls,
-      showSpinner,
       className,
       currentLocale
     } = this.props;
 
-    if (showSpinner) {
+    if (this.state.showSpinner) {
       return (<SpinnerOverlay />);
     }
     if (!this.hasCalls()) {
@@ -327,7 +336,6 @@ ActiveCallsPanel.propTypes = {
   activeOnHoldCalls: PropTypes.array.isRequired,
   activeCurrentCalls: PropTypes.array.isRequired,
   otherDeviceCalls: PropTypes.array.isRequired,
-  showSpinner: PropTypes.bool.isRequired,
   areaCode: PropTypes.string.isRequired,
   countryCode: PropTypes.string.isRequired,
   brand: PropTypes.string,
