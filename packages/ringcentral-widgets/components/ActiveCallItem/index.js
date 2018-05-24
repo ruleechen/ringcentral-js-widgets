@@ -14,6 +14,7 @@ import CircleButton from '../CircleButton';
 import EndIcon from '../../assets/images/End.svg';
 import AnswerIcon from '../../assets/images/Answer.svg';
 import VoicemailIcon from '../../assets/images/Voicemail.svg';
+import ConferenceCallIcon from '../../assets/images/ConferenceCallIcon.svg';
 
 import styles from './styles.scss';
 
@@ -29,11 +30,14 @@ function CallIcon({
   ringing,
   inboundTitle,
   outboundTitle,
+  isOnConferenceCall,
 }) {
   const title = (direction === callDirections.inbound) ? inboundTitle : outboundTitle;
   return (
     <div className={styles.callIcon}>
-      <span
+      {isOnConferenceCall
+      ? <ConferenceCallIcon />
+      : <span
         className={classnames(
           callIconMap[direction],
           styles.activeCall,
@@ -41,6 +45,7 @@ function CallIcon({
         )}
         title={title}
       />
+      }
     </div>
   );
 }
@@ -48,12 +53,14 @@ function CallIcon({
 CallIcon.propTypes = {
   direction: PropTypes.string.isRequired,
   ringing: PropTypes.bool,
+  isOnConferenceCall: PropTypes.bool,
   inboundTitle: PropTypes.string,
   outboundTitle: PropTypes.string,
 };
 
 CallIcon.defaultProps = {
   ringing: false,
+  isOnConferenceCall: false,
   inboundTitle: undefined,
   outboundTitle: undefined,
 };
@@ -138,8 +145,13 @@ export default class ActiveCallItem extends Component {
       isCreating: false,
     };
     this._userSelection = false;
+    this.contactDisplay = null;// define shape of the instance
 
     this.toggleExtended = (e) => {
+      // TODO: add conference call control buttons
+      if (this.props.isOnConferenceCall) {
+        return;
+      }
       if ((
         this.contactDisplay &&
         this.contactDisplay.contains(e.target))
@@ -347,6 +359,8 @@ export default class ActiveCallItem extends Component {
         activityMatches,
         webphoneSession,
       },
+      conference,
+      isOnConferenceCall,
       disableLinks,
       currentLocale,
       areaCode,
@@ -402,10 +416,17 @@ export default class ActiveCallItem extends Component {
             inboundTitle={i18n.getString('inboundCall', currentLocale)}
             outboundTitle={i18n.getString('outboundCall', currentLocale)}
             missedTitle={i18n.getString('missedCall', currentLocale)}
+            isOnConferenceCall={isOnConferenceCall}
           />
           <ContactDisplay
+            isOnConferenceCall={isOnConferenceCall}
             contactName={contactName}
-            className={classnames(styles.contactDisplay, contactDisplayStyle)}
+            className={
+              isOnConferenceCall
+              ? classnames(styles.conferenceContactDisplay)
+              : classnames(styles.contactDisplay, contactDisplayStyle)
+
+            }
             contactMatches={contactMatches}
             selected={this.state.selected}
             onSelectContact={this.onSelectContact}
@@ -423,7 +444,7 @@ export default class ActiveCallItem extends Component {
             sourceIcons={sourceIcons}
             stopPropagation
           />
-          {callDetail}
+          {isOnConferenceCall ? null : callDetail}
           <WebphoneButtons
             session={webphoneSession}
             webphoneAnswer={webphoneAnswer}
@@ -433,30 +454,34 @@ export default class ActiveCallItem extends Component {
           />
           {extraButton}
         </div>
-        <ActionMenu
-          extended={this.state.extended}
-          onToggle={this.toggleExtended}
-          currentLocale={currentLocale}
-          disableLinks={disableLinks}
-          phoneNumber={phoneNumber}
-          onClickToSms={
+        {
+          isOnConferenceCall
+          ? null
+          : <ActionMenu
+            extended={this.state.extended}
+            onToggle={this.toggleExtended}
+            currentLocale={currentLocale}
+            disableLinks={disableLinks}
+            phoneNumber={phoneNumber}
+            onClickToSms={
             showClickToSms ?
               () => this.clickToSms({ countryCode, areaCode })
               : undefined
           }
-          hasEntity={!!contactMatches.length}
-          onViewEntity={onViewContact && this.viewSelectedContact}
-          onCreateEntity={onCreateContact && this.createSelectedContact}
-          textTitle={i18n.getString('text', currentLocale)}
-          onLog={onLogCall}
-          isLogging={isLogging || this.state.isLogging}
-          isLogged={activityMatches.length > 0}
-          isCreating={this.state.isCreating}
-          addLogTitle={i18n.getString('addLog', currentLocale)}
-          editLogTitle={i18n.getString('editLog', currentLocale)}
-          createEntityTitle={i18n.getString('addEntity', currentLocale)}
-          viewEntityTitle={i18n.getString('viewDetails', currentLocale)}
-        />
+            hasEntity={!!contactMatches.length}
+            onViewEntity={onViewContact && this.viewSelectedContact}
+            onCreateEntity={onCreateContact && this.createSelectedContact}
+            textTitle={i18n.getString('text', currentLocale)}
+            onLog={onLogCall}
+            isLogging={isLogging || this.state.isLogging}
+            isLogged={activityMatches.length > 0}
+            isCreating={this.state.isCreating}
+            addLogTitle={i18n.getString('addLog', currentLocale)}
+            editLogTitle={i18n.getString('editLog', currentLocale)}
+            createEntityTitle={i18n.getString('addEntity', currentLocale)}
+            viewEntityTitle={i18n.getString('viewDetails', currentLocale)}
+          />
+        }
       </div>
     );
   }
@@ -482,6 +507,17 @@ ActiveCallItem.propTypes = {
     }),
     webphoneSession: PropTypes.object,
   }).isRequired,
+  conference: PropTypes.shape({
+    conference: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      creationTime: PropTypes.string.isRequired,
+      parties: PropTypes.array.isRequired,
+    }),
+    session: PropTypes.shape({
+      id: PropTypes.string.isRequired
+    })
+  }),
+  isOnConferenceCall: PropTypes.bool,
   areaCode: PropTypes.string.isRequired,
   countryCode: PropTypes.string.isRequired,
   currentLocale: PropTypes.string.isRequired,
@@ -503,6 +539,7 @@ ActiveCallItem.propTypes = {
   onCreateContact: PropTypes.func,
   onLogCall: PropTypes.func,
   onViewContact: PropTypes.func,
+  onMergeToConference: PropTypes.func,
   sourceIcons: PropTypes.object,
   renderContactName: PropTypes.func,
   renderExtraButton: PropTypes.func,
@@ -514,6 +551,7 @@ ActiveCallItem.defaultProps = {
   onClickToSms: undefined,
   onViewContact: undefined,
   onCreateContact: undefined,
+  onMergeToConference: undefined,
   isLogging: false,
   outboundSmsPermission: false,
   internalSmsPermission: false,
@@ -531,4 +569,6 @@ ActiveCallItem.defaultProps = {
   renderContactName: undefined,
   renderExtraButton: undefined,
   contactDisplayStyle: undefined,
+  conference: null,
+  isOnConferenceCall: false,
 };

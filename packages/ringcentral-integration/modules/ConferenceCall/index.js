@@ -67,6 +67,7 @@ export default class ConferenceCall extends RcModule {
     this._timers = {};
   }
 
+  // only can be used after webphone._onCallStartFunc
   isConferenceSession(sessionId) {
     return !!this.findConferenceWithSession(sessionId);
   }
@@ -259,8 +260,7 @@ export default class ConferenceCall extends RcModule {
 
       if (typeof session === 'object' &&
         Object.prototype.toString.call(session.on).toLowerCase() === '[object function]') {
-        conference.session = session;
-        this._hookConference(conference);
+        this._hookConference(conference, session);
 
         this.store.dispatch({
           type: this.actionTypes.makeConferenceSucceeded,
@@ -342,15 +342,15 @@ export default class ConferenceCall extends RcModule {
     return true;
   }
 
-  _hookConference(conference) {
+  _hookConference(conference, session) {
     ['accepted'].forEach(
-      evt => conference.session.on(
+      evt => session.on(
         evt,
         () => this.startPollingConferenceStatus(conference.id)
       )
     );
     ['terminated', 'failed', 'rejected'].forEach(
-      evt => conference.session.on(evt, () => {
+      evt => session.on(evt, () => {
         this.store.dispatch({
           type: this.actionTypes.terminateConferenceSucceeded,
           conference,
@@ -384,7 +384,7 @@ export default class ConferenceCall extends RcModule {
     return this.state.conferences;
   }
 
-  get confreenceCallStatus() {
-    return this.state.confreenceCallStatus;
+  get conferenceCallStatus() {
+    return this.state.conferenceCallStatus;
   }
 }

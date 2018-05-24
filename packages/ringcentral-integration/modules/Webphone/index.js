@@ -116,7 +116,7 @@ export default class Webphone extends RcModule {
     this._tabManager = tabManager;
     this._onCallEndFunc = onCallEnd;
     this._onCallRingFunc = onCallRing;
-    this._onCallStartFunc = onCallStart;
+    this._onBeforeCallStartFunc = onCallStart;
     this._webphone = null;
     this._remoteVideo = null;
     this._localVideo = null;
@@ -1144,7 +1144,7 @@ export default class Webphone extends RcModule {
     session.creationTime = Date.now();
     this._onAccepted(session);
     this._holdOtherSession(session.id);
-    this._onCallStart(session);
+    this._beforeCallStart(session);
     return session;
   }
 
@@ -1181,6 +1181,22 @@ export default class Webphone extends RcModule {
     });
   }
 
+  _beforeCallStart(session) {
+    this._addSession(session);
+    const normalizedSession = normalizeSession(session);
+    this.store.dispatch({
+      type: this.actionTypes.beforeCallStart,
+      session: normalizedSession,
+      sessions: this.sessions,
+    });
+    if (this._contactMatcher) {
+      this._contactMatcher.triggerMatch();
+    }
+    if (typeof this._onBeforeCallStartFunc === 'function') {
+      this._onBeforeCallStartFunc(normalizedSession, this.activeSession);
+    }
+  }
+
   _onCallStart(session) {
     this._addSession(session);
     const normalizedSession = normalizeSession(session);
@@ -1191,9 +1207,6 @@ export default class Webphone extends RcModule {
     });
     if (this._contactMatcher) {
       this._contactMatcher.triggerMatch();
-    }
-    if (typeof this._onCallStartFunc === 'function') {
-      this._onCallStartFunc(normalizedSession, this.activeSession);
     }
   }
 

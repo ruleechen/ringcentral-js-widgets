@@ -45,6 +45,7 @@ import ContactSearch from 'ringcentral-integration/modules/ContactSearch';
 import DateTimeFormat from 'ringcentral-integration/modules/DateTimeFormat';
 import Conference from 'ringcentral-integration/modules/Conference';
 import ConferenceCall from 'ringcentral-integration/modules/ConferenceCall';
+import conferenceCallStatus from 'ringcentral-integration/modules/ConferenceCall/conferenceCallStatus';
 
 import ActiveCalls from 'ringcentral-integration/modules/ActiveCalls';
 import DetailedPresence from 'ringcentral-integration/modules/DetailedPresence';
@@ -151,6 +152,7 @@ export default class BasePhone extends RcModule {
     contactSearch,
     contacts,
     contactMatcher,
+    conferenceCall,
     ...options,
   }) {
     super({
@@ -206,8 +208,20 @@ export default class BasePhone extends RcModule {
       }
       routerInteraction.goBack();
     };
-    webphone._onCallStartFunc = () => {
-      if (routerInteraction.currentPath === '/calls/active') {
+
+    /**
+     * HACK: webphone._onCallStartFunc happens before session's accepted event,
+     * so we can't use conferenceCall.isConferenceSession()
+     * @param {object} session 
+     */
+    webphone._onCallStartFunc = (session) => {
+      if (routerInteraction.currentPath === '/calls/active'
+      || (
+        session.callStatus === 'webphone-session-connecting'
+        && session.to.indexOf('conf_') === 0
+        && conferenceCall.conferenceCallStatus === conferenceCallStatus.requesting
+        && routerInteraction.currentPath === '/calls'
+      )) {
         return;
       }
       routerInteraction.push('/calls/active');

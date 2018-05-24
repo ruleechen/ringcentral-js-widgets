@@ -73,6 +73,15 @@
   }
 }
 
+.conferenceContactDisplay{
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 45px;
+  margin: auto;
+  line-height: 50px;  
+}
+
 .missed {
   color: $missed;
   button {
