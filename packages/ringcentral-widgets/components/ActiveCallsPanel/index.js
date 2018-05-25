@@ -88,6 +88,8 @@ function ActiveCallList({
               if (isOnConferenceCall) {
                 showMergeButton = false;
               } else {
+                showMergeButton = true;
+                // TODO: open modal
                 onConfirmMerge = () => mergeToConference([call]);
               }
             } else {
