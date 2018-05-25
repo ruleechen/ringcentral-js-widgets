@@ -23,7 +23,6 @@ function mapToProps(_, {
     conference: conferenceList.length ? conferenceList[0] : null,
     currentLocale: locale.currentLocale,
     callingMode,
-    callMonitor,
     activeRingCalls: callMonitor.activeRingCalls,
     activeOnHoldCalls: callMonitor.activeOnHoldCalls,
     activeCurrentCalls: callMonitor.activeCurrentCalls,

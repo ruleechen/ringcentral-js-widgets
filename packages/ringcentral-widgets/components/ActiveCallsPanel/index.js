@@ -9,7 +9,6 @@ import styles from './styles.scss';
 import i18n from './i18n';
 
 function ActiveCallList({
-  callMonitor,
   calls,
   conference,
   className,
@@ -39,6 +38,7 @@ function ActiveCallList({
   title,
   sourceIcons,
   isOnWebRTC,
+  activeCurrentCalls,
 }) {
   if (calls.length === 0) {
     return null;
@@ -52,13 +52,11 @@ function ActiveCallList({
         calls.map((call) => {
           let showMergeButton = false;
           let onConfirmMerge;
-          const currentCall = callMonitor.activeCurrentCalls[0];
-          const hasConference = !!callMonitor.calls.find(
-            call => call.webphoneSession && isConferenceCall(call.webphoneSession.id)
-          );
+          const currentCall = activeCurrentCalls[0];
+          const hasConference = !!conference;
           const isOnConferenceCall = call.webphoneSession
-                    ? isConferenceCall(call.webphoneSession.id)
-                    : false;
+            ? isConferenceCall(call.webphoneSession.id)
+            : false;
           if (!isOnWebRTC) {
             showMergeButton = false;
           } else if (currentCall) {
@@ -81,7 +79,7 @@ function ActiveCallList({
                 showMergeButton = true;
                 onConfirmMerge = () => mergeToConference([
                   call,
-                  callMonitor.activeCurrentCalls[0]
+                  activeCurrentCalls[0]
                 ]);
               }
             } else if (hasConference) {
@@ -129,7 +127,7 @@ function ActiveCallList({
               enableContactFallback={enableContactFallback}
               autoLog={autoLog}
               sourceIcons={sourceIcons}
-          />
+            />
           );
         })
       }
@@ -143,7 +141,6 @@ ActiveCallList.propTypes = {
   className: PropTypes.string,
   title: PropTypes.string.isRequired,
   calls: PropTypes.array.isRequired,
-  callMonitor: PropTypes.object.isRequired,
   areaCode: PropTypes.string.isRequired,
   countryCode: PropTypes.string.isRequired,
   brand: PropTypes.string,
@@ -177,6 +174,7 @@ ActiveCallList.propTypes = {
       id: PropTypes.string.isRequired
     })
   }),
+  activeCurrentCalls: PropTypes.array.isRequired,
 };
 
 ActiveCallList.defaultProps = {
@@ -265,7 +263,7 @@ export default class ActiveCallsPanel extends Component {
       isConferenceCall,
       mergeToConference,
       callingMode,
-      callMonitor,
+      activeCurrentCalls,
     } = this.props;
 
     return (
@@ -275,7 +273,6 @@ export default class ActiveCallsPanel extends Component {
         conference={conference}
         title={title}
         calls={calls}
-        callMonitor={callMonitor}
         currentLocale={currentLocale}
         areaCode={areaCode}
         countryCode={countryCode}
@@ -303,6 +300,7 @@ export default class ActiveCallsPanel extends Component {
         webphoneToVoicemail={webphoneToVoicemail}
         enableContactFallback={enableContactFallback}
         sourceIcons={sourceIcons}
+        activeCurrentCalls={activeCurrentCalls}
       />
     );
   }
@@ -332,7 +330,7 @@ export default class ActiveCallsPanel extends Component {
     return (
       <div className={classnames(styles.root, className)}>
         {this.getCallList(activeRingCalls, i18n.getString('ringCall', currentLocale))}
-        {this.getCallList(activeCurrentCalls, i18n.getString('currentCall', currentLocale), true)}
+        {this.getCallList(activeCurrentCalls, i18n.getString('currentCall', currentLocale))}
         {this.getCallList(activeOnHoldCalls, i18n.getString('onHoldCall', currentLocale))}
         {this.getCallList(otherDeviceCalls, i18n.getString('otherDeviceCall', currentLocale))}
       </div>
@@ -344,7 +342,6 @@ ActiveCallsPanel.propTypes = {
   callingMode: PropTypes.string.isRequired,
   currentLocale: PropTypes.string.isRequired,
   className: PropTypes.string,
-  callMonitor: PropTypes.object.isRequired,
   activeRingCalls: PropTypes.array.isRequired,
   activeOnHoldCalls: PropTypes.array.isRequired,
   activeCurrentCalls: PropTypes.array.isRequired,
