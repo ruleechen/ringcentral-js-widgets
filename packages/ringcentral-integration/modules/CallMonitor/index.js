@@ -240,16 +240,7 @@ export default class CallMonitor extends RcModule {
 
     this.addSelector('currentCalls',
       this._selectors.calls,
-      this._selectors.activeCurrentCalls,
-      (calls, activeCurrentCalls) => {
-        if (activeCurrentCalls.length) {
-          return activeCurrentCalls;
-        }
-        if (calls.length) {
-          return [calls[0]];
-        }
-        return [];
-      }
+      calls => (calls[0] ? [calls[0]] : []),
     );
 
     this.addSelector('activeRingCalls',
