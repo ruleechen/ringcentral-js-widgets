@@ -1,4 +1,5 @@
 import 'core-js/fn/array/find';
+import { filter, any } from 'ramda';
 import { Module } from '../../lib/di';
 import RcModule from '../../lib/RcModule';
 import moduleStatuses from '../../enums/moduleStatuses';
@@ -12,6 +13,7 @@ import {
   isRinging,
   hasRingingCalls,
   sortByStartTime,
+  isCallConnected,
 } from '../../lib/callLogHelpers';
 import ensureExist from '../../lib/ensureExist';
 import { isRing, isOnHold } from '../Webphone/webphoneHelper';
@@ -115,8 +117,8 @@ export default class CallMonitor extends RcModule {
       actionTypes,
     });
     this._call = call;
-    this._accountInfo = this::ensureExist(accountInfo, 'accountInfo');
-    this._detailedPresence = this::ensureExist(detailedPresence, 'detailedPresence');
+    this._accountInfo = this:: ensureExist(accountInfo, 'accountInfo');
+    this._detailedPresence = this:: ensureExist(detailedPresence, 'detailedPresence');
     this._contactMatcher = contactMatcher;
     this._activityMatcher = activityMatcher;
     this._webphone = webphone;
@@ -124,7 +126,7 @@ export default class CallMonitor extends RcModule {
     this._onNewCall = onNewCall;
     this._onCallUpdated = onCallUpdated;
     this._onCallEnded = onCallEnded;
-    this._storage = this::ensureExist(storage, 'storage');
+    this._storage = this:: ensureExist(storage, 'storage');
     this._callMatchedKey = 'callMatched';
 
     this._reducer = getCallMonitorReducer(this.actionTypes);
@@ -134,13 +136,13 @@ export default class CallMonitor extends RcModule {
       reducer: getCallMatchedReducer(this.actionTypes),
     });
 
-
+    this._callsSequenceCache = {};
     this.addSelector('normalizedCalls',
       () => this._detailedPresence.calls,
       () => this._accountInfo.countryCode,
       () => this._webphone && this._webphone.sessions,
-      (callsFromPresence, countryCode, sessions) => (
-        callsFromPresence.map((callItem) => {
+      (callsFromPresence, countryCode, sessions) => {
+        const calls = callsFromPresence.map((callItem) => {
           // use account countryCode to normalize number due to API issues [RCINT-3419]
           const fromNumber = normalizeNumber({
             phoneNumber: callItem.from && callItem.from.phoneNumber,
@@ -165,8 +167,51 @@ export default class CallMonitor extends RcModule {
             ),
             webphoneSession,
           };
-        }).sort(sortByStartTime)
-      ),
+        });
+        // classify
+        const sequencedConnectedCalls = filter(call => (
+          isCallConnected(call) &&
+          (call.id in this._callsSequenceCache)
+        ), calls);
+        const newConnectedCalls = filter(call => (
+          isCallConnected(call) &&
+          !any(x => x === call, sequencedConnectedCalls)
+        ), calls);
+        const sequencedCalls = filter(call => (
+          !any(x => x === call, sequencedConnectedCalls) &&
+          !any(x => x === call, newConnectedCalls) &&
+          (call.id in this._callsSequenceCache)
+        ), calls);
+        const newCalls = filter(call => (
+          !any(x => x === call, sequencedConnectedCalls) &&
+          !any(x => x === call, newConnectedCalls) &&
+          !any(x => x === call, sequencedCalls)
+        ), calls);
+        // sort
+        const sortBySequenceCache = (a, b) => {
+          const sequenceA = this._callsSequenceCache[a.id];
+          const sequenceB = this._callsSequenceCache[b.id];
+          if (sequenceA === sequenceB) { return 0; }
+          return sequenceA < sequenceB ? -1 : 1;
+        };
+        // concat
+        const sortedCalls = [].concat(
+          newConnectedCalls.sort(sortByStartTime)
+        ).concat(
+          sequencedConnectedCalls.sort(sortBySequenceCache)
+        ).concat(
+          newCalls.sort(sortByStartTime)
+        ).concat(
+          sequencedCalls.sort(sortBySequenceCache)
+        );
+        // cache
+        this._callsSequenceCache = {};
+        for (let i = 0; i < sortedCalls.length; i += 1) {
+          this._callsSequenceCache[sortedCalls[i].id] = i;
+        }
+        // out
+        return sortedCalls;
+      },
     );
 
     this.addSelector('calls',
@@ -190,6 +235,20 @@ export default class CallMonitor extends RcModule {
           };
         });
         return calls;
+      }
+    );
+
+    this.addSelector('currentCalls',
+      this._selectors.calls,
+      this._selectors.activeCurrentCalls,
+      (calls, activeCurrentCalls) => {
+        if (activeCurrentCalls.length) {
+          return activeCurrentCalls;
+        }
+        if (calls.length) {
+          return [calls[0]];
+        }
+        return [];
       }
     );
 
@@ -346,11 +405,13 @@ export default class CallMonitor extends RcModule {
         this._lastProcessedCalls = this.calls;
 
         // no ringing calls
-        if (this._call &&
-            oldCalls.length !== 0 &&
-            this.calls.length === 0 &&
-            this._call.toNumberEntities &&
-            this._call.toNumberEntities.length !== 0) {
+        if (
+          this._call &&
+          oldCalls.length !== 0 &&
+          this.calls.length === 0 &&
+          this._call.toNumberEntities &&
+          this._call.toNumberEntities.length !== 0
+        ) {
           // console.log('no calls clean to number:');
           this._call.cleanToNumberEntities();
         }
@@ -440,6 +501,10 @@ export default class CallMonitor extends RcModule {
 
   get callMatched() {
     return this._storage.getItem(this._callMatchedKey);
+  }
+
+  get currentCalls() {
+    return this._selectors.currentCalls();
   }
 
   get activeRingCalls() {
