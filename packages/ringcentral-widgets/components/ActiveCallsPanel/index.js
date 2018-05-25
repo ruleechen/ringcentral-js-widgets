@@ -12,7 +12,6 @@ function ActiveCallList({
   callMonitor,
   calls,
   conference,
-  isCurrentCallList,
   className,
   currentLocale,
   areaCode,
@@ -44,10 +43,6 @@ function ActiveCallList({
   if (calls.length === 0) {
     return null;
   }
-  const outboundWebRTCCalls = callMonitor.calls.filter(call => (
-    call.direction === callDirections.outbound
-    && call.webphoneSession
-  ));
   return (
     <div className={classnames(styles.list, className)}>
       <div className={styles.listTitle}>
@@ -55,49 +50,48 @@ function ActiveCallList({
       </div>
       {
         calls.map((call) => {
-          const isOnConferenceCall = call.webphoneSession
-          ? isConferenceCall(call.webphoneSession.id)
-          : false;
-
-          let showMergeButton;
+          let showMergeButton = false;
           let onConfirmMerge;
-
-          if (!callMonitor.activeCurrentCalls[0]) {
+          const currentCall = callMonitor.activeCurrentCalls[0];
+          const hasConference = !!callMonitor.calls.find(
+            call => call.webphoneSession && isConferenceCall(call.webphoneSession.id)
+          );
+          const isOnConferenceCall = call.webphoneSession
+                    ? isConferenceCall(call.webphoneSession.id)
+                    : false;
+          if (!isOnWebRTC) {
             showMergeButton = false;
-          } else if (
-            callMonitor.activeCurrentCalls[0].direction === callDirections.inbound
-            || call.direction === callDirections.inbound
-            || isCurrentCallList
-            || !isOnWebRTC
-          ) {
-            showMergeButton = false;
-          } else if (outboundWebRTCCalls.length > 1) {
-            if (isOnConferenceCall) {
-              showMergeButton = true;
+          } else if (currentCall) {
+            if (call === currentCall) {
+              showMergeButton = false;
+            } else if (call.direction === callDirections.inbound) {
+              showMergeButton = false;
+            } else if (currentCall.direction === callDirections.outbound) {
+              if (hasConference) {
+                showMergeButton = true;
 
-              onConfirmMerge = () => {
-                mergeToConference([callMonitor.activeCurrentCalls[0]]);
-              };// todo
-            } else {
-              showMergeButton = true;
-
-              onConfirmMerge = () => {
-                if (
-                  callMonitor.activeCurrentCalls[0]
-                  && callMonitor.activeCurrentCalls[0].webphoneSession
-                  && isConferenceCall(callMonitor.activeCurrentCalls[0].webphoneSession.id)
-                ) {
-                  mergeToConference([
-                    call
+                if (isOnConferenceCall) {
+                  onConfirmMerge = () => mergeToConference([
+                    currentCall
                   ]);
                 } else {
-                  // gonna make a conference and then bring two session into it.
-                  mergeToConference([
-                    call,
-                    callMonitor.activeCurrentCalls[0]
-                  ]);
+                  onConfirmMerge = () => mergeToConference([call]);
                 }
-              };
+              } else {
+                showMergeButton = true;
+                onConfirmMerge = () => mergeToConference([
+                  call,
+                  callMonitor.activeCurrentCalls[0]
+                ]);
+              }
+            } else if (hasConference) {
+              if (isOnConferenceCall) {
+                showMergeButton = false;
+              } else {
+                onConfirmMerge = () => mergeToConference([call]);
+              }
+            } else {
+              showMergeButton = false;
             }
           } else {
             showMergeButton = false;
@@ -160,8 +154,6 @@ ActiveCallList.propTypes = {
   internalSmsPermission: PropTypes.bool,
   isLoggedContact: PropTypes.func,
   isConferenceCall: PropTypes.func.isRequired,
-  isCurrentCallList: PropTypes.bool,
-  currentCall: PropTypes.object,
   onLogCall: PropTypes.func,
   loggingMap: PropTypes.object,
   webphoneAnswer: PropTypes.func,
@@ -205,9 +197,7 @@ ActiveCallList.defaultProps = {
   onViewContact: undefined,
   webphoneToVoicemail: undefined,
   sourceIcons: undefined,
-  isCurrentCallList: false,
   conference: null,
-  currentCall: null,
 };
 
 export default class ActiveCallsPanel extends Component {
@@ -245,7 +235,7 @@ export default class ActiveCallsPanel extends Component {
     );
   }
 
-  getCallList(calls, title, isCurrentCallList) {
+  getCallList(calls, title) {
     const {
       currentLocale,
       areaCode,
@@ -281,7 +271,6 @@ export default class ActiveCallsPanel extends Component {
       <ActiveCallList
         isOnWebRTC={callingMode === callingModes.webphone}
         isConferenceCall={isConferenceCall}
-        isCurrentCallList={isCurrentCallList}
         conference={conference}
         title={title}
         calls={calls}
@@ -313,7 +302,6 @@ export default class ActiveCallsPanel extends Component {
         webphoneToVoicemail={webphoneToVoicemail}
         enableContactFallback={enableContactFallback}
         sourceIcons={sourceIcons}
-        currentCall={activeCurrentCalls[0]}
       />
     );
   }
