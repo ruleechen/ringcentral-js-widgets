@@ -246,6 +246,13 @@ export default class CallMonitor extends RcModule {
       )
     );
 
+    this.addSelector('_activeOnHoldCalls',
+      this._selectors.calls,
+      calls => calls.filter(callItem =>
+        callItem.webphoneSession && isOnHold(callItem.webphoneSession)
+      )
+    );
+
     this.addSelector('_activeCurrentCalls',
       this._selectors.calls,
       calls => calls.filter(callItem =>
@@ -256,26 +263,21 @@ export default class CallMonitor extends RcModule {
     );
 
     this.addSelector('activeOnHoldCalls',
-      this._selectors.calls,
+      this._selectors._activeOnHoldCalls,
       this._selectors._activeCurrentCalls,
-      (calls, _activeCurrentCalls) => {
-        let items = calls.filter(callItem =>
-          callItem.webphoneSession &&
-          isOnHold(callItem.webphoneSession)
-        );
-        if (items.length && !_activeCurrentCalls.length) {
-          items = items.splice(1);
-        }
-        return items;
-      }
+      (_activeOnHoldCalls, _activeCurrentCalls) => (
+        (_activeOnHoldCalls.length && !_activeCurrentCalls.length) ?
+          _activeOnHoldCalls.splice(1) :
+          _activeOnHoldCalls
+      ),
     );
 
     this.addSelector('activeCurrentCalls',
       this._selectors._activeCurrentCalls,
-      this._selectors.activeOnHoldCalls,
-      (_activeCurrentCalls, activeOnHoldCalls) => (
-        (!_activeCurrentCalls.length && activeOnHoldCalls.length) ?
-          activeOnHoldCalls.splice(0, 1) :
+      this._selectors._activeOnHoldCalls,
+      (_activeCurrentCalls, _activeOnHoldCalls) => (
+        (!_activeCurrentCalls.length && _activeOnHoldCalls.length) ?
+          _activeOnHoldCalls.splice(0, 1) :
           _activeCurrentCalls
       )
     );
