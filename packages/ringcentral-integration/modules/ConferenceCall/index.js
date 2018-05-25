@@ -157,13 +157,21 @@ export default class ConferenceCall extends RcModule {
    */
   @proxify
   async bringInToConference(id, partyCall) {
-    if (!partyCall || partyCall.direction !== callDirections.outbound) {
-      // TODO: alert error that only can merge outbound call
+    const conference = this.state.conferences[id];
+    if (
+      !conference
+      || !partyCall
+      || partyCall.direction !== callDirections.outbound
+      || conference.conference.parties.length === 11
+    ) {
+      this._alert.warning({
+        message: conferenceErrors.bringInFailed,
+      });
       return null;
     }
     this.store.dispatch({
       type: this.actionTypes.bringInConference,
-      conference: this.state.conferences[id],
+      conference,
     });
     const sessionData = partyCall.webphoneSession.data;
     try {
@@ -174,17 +182,19 @@ export default class ConferenceCall extends RcModule {
       // let the contact match to do the matching of the parties.
       this.store.dispatch({
         type: this.actionTypes.bringInConferenceSucceeded,
-        conference: this.state.conferences[id],
+        conference,
       });
     } catch (e) {
-      // TODO:this._alert.warning
+      this._alert.warning({
+        message: conferenceErrors.bringInFailed,
+      });
       this.store.dispatch({
         type: this.actionTypes.bringInConferenceFailed,
         message: e.toString()
       });
     } finally {
       // eslint-disable-next-line no-unsafe-finally
-      return this.state.conferences[id];
+      return conference;
     }
   }
 
@@ -278,7 +288,9 @@ export default class ConferenceCall extends RcModule {
         type: this.actionTypes.makeConferenceFailed,
         message: e.toString()
       });
-      // TODO:this._alert.warning
+      this._alert.warning({
+        message: conferenceErrors.makeConferenceFailed,
+      });
     }
     return null;
   }
