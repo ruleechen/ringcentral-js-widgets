@@ -21,6 +21,7 @@ import AudioSettingsAlert from '../../components/AudioSettingsAlert';
 import RolesAndPermissionsAlert from '../../components/RolesAndPermissionsAlert';
 import withPhone from '../../lib/withPhone';
 import ConferenceAlert from '../../components/ConferenceAlert/index';
+import ConferenceCallAlert from '../../components/ConferenceCallAlert/index';
 
 
 function mapToProps(_, {
@@ -137,6 +138,10 @@ function getDefaultRenderer({
       return ConferenceAlert;
     }
 
+    if (ConferenceCallAlert.handleMessage(message)) {
+      return ConferenceCallAlert;
+    }
+
     if (AudioSettingsAlert.handleMessage(message)) {
       return props => (
         <AudioSettingsAlert
@@ -171,14 +176,14 @@ function mapToFunctions(_, {
 }) {
   const additionalRenderer = getAdditionalRenderer && getAdditionalRenderer();
   return {
-    getRenderer: (message) => {
+    getRenderer(message) {
       if (additionalRenderer) {
         const renderer = additionalRenderer(message);
         if (renderer) return renderer;
       }
       return getRenderer(message);
     },
-    dismiss: (id) => {
+    dismiss(id) {
       alert.dismiss(id);
     },
   };
