@@ -249,7 +249,8 @@ export default class CallMonitor extends RcModule {
     this.addSelector('_activeOnHoldCalls',
       this._selectors.calls,
       calls => calls.filter(callItem =>
-        callItem.webphoneSession && isOnHold(callItem.webphoneSession)
+        callItem.webphoneSession &&
+        isOnHold(callItem.webphoneSession)
       )
     );
 
