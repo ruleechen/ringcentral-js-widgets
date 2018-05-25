@@ -157,7 +157,8 @@ export default class ConferenceCall extends RcModule {
    */
   @proxify
   async bringInToConference(id, partyCall) {
-    if (partyCall.direction !== callDirections.outbound) {
+    console.log(partyCall, 333);
+    if (!partyCall || partyCall.direction !== callDirections.outbound) {
       // TODO: alert error that only can merge outbound call
       return null;
     }
@@ -360,7 +361,8 @@ export default class ConferenceCall extends RcModule {
     );
   }
 
-  startPollingConferenceStatus(id) {
+  async startPollingConferenceStatus(id) {
+    await this.updateConferenceStatus(id);
     this._timers[id] = setTimeout(
       async () => {
         await this.updateConferenceStatus(id);

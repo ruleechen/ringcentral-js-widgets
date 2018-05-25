@@ -23,6 +23,7 @@ function mapToProps(_, {
     conference: conferenceList.length ? conferenceList[0] : null,
     currentLocale: locale.currentLocale,
     callingMode,
+    callMonitor,
     activeRingCalls: callMonitor.activeRingCalls,
     activeOnHoldCalls: callMonitor.activeOnHoldCalls,
     activeCurrentCalls: callMonitor.activeCurrentCalls,
@@ -63,17 +64,34 @@ function mapToFunctions(_, {
   onViewContact,
   showViewContact = true,
 }) {
-  const mergeToConference = async (sessionIds = []) => {
-    const conference = Object.values(conferenceCall.conferences)[0];
-    if (conference) {
-      await Promise.all(
-        sessionIds.map(
-          sessionId => conferenceCall.bringInToConference(conference.id, sessionId)
-        )
-      );
-    } else {
+  const mergeToConference = async (calls = []) => {
+    // console.log(calls, '000');
+    const conferenceState = Object.values(conferenceCall.conferences)[0];
+    try {
+      if (conferenceState) {
+        const conferenceId = conferenceState.conference.id;
+        // console.log(conferenceState.conference, 444);
+        conferenceCall.stopPollingConferenceStatus();
+        await Promise.all(
+          calls.map(
+            call => setTimeout(
+              () => conferenceCall.bringInToConference(conferenceId, call),
+              1000
+            )
+          )
+        );
+        // for (const call of calls) {
+        //   console.log(call);
+        //   await conferenceCall.bringInToConference(conferenceId, call).then(null, e => console.log(e, 111));
+        // }
+        conferenceCall.startPollingConferenceStatus(conferenceId);
+        return;
+      }
       await conferenceCall.makeConference();
-      await mergeToConference(sessionIds);
+      // console.log(calls, 222);
+      await mergeToConference(calls);
+    } catch (e) {
+      // console.log(e);
     }
   };
 

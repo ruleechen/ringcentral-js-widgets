@@ -9,9 +9,9 @@ import styles from './styles.scss';
 import i18n from './i18n';
 
 function ActiveCallList({
+  callMonitor,
   calls,
   conference,
-  currentCall,
   isCurrentCallList,
   className,
   currentLocale,
@@ -44,7 +44,10 @@ function ActiveCallList({
   if (calls.length === 0) {
     return null;
   }
-  const outboundCalls = calls.filter(call => call.direction === callDirections.outbound);
+  const outboundWebRTCCalls = callMonitor.calls.filter(call => (
+    call.direction === callDirections.outbound
+    && call.webphoneSession
+  ));
   return (
     <div className={classnames(styles.list, className)}>
       <div className={styles.listTitle}>
@@ -58,25 +61,42 @@ function ActiveCallList({
 
           let showMergeButton;
           let onConfirmMerge;
-          if (
-            call.direction === callDirections.inbound
+
+          if (!callMonitor.activeCurrentCalls[0]) {
+            showMergeButton = false;
+          } else if (
+            callMonitor.activeCurrentCalls[0].direction === callDirections.inbound
+            || call.direction === callDirections.inbound
             || isCurrentCallList
             || !isOnWebRTC
           ) {
             showMergeButton = false;
-          } else if (outboundCalls.length > 1) {
+          } else if (outboundWebRTCCalls.length > 1) {
             if (isOnConferenceCall) {
               showMergeButton = true;
 
               onConfirmMerge = () => {
-                mergeToConference([currentCall.webphoneSession.id]);
+                mergeToConference([callMonitor.activeCurrentCalls[0]]);
               };// todo
             } else {
+              showMergeButton = true;
+
               onConfirmMerge = () => {
-                mergeToConference([
-                  call.webphoneSession.id,
-                  currentCall.webphoneSession.id
-                ]);
+                if (
+                  callMonitor.activeCurrentCalls[0]
+                  && callMonitor.activeCurrentCalls[0].webphoneSession
+                  && isConferenceCall(callMonitor.activeCurrentCalls[0].webphoneSession.id)
+                ) {
+                  mergeToConference([
+                    call
+                  ]);
+                } else {
+                  // gonna make a conference and then bring two session into it.
+                  mergeToConference([
+                    call,
+                    callMonitor.activeCurrentCalls[0]
+                  ]);
+                }
               };
             }
           } else {
@@ -127,6 +147,7 @@ ActiveCallList.propTypes = {
   className: PropTypes.string,
   title: PropTypes.string.isRequired,
   calls: PropTypes.array.isRequired,
+  callMonitor: PropTypes.object.isRequired,
   areaCode: PropTypes.string.isRequired,
   countryCode: PropTypes.string.isRequired,
   brand: PropTypes.string,
@@ -253,6 +274,7 @@ export default class ActiveCallsPanel extends Component {
       mergeToConference,
       activeCurrentCalls,
       callingMode,
+      callMonitor,
     } = this.props;
 
     return (
@@ -263,6 +285,7 @@ export default class ActiveCallsPanel extends Component {
         conference={conference}
         title={title}
         calls={calls}
+        callMonitor={callMonitor}
         currentLocale={currentLocale}
         areaCode={areaCode}
         countryCode={countryCode}
@@ -274,7 +297,7 @@ export default class ActiveCallsPanel extends Component {
         onViewContact={onViewContact}
         mergeToConference={async (...args) => {
           this.setState({ showSpinner: true });
-          await mergeToConference.call(this, args);
+          await mergeToConference.call(this, ...args);
           this.setState({ showSpinner: false });
         }}
         outboundSmsPermission={outboundSmsPermission}
@@ -302,7 +325,8 @@ export default class ActiveCallsPanel extends Component {
       activeCurrentCalls,
       otherDeviceCalls,
       className,
-      currentLocale
+      currentLocale,
+      callMonitor,
     } = this.props;
 
     if (this.state.showSpinner) {
@@ -332,6 +356,7 @@ ActiveCallsPanel.propTypes = {
   callingMode: PropTypes.string.isRequired,
   currentLocale: PropTypes.string.isRequired,
   className: PropTypes.string,
+  callMonitor: PropTypes.object.isRequired,
   activeRingCalls: PropTypes.array.isRequired,
   activeOnHoldCalls: PropTypes.array.isRequired,
   activeCurrentCalls: PropTypes.array.isRequired,
