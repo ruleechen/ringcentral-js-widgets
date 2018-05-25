@@ -9,9 +9,9 @@ import styles from './styles.scss';
 import i18n from './i18n';
 
 function ActiveCallList({
+  callMonitor,
   calls,
   conference,
-  currentCall,
   isCurrentCallList,
   className,
   currentLocale,
@@ -44,7 +44,10 @@ function ActiveCallList({
   if (calls.length === 0) {
     return null;
   }
-  const outboundCalls = calls.filter(call => call.direction === callDirections.outbound);
+  const outboundWebRTCCalls = callMonitor.calls.filter(call => (
+    call.direction === callDirections.outbound
+    && call.webphoneSession
+  ));
   return (
     <div className={classnames(styles.list, className)}>
       <div className={styles.listTitle}>
@@ -57,26 +60,43 @@ function ActiveCallList({
           : false;
 
           let showMergeButton;
-          let onClickMergeBtn = () => {};
-          if (
-            call.direction === callDirections.inbound
+          let onConfirmMerge;
+
+          if (!callMonitor.activeCurrentCalls[0]) {
+            showMergeButton = false;
+          } else if (
+            callMonitor.activeCurrentCalls[0].direction === callDirections.inbound
+            || call.direction === callDirections.inbound
             || isCurrentCallList
             || !isOnWebRTC
           ) {
             showMergeButton = false;
-          } else if (outboundCalls.length > 1) {
+          } else if (outboundWebRTCCalls.length > 1) {
             if (isOnConferenceCall) {
               showMergeButton = true;
 
-              onClickMergeBtn = () => {
-                mergeToConference([currentCall.webphoneSession.id]);
+              onConfirmMerge = () => {
+                mergeToConference([callMonitor.activeCurrentCalls[0]]);
               };// todo
             } else {
-              onClickMergeBtn = () => {
-                mergeToConference([
-                  call.webphoneSession.id,
-                  currentCall.webphoneSession.id
-                ]);
+              showMergeButton = true;
+
+              onConfirmMerge = () => {
+                if (
+                  callMonitor.activeCurrentCalls[0]
+                  && callMonitor.activeCurrentCalls[0].webphoneSession
+                  && isConferenceCall(callMonitor.activeCurrentCalls[0].webphoneSession.id)
+                ) {
+                  mergeToConference([
+                    call
+                  ]);
+                } else {
+                  // gonna make a conference and then bring two session into it.
+                  mergeToConference([
+                    call,
+                    callMonitor.activeCurrentCalls[0]
+                  ]);
+                }
               };
             }
           } else {
@@ -103,7 +123,7 @@ function ActiveCallList({
               onLogCall={onLogCall}
               onViewContact={onViewContact}
               onCreateContact={onCreateContact}
-              onClickMergeBtn={onClickMergeBtn}
+              onConfirmMerge={onConfirmMerge}
               loggingMap={loggingMap}
               webphoneAnswer={webphoneAnswer}
               webphoneReject={webphoneReject}
@@ -127,6 +147,7 @@ ActiveCallList.propTypes = {
   className: PropTypes.string,
   title: PropTypes.string.isRequired,
   calls: PropTypes.array.isRequired,
+  callMonitor: PropTypes.object.isRequired,
   areaCode: PropTypes.string.isRequired,
   countryCode: PropTypes.string.isRequired,
   brand: PropTypes.string,
@@ -190,6 +211,12 @@ ActiveCallList.defaultProps = {
 };
 
 export default class ActiveCallsPanel extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      showSpinner: false
+    };
+  }
   componentDidMount() {
     if (
       !this.hasCalls(this.props) &&
@@ -247,6 +274,7 @@ export default class ActiveCallsPanel extends Component {
       mergeToConference,
       activeCurrentCalls,
       callingMode,
+      callMonitor,
     } = this.props;
 
     return (
@@ -257,6 +285,7 @@ export default class ActiveCallsPanel extends Component {
         conference={conference}
         title={title}
         calls={calls}
+        callMonitor={callMonitor}
         currentLocale={currentLocale}
         areaCode={areaCode}
         countryCode={countryCode}
@@ -266,7 +295,11 @@ export default class ActiveCallsPanel extends Component {
         onClickToSms={onClickToSms}
         onCreateContact={onCreateContact}
         onViewContact={onViewContact}
-        mergeToConference={mergeToConference}
+        mergeToConference={async (...args) => {
+          this.setState({ showSpinner: true });
+          await mergeToConference.call(this, ...args);
+          this.setState({ showSpinner: false });
+        }}
         outboundSmsPermission={outboundSmsPermission}
         internalSmsPermission={internalSmsPermission}
         isLoggedContact={isLoggedContact}
@@ -291,12 +324,12 @@ export default class ActiveCallsPanel extends Component {
       activeOnHoldCalls,
       activeCurrentCalls,
       otherDeviceCalls,
-      showSpinner,
       className,
-      currentLocale
+      currentLocale,
+      callMonitor,
     } = this.props;
 
-    if (showSpinner) {
+    if (this.state.showSpinner) {
       return (<SpinnerOverlay />);
     }
     if (!this.hasCalls()) {
@@ -323,11 +356,11 @@ ActiveCallsPanel.propTypes = {
   callingMode: PropTypes.string.isRequired,
   currentLocale: PropTypes.string.isRequired,
   className: PropTypes.string,
+  callMonitor: PropTypes.object.isRequired,
   activeRingCalls: PropTypes.array.isRequired,
   activeOnHoldCalls: PropTypes.array.isRequired,
   activeCurrentCalls: PropTypes.array.isRequired,
   otherDeviceCalls: PropTypes.array.isRequired,
-  showSpinner: PropTypes.bool.isRequired,
   areaCode: PropTypes.string.isRequired,
   countryCode: PropTypes.string.isRequired,
   brand: PropTypes.string,

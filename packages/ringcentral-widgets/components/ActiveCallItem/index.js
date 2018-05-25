@@ -73,7 +73,7 @@ function WebphoneButtons({
   webphoneHangup,
   webphoneResume,
   showMergeButton,
-  onClickMergeBtn
+  onConfirmMerge
 }) {
   if (!session || !webphoneAnswer || !webphoneHangup) {
     return null;
@@ -104,7 +104,7 @@ function WebphoneButtons({
               className={styles.mergeButton}
               onClick={(e) => {
                 e.stopPropagation();
-                onClickMergeBtn();
+                onConfirmMerge();
               }}
               iconWidth={260}
               iconX={120}
@@ -148,7 +148,7 @@ WebphoneButtons.propTypes = {
   webphoneReject: PropTypes.func,
   webphoneHangup: PropTypes.func,
   webphoneResume: PropTypes.func,
-  onClickMergeBtn: PropTypes.func,
+  onConfirmMerge: PropTypes.func,
   showMergeButton: PropTypes.bool,
 };
 
@@ -159,7 +159,7 @@ WebphoneButtons.defaultProps = {
   webphoneHangup: undefined,
   webphoneResume: undefined,
   showMergeButton: false,
-  onClickMergeBtn: undefined,
+  onConfirmMerge: undefined,
 };
 
 export default class ActiveCallItem extends Component {
@@ -409,7 +409,7 @@ export default class ActiveCallItem extends Component {
       renderExtraButton,
       contactDisplayStyle,
       showMergeButton,
-      onClickMergeBtn
+      onConfirmMerge
     } = this.props;
     const phoneNumber = this.getPhoneNumber();
     const parsedInfo = parseNumber(phoneNumber);
@@ -481,7 +481,7 @@ export default class ActiveCallItem extends Component {
             webphoneReject={this.webphoneToVoicemail}
             webphoneHangup={webphoneHangup}
             webphoneResume={webphoneResume}
-            onClickMergeBtn={onClickMergeBtn}
+            onConfirmMerge={onConfirmMerge}
           />
           {extraButton}
         </div>
@@ -561,7 +561,7 @@ ActiveCallItem.propTypes = {
   onCreateContact: PropTypes.func,
   onLogCall: PropTypes.func,
   onViewContact: PropTypes.func,
-  onClickMergeBtn: PropTypes.func,
+  onConfirmMerge: PropTypes.func,
   sourceIcons: PropTypes.object,
   renderContactName: PropTypes.func,
   renderExtraButton: PropTypes.func,
@@ -573,7 +573,7 @@ ActiveCallItem.defaultProps = {
   onClickToSms: undefined,
   onViewContact: undefined,
   onCreateContact: undefined,
-  onClickMergeBtn: undefined,
+  onConfirmMerge: undefined,
   isLogging: false,
   outboundSmsPermission: false,
   internalSmsPermission: false,

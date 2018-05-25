@@ -23,6 +23,7 @@ function mapToProps(_, {
     conference: conferenceList.length ? conferenceList[0] : null,
     currentLocale: locale.currentLocale,
     callingMode,
+    callMonitor,
     activeRingCalls: callMonitor.activeRingCalls,
     activeOnHoldCalls: callMonitor.activeOnHoldCalls,
     activeCurrentCalls: callMonitor.activeCurrentCalls,
@@ -37,7 +38,6 @@ function mapToProps(_, {
       rolesAndPermissions.permissions &&
       rolesAndPermissions.permissions.InternalSMS
     ),
-    showSpinner: false,
     brand: brand.fullName,
     showContactDisplayPlaceholder,
     autoLog: !!(callLogger && callLogger.autoLog),
@@ -64,17 +64,30 @@ function mapToFunctions(_, {
   onViewContact,
   showViewContact = true,
 }) {
-  const mergeToConference = async (sessionIds = []) => {
-    const conference = Object.values(conferenceCall.conferences)[0];
-    if (conference) {
-      await Promise.all(
-        sessionIds.map(
-          sessionId => conferenceCall.bringInToConference(conference.id, sessionId)
-        )
-      );
-    } else {
+  const mergeToConference = async (calls = []) => {
+    const conferenceState = Object.values(conferenceCall.conferences)[0];
+    try {
+      if (conferenceState) {
+        const conferenceId = conferenceState.conference.id;
+        conferenceCall.stopPollingConferenceStatus(conferenceId);
+        await Promise.all(
+          calls.map(
+            call => conferenceCall.bringInToConference(conferenceId, call)
+          )
+        );
+        conferenceCall.startPollingConferenceStatus(conferenceId);
+        return;
+      }
       await conferenceCall.makeConference();
-      await mergeToConference(sessionIds);
+      /**
+       * HACK: 700ms came from exprience, if we try to bring other calls into the conference
+       * immediately, the api will throw 403 error which says: can't find the host of the
+       * conference.
+       */
+      await new Promise(resolve => setTimeout(resolve, 700));
+      await mergeToConference(calls);
+    } catch (e) {
+      console.log('error when merge to conference:', e);
     }
   };
 
