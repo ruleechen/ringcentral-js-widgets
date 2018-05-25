@@ -262,7 +262,6 @@ export default class ActiveCallsPanel extends Component {
       conference,
       isConferenceCall,
       mergeToConference,
-      activeCurrentCalls,
       callingMode,
       callMonitor,
     } = this.props;
@@ -314,7 +313,6 @@ export default class ActiveCallsPanel extends Component {
       otherDeviceCalls,
       className,
       currentLocale,
-      callMonitor,
     } = this.props;
 
     if (this.state.showSpinner) {
