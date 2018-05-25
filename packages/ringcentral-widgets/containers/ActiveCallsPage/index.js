@@ -65,33 +65,29 @@ function mapToFunctions(_, {
   showViewContact = true,
 }) {
   const mergeToConference = async (calls = []) => {
-    // console.log(calls, '000');
     const conferenceState = Object.values(conferenceCall.conferences)[0];
     try {
       if (conferenceState) {
         const conferenceId = conferenceState.conference.id;
-        // console.log(conferenceState.conference, 444);
-        conferenceCall.stopPollingConferenceStatus();
+        conferenceCall.stopPollingConferenceStatus(conferenceId);
         await Promise.all(
           calls.map(
-            call => setTimeout(
-              () => conferenceCall.bringInToConference(conferenceId, call),
-              1000
-            )
+            call => conferenceCall.bringInToConference(conferenceId, call)
           )
         );
-        // for (const call of calls) {
-        //   console.log(call);
-        //   await conferenceCall.bringInToConference(conferenceId, call).then(null, e => console.log(e, 111));
-        // }
         conferenceCall.startPollingConferenceStatus(conferenceId);
         return;
       }
       await conferenceCall.makeConference();
-      // console.log(calls, 222);
+      /**
+       * HACK: 700ms came from exprience, if we try to bring other calls into the conference
+       * immediately, the api will throw 403 error which says: can't find the host of the
+       * conference.
+       */
+      await new Promise(resolve => setTimeout(resolve, 700));
       await mergeToConference(calls);
     } catch (e) {
-      // console.log(e);
+      console.log('error when merge to conference:', e);
     }
   };
 
