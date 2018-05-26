@@ -6,7 +6,7 @@ import Modal from '../Modal';
 import Button from '../Button';
 import CloseIcon from '../../assets/images/CloseIcon.svg';
 
-export function ConfirmMergeModal({
+export default function ConfirmMergeModal({
   currentLocale,
   show,
   onMerge,
@@ -18,11 +18,11 @@ export function ConfirmMergeModal({
       currentLocale={currentLocale}
       onConfirm={onMerge}
       onCancel={onCancel}
-      className={styles.confirmDeleteModal}
-      modalClassName={styles.confirmDeleteModal}
+      className={styles.confirmMergeModal}
+      modalClassName={styles.confirmMergeModal}
       cancelBtnClassName={styles.cancelBtn}
       confirmBtnClassName={styles.confirmBtn}
-      title={i18n.getString('confirmation', currentLocale)}
+      // title={i18n.getString('confirmation', currentLocale)}
       closeBtn={
         <Button
           className={styles.closeBtn}

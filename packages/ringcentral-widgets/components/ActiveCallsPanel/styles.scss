@@ -26,3 +26,32 @@
   color: #2f2f2f;
   padding: 14px 20px 0 20px;
 }
+
+.confirmMergeModal {
+  min-width: 260px;
+
+  .contentText {
+    margin-top: 5px;
+  }
+  .cancelBtn {
+    width: 70px;
+    height: 28px;
+  }
+  .confirmBtn {
+    width: 70px;
+    height: 28px;
+    margin-left: 10px;
+  }
+}
+.button {
+  display: block;
+  float: left;
+}
+.button:not(:last-child) {
+  margin-right: 18px;
+}
+.closeBtn {
+  margin-top: 10px;
+  margin-right: 11px;
+  text-align: right;
+}
