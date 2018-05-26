@@ -162,7 +162,7 @@ export default class ConferenceCall extends RcModule {
       !conference
       || !partyCall
       || partyCall.direction !== callDirections.outbound
-      || conference.conference.parties.length === 11
+      || conference.conference.parties.length >= 11
     ) {
       this._alert.warning({
         message: conferenceErrors.bringInFailed,
