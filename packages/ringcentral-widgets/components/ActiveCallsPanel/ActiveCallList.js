@@ -15,6 +15,11 @@ class ActiveCallList extends Component {
       onMerge() {
         if (this.state.callOfModal) {
           this.props.mergeToConference([this.state.callOfModal]);
+          // close then
+          this.setState(Object.assign({}, this.state, {
+            isModalOpen: false,
+            callOfModal: null
+          }));
         }
       }
     };
