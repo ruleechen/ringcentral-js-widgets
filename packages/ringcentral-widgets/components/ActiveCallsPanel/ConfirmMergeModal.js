@@ -6,23 +6,23 @@ import Modal from '../Modal';
 import Button from '../Button';
 import CloseIcon from '../../assets/images/CloseIcon.svg';
 
-export function ConfirmDeleteModal({
+export default function ConfirmMergeModal({
   currentLocale,
   show,
-  onDelete,
+  onMerge,
   onCancel,
 }) {
   return (
     <Modal
       show={show}
       currentLocale={currentLocale}
-      onConfirm={onDelete}
+      onConfirm={onMerge}
       onCancel={onCancel}
-      className={styles.confirmDeleteModal}
-      modalClassName={styles.confirmDeleteModal}
+      className={styles.confirmMergeModal}
+      modalClassName={styles.confirmMergeModal}
       cancelBtnClassName={styles.cancelBtn}
       confirmBtnClassName={styles.confirmBtn}
-      title={i18n.getString('confirmation', currentLocale)}
+      // title={i18n.getString('confirmation', currentLocale)}
       closeBtn={
         <Button
           className={styles.closeBtn}
@@ -38,14 +38,14 @@ export function ConfirmDeleteModal({
     </Modal>
   );
 }
-ConfirmDeleteModal.propTypes = {
+ConfirmMergeModal.propTypes = {
   currentLocale: PropTypes.string.isRequired,
   show: PropTypes.bool.isRequired,
-  onDelete: PropTypes.func,
+  onMerge: PropTypes.func,
   onCancel: PropTypes.func,
 };
 
-ConfirmDeleteModal.defaultProps = {
-  onDelete() {},
+ConfirmMergeModal.defaultProps = {
+  onMerge() {},
   onCancel() {}
 };
