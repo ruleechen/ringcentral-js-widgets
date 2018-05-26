@@ -3,7 +3,8 @@ import callingModes from 'ringcentral-integration/modules/CallingSettings/callin
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import SpinnerOverlay from '../SpinnerOverlay';
-import ActiveCallList from './ActiveCallList';
+import ActiveCallList from '../ActiveCallList';
+import ConfirmMergeModal from './ConfirmMergeModal';
 import styles from './styles.scss';
 import i18n from './i18n';
 
@@ -11,9 +12,37 @@ export default class ActiveCallsPanel extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      showSpinner: false
+      showSpinner: false,
+      isModalOpen: false,
+      callOfModal: null,
+    };
+
+    this.mergeToConference = async (...args) => {
+      this.setState({ showSpinner: true });
+      await this.props.mergeToConference(...args);
+      this.setState({ showSpinner: false });
+    };
+
+    this.showConfirmMergeModal = (call) => {
+      this.setState({
+        isModalOpen: true,
+        callOfModal: call,
+      });
+    };
+
+    this.hideConfirmMergeModal = () => {
+      this.setState({
+        isModalOpen: false,
+        callOfModal: null,
+      });
+    };
+
+    this.confirmMergeCall = () => {
+      this.mergeToConference([this.state.callOfModal]);
+      this.hideConfirmMergeModal();
     };
   }
+
   componentDidMount() {
     if (
       !this.hasCalls(this.props) &&
@@ -68,7 +97,6 @@ export default class ActiveCallsPanel extends Component {
       sourceIcons,
       conference,
       isConferenceCall,
-      mergeToConference,
       callingMode,
       activeCurrentCalls,
     } = this.props;
@@ -89,11 +117,7 @@ export default class ActiveCallsPanel extends Component {
         onClickToSms={onClickToSms}
         onCreateContact={onCreateContact}
         onViewContact={onViewContact}
-        mergeToConference={async (...args) => {
-          this.setState({ showSpinner: true });
-          await mergeToConference.call(this, ...args);
-          this.setState({ showSpinner: false });
-        }}
+        mergeToConference={this.mergeToConference}
         outboundSmsPermission={outboundSmsPermission}
         internalSmsPermission={internalSmsPermission}
         isLoggedContact={isLoggedContact}
@@ -108,6 +132,7 @@ export default class ActiveCallsPanel extends Component {
         enableContactFallback={enableContactFallback}
         sourceIcons={sourceIcons}
         activeCurrentCalls={activeCurrentCalls}
+        onConfirmMergeCall={this.showConfirmMergeModal}
       />
     );
   }
@@ -121,16 +146,11 @@ export default class ActiveCallsPanel extends Component {
       className,
       currentLocale,
     } = this.props;
-
-    if (this.state.showSpinner) {
-      return (<SpinnerOverlay />);
-    }
     if (!this.hasCalls()) {
       return (
         <div className={classnames(styles.root, className)}>
-          <p className={styles.noCalls}>
-            {i18n.getString('noActiveCalls', currentLocale)}
-          </p>
+          <p className={styles.noCalls}>{i18n.getString('noActiveCalls', currentLocale)}</p>
+          {this.state.showSpinner && <SpinnerOverlay className={styles.spinner} />}
         </div>
       );
     }
@@ -140,6 +160,13 @@ export default class ActiveCallsPanel extends Component {
         {this.getCallList(activeCurrentCalls, i18n.getString('currentCall', currentLocale))}
         {this.getCallList(activeOnHoldCalls, i18n.getString('onHoldCall', currentLocale))}
         {this.getCallList(otherDeviceCalls, i18n.getString('otherDeviceCall', currentLocale))}
+        <ConfirmMergeModal
+          currentLocale={currentLocale}
+          show={this.state.isModalOpen}
+          onMerge={this.confirmMergeCall}
+          onCancel={this.hideConfirmMergeModal}
+        />
+        {this.state.showSpinner && <SpinnerOverlay className={styles.spinner} />}
       </div>
     );
   }
