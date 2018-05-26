@@ -66,18 +66,14 @@ function ActiveCallList({
               if (hasConference) {
                 showMergeCall = true;
                 if (isOnConferenceCall) {
-                  onMergeCall = () => mergeToConference([
-                    currentCall
-                  ]);
+                  onMergeCall = () => mergeToConference([currentCall]);
                 } else {
                   onMergeCall = () => mergeToConference([call]);
                 }
               } else {
                 showMergeCall = true;
-                onMergeCall = () => mergeToConference([
-                  call,
-                  activeCurrentCalls[0]
-                ]);
+                const partyCalls = [call, activeCurrentCalls[0]];
+                onMergeCall = () => mergeToConference(partyCalls);
               }
             } else if (hasConference) {
               if (isOnConferenceCall) {
