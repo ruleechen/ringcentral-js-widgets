@@ -37,15 +37,15 @@ function CallIcon({
   return (
     <div className={styles.callIcon}>
       {isOnConferenceCall
-      ? <ConferenceCallIcon />
-      : <span
-        className={classnames(
-          callIconMap[direction],
-          styles.activeCall,
-          ringing && styles.ringing,
-        )}
-        title={title}
-      />
+        ? <ConferenceCallIcon />
+        : <span
+          className={classnames(
+            callIconMap[direction],
+            styles.activeCall,
+            ringing && styles.ringing,
+          )}
+          title={title}
+        />
       }
     </div>
   );
@@ -72,8 +72,8 @@ function WebphoneButtons({
   webphoneReject,
   webphoneHangup,
   webphoneResume,
-  showMergeButton,
-  onConfirmMerge
+  showMergeCall,
+  onMergeCall,
 }) {
   if (!session || !webphoneAnswer || !webphoneHangup) {
     return null;
@@ -97,14 +97,13 @@ function WebphoneButtons({
   return (
     <div className={styles.webphoneButtons}>
       {
-        showMergeButton
-        ?
+        showMergeCall ?
           <span title={mergeTitle} className={styles.webphoneButton}>
             <CircleButton
               className={styles.mergeButton}
               onClick={(e) => {
                 e.stopPropagation();
-                onConfirmMerge();
+                onMergeCall();
               }}
               iconWidth={260}
               iconX={120}
@@ -112,7 +111,7 @@ function WebphoneButtons({
               showBorder={false}
             />
           </span>
-        : null
+          : null
       }
       <span title={rejectTitle} className={styles.webphoneButton}>
         <CircleButton
@@ -136,7 +135,7 @@ function WebphoneButtons({
           }}
           icon={AnswerIcon}
           showBorder={false}
-      />
+        />
       </span>
     </div>
   );
@@ -148,8 +147,8 @@ WebphoneButtons.propTypes = {
   webphoneReject: PropTypes.func,
   webphoneHangup: PropTypes.func,
   webphoneResume: PropTypes.func,
-  onConfirmMerge: PropTypes.func,
-  showMergeButton: PropTypes.bool,
+  showMergeCall: PropTypes.bool,
+  onMergeCall: PropTypes.func,
 };
 
 WebphoneButtons.defaultProps = {
@@ -158,8 +157,8 @@ WebphoneButtons.defaultProps = {
   webphoneReject: undefined,
   webphoneHangup: undefined,
   webphoneResume: undefined,
-  showMergeButton: false,
-  onConfirmMerge: undefined,
+  showMergeCall: false,
+  onMergeCall: undefined,
 };
 
 export default class ActiveCallItem extends Component {
@@ -408,8 +407,8 @@ export default class ActiveCallItem extends Component {
       renderContactName,
       renderExtraButton,
       contactDisplayStyle,
-      showMergeButton,
-      onConfirmMerge
+      showMergeCall,
+      onMergeCall,
     } = this.props;
     const phoneNumber = this.getPhoneNumber();
     const parsedInfo = parseNumber(phoneNumber);
@@ -452,8 +451,8 @@ export default class ActiveCallItem extends Component {
             contactName={contactName}
             className={
               isOnConferenceCall
-              ? classnames(styles.conferenceContactDisplay)
-              : classnames(styles.contactDisplay, contactDisplayStyle)
+                ? classnames(styles.conferenceContactDisplay)
+                : classnames(styles.contactDisplay, contactDisplayStyle)
 
             }
             contactMatches={contactMatches}
@@ -475,43 +474,43 @@ export default class ActiveCallItem extends Component {
           />
           {isOnConferenceCall ? null : callDetail}
           <WebphoneButtons
-            showMergeButton={showMergeButton}
             session={webphoneSession}
             webphoneAnswer={webphoneAnswer}
             webphoneReject={this.webphoneToVoicemail}
             webphoneHangup={webphoneHangup}
             webphoneResume={webphoneResume}
-            onConfirmMerge={onConfirmMerge}
+            showMergeCall={showMergeCall}
+            onMergeCall={onMergeCall}
           />
           {extraButton}
         </div>
         {
           isOnConferenceCall
-          ? null
-          : <ActionMenu
-            extended={this.state.extended}
-            onToggle={this.toggleExtended}
-            currentLocale={currentLocale}
-            disableLinks={disableLinks}
-            phoneNumber={phoneNumber}
-            onClickToSms={
-            showClickToSms ?
-              () => this.clickToSms({ countryCode, areaCode })
-              : undefined
-          }
-            hasEntity={!!contactMatches.length}
-            onViewEntity={onViewContact && this.viewSelectedContact}
-            onCreateEntity={onCreateContact && this.createSelectedContact}
-            textTitle={i18n.getString('text', currentLocale)}
-            onLog={onLogCall}
-            isLogging={isLogging || this.state.isLogging}
-            isLogged={activityMatches.length > 0}
-            isCreating={this.state.isCreating}
-            addLogTitle={i18n.getString('addLog', currentLocale)}
-            editLogTitle={i18n.getString('editLog', currentLocale)}
-            createEntityTitle={i18n.getString('addEntity', currentLocale)}
-            viewEntityTitle={i18n.getString('viewDetails', currentLocale)}
-          />
+            ? null
+            : <ActionMenu
+              extended={this.state.extended}
+              onToggle={this.toggleExtended}
+              currentLocale={currentLocale}
+              disableLinks={disableLinks}
+              phoneNumber={phoneNumber}
+              onClickToSms={
+                showClickToSms ?
+                  () => this.clickToSms({ countryCode, areaCode })
+                  : undefined
+              }
+              hasEntity={!!contactMatches.length}
+              onViewEntity={onViewContact && this.viewSelectedContact}
+              onCreateEntity={onCreateContact && this.createSelectedContact}
+              textTitle={i18n.getString('text', currentLocale)}
+              onLog={onLogCall}
+              isLogging={isLogging || this.state.isLogging}
+              isLogged={activityMatches.length > 0}
+              isCreating={this.state.isCreating}
+              addLogTitle={i18n.getString('addLog', currentLocale)}
+              editLogTitle={i18n.getString('editLog', currentLocale)}
+              createEntityTitle={i18n.getString('addEntity', currentLocale)}
+              viewEntityTitle={i18n.getString('viewDetails', currentLocale)}
+            />
         }
       </div>
     );
@@ -555,13 +554,13 @@ ActiveCallItem.propTypes = {
   autoLog: PropTypes.bool,
   brand: PropTypes.string,
   showContactDisplayPlaceholder: PropTypes.bool,
-  showMergeButton: PropTypes.bool,
+  showMergeCall: PropTypes.bool,
   formatPhone: PropTypes.func.isRequired,
   onClickToSms: PropTypes.func,
   onCreateContact: PropTypes.func,
   onLogCall: PropTypes.func,
   onViewContact: PropTypes.func,
-  onConfirmMerge: PropTypes.func,
+  onMergeCall: PropTypes.func,
   sourceIcons: PropTypes.object,
   renderContactName: PropTypes.func,
   renderExtraButton: PropTypes.func,
@@ -573,7 +572,7 @@ ActiveCallItem.defaultProps = {
   onClickToSms: undefined,
   onViewContact: undefined,
   onCreateContact: undefined,
-  onConfirmMerge: undefined,
+  onMergeCall: undefined,
   isLogging: false,
   outboundSmsPermission: false,
   internalSmsPermission: false,
@@ -587,7 +586,7 @@ ActiveCallItem.defaultProps = {
   autoLog: false,
   brand: 'RingCentral',
   showContactDisplayPlaceholder: true,
-  showMergeButton: false,
+  showMergeCall: false,
   sourceIcons: undefined,
   renderContactName: undefined,
   renderExtraButton: undefined,
