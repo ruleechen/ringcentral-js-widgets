@@ -75,18 +75,24 @@ function mapToFunctions(_, {
           )
         );
         conferenceCall.startPollingConferenceStatus(conferenceId);
-        return;
+        return conferenceId;
       }
-      await conferenceCall.makeConference();
+      const { id } = await conferenceCall.makeConference();
       /**
        * HACK: 700ms came from exprience, if we try to bring other calls into the conference
        * immediately, the api will throw 403 error which says: can't find the host of the
        * conference.
        */
       await new Promise(resolve => setTimeout(resolve, 700));
-      await mergeToConference(calls);
+      const mergedId = await mergeToConference(calls);
+
+      if (mergedId !== id) {
+        conferenceCall.terminateConference(id);
+      }
+      return id;
     } catch (e) {
       console.log('error when merge to conference:', e);
+      return null;
     }
   };
 
