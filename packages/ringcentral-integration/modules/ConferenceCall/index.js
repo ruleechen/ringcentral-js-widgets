@@ -291,6 +291,8 @@ export default class ConferenceCall extends RcModule {
       this._alert.warning({
         message: conferenceErrors.makeConferenceFailed,
       });
+      // need to propagate to out side try...catch block
+      throw e;
     }
     return null;
   }
