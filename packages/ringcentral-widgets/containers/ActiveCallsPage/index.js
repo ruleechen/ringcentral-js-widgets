@@ -88,6 +88,7 @@ function mapToFunctions(_, {
 
       if (mergedId !== id) {
         conferenceCall.terminateConference(id);
+        return null;
       }
       return id;
     } catch (e) {
