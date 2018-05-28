@@ -294,7 +294,6 @@ export default class ConferenceCall extends RcModule {
       // need to propagate to out side try...catch block
       throw e;
     }
-    return null;
   }
 
   initialize() {
