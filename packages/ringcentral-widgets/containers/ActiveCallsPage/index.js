@@ -86,6 +86,7 @@ function mapToFunctions(_, {
       await new Promise(resolve => setTimeout(resolve, 700));
       const mergedId = await mergeToConference(calls);
 
+      // if create conference successfully but failed to bring-in, then terminate the conference.
       if (mergedId !== id) {
         conferenceCall.terminateConference(id);
         return null;
