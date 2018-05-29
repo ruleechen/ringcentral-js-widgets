@@ -5,6 +5,8 @@ import withPhone from '../../lib/withPhone';
 
 import ActiveCallsPanel from '../../components/ActiveCallsPanel';
 
+const DEFAULT_WAIT = 700;
+
 function mapToProps(_, {
   phone: {
     brand,
@@ -85,7 +87,7 @@ function mapToFunctions(_, {
        * immediately, the api will throw 403 error which says: can't find the host of the
        * conference.
        */
-      await new Promise(resolve => setTimeout(resolve, 700));
+      await new Promise(resolve => setTimeout(resolve, DEFAULT_WAIT));
       const mergedId = await mergeToConference(calls);
 
       // if create conference successfully but failed to bring-in, then terminate the conference.
