@@ -141,7 +141,14 @@ import ProxyFrameOAuth from 'ringcentral-widgets/modules/ProxyFrameOAuth';
     DialerUI,
     Feedback,
     UserGuide,
-    ConferenceCall,    
+    ConferenceCall,
+    // { 
+    //   provide: 'ConferenceCallOptions',
+    //   useValue: {
+    //     pulling: false,
+    //   },
+    //   spread: true, 
+    // },
   ]
 })
 export default class BasePhone extends RcModule {

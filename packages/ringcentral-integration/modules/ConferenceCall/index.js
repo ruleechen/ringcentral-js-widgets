@@ -10,7 +10,7 @@ import conferenceErrors from './conferenceCallErrors';
 import ensureExist from '../../lib/ensureExist';
 import callingModes from '../CallingSettings/callingModes';
 
-const DEFAULT_TTL = 2000;
+const DEFAULT_TTL = 5000;
 
 /**
  * @class
@@ -27,6 +27,10 @@ const DEFAULT_TTL = 2000;
     'CallingSettings',
     'Client',
     'RolesAndPermissions',
+    {
+      dep: 'ConferenceCallOptions',
+      optional: true
+    },
   ]
 })
 export default class ConferenceCall extends RcModule {
@@ -43,6 +47,7 @@ export default class ConferenceCall extends RcModule {
     callingSettings,
     client,
     rolesAndPermissions,
+    pulling = true,
     ...options
   }) {
     super({
@@ -52,6 +57,7 @@ export default class ConferenceCall extends RcModule {
       callingSettings,
       client,
       rolesAndPermissions,
+      pulling,
       ...options,
       actionTypes,
     });
@@ -65,6 +71,7 @@ export default class ConferenceCall extends RcModule {
     this._reducer = getConferenceCallReducer(this.actionTypes);
     this._ttl = DEFAULT_TTL;
     this._timers = {};
+    this._pulling = pulling;
   }
 
   // only can be used after webphone._onCallStartFunc
@@ -374,7 +381,7 @@ export default class ConferenceCall extends RcModule {
   }
 
   async startPollingConferenceStatus(id) {
-    if (this._timers[id]) {
+    if (this._timers[id] || !this._pulling) {
       return;
     }
     await this.updateConferenceStatus(id);
@@ -392,6 +399,18 @@ export default class ConferenceCall extends RcModule {
   stopPollingConferenceStatus(id) {
     clearTimeout(this._timers[id]);
     delete this._timers[id];
+  }
+
+  openPulling() {
+    this._pulling = true;
+  }
+
+  closePulling() {
+    this._pulling = false;
+  }
+
+  togglePulling() {
+    this._pulling = !this.pulling;
   }
 
   get status() {
