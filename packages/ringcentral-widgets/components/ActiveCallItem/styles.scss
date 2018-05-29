@@ -1,5 +1,9 @@
 @import '../../lib/commonStyles/colors';
 @import '../../lib/commonStyles/fonts';
+
+// TODO: fix the whole style with flex
+$tmpWidth: calc(100% - 53px - 7px - 98px - 20px);
+
 .root {
   display: block;
   background: #fff;
@@ -63,7 +67,7 @@
   top: 5px;
   left: 45px;
   line-height: 25px;
-  max-width: 50%;
+  max-width: $tmpWidth;
   button {
     font-size: 13px;
   }
@@ -138,7 +142,7 @@
   position: absolute;
   top: 30px;
   left: 45px;
-  max-width: 50%;
+  max-width: $tmpWidth;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
