@@ -1,5 +1,6 @@
 import { connect } from 'react-redux';
 import formatNumber from 'ringcentral-integration/lib/formatNumber';
+import conferenceErrors from 'ringcentral-integration/modules/ConferenceCall/conferenceCallErrors';
 import withPhone from '../../lib/withPhone';
 
 import ActiveCallsPanel from '../../components/ActiveCallsPanel';
@@ -53,6 +54,7 @@ function mapToFunctions(_, {
     routerInteraction,
     webphone,
     conferenceCall,
+    alert,
   },
   composeTextRoute = '/composeText',
   callCtrlRoute = '/calls/active',
@@ -71,13 +73,13 @@ function mapToFunctions(_, {
         conferenceCall.stopPollingConferenceStatus(conferenceId);
         await Promise.all(
           calls.map(
-            call => conferenceCall.bringInToConference(conferenceId, call)
+            call => conferenceCall.bringInToConference(conferenceId, call, false)
           )
         );
         conferenceCall.startPollingConferenceStatus(conferenceId);
         return conferenceId;
       }
-      const { id } = await conferenceCall.makeConference();
+      const { id } = await conferenceCall.makeConference(false);
       /**
        * HACK: 700ms came from exprience, if we try to bring other calls into the conference
        * immediately, the api will throw 403 error which says: can't find the host of the
@@ -93,7 +95,9 @@ function mapToFunctions(_, {
       }
       return id;
     } catch (e) {
-      console.log('error when merge to conference:', e);
+      alert.warning({
+        message: conferenceErrors.bringInFailed,
+      });
       return null;
     }
   };
