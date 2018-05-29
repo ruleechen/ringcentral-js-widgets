@@ -163,17 +163,20 @@ export default class ConferenceCall extends RcModule {
    * }
    */
   @proxify
-  async bringInToConference(id, partyCall) {
+  async bringInToConference(id, partyCall, needAlert = true) {
     const conference = this.state.conferences[id];
     if (
       !conference
-      || !partyCall
-      || partyCall.direction !== callDirections.outbound
-      || conference.conference.parties.length >= 11
+        || !partyCall
+        || partyCall.direction !== callDirections.outbound
+        || conference.conference.parties.length >= 11
     ) {
-      this._alert.warning({
-        message: conferenceErrors.bringInFailed,
-      });
+      if (needAlert) {
+        this._alert.warning({
+          message: conferenceErrors.bringInFailed,
+        });
+      }
+
       return null;
     }
     this.store.dispatch({
@@ -192,16 +195,18 @@ export default class ConferenceCall extends RcModule {
         conference,
       });
     } catch (e) {
-      this._alert.warning({
-        message: conferenceErrors.bringInFailed,
-      });
+      if (needAlert) {
+        this._alert.warning({
+          message: conferenceErrors.bringInFailed,
+        });
+      }
+
       this.store.dispatch({
         type: this.actionTypes.bringInConferenceFailed,
         message: e.toString()
       });
-    } finally {
-      // eslint-disable-next-line no-unsafe-finally
-      return conference;
+
+      throw e;
     }
   }
 
@@ -241,22 +246,28 @@ export default class ConferenceCall extends RcModule {
    * start a conference call, return the session
    */
   @proxify
-  async makeConference() {
+  async makeConference(needAlert = true) {
     if (!this.ready) {
       return null;
     }
     if (!this._checkPermission()) {
-      this._alert.danger({
-        message: permissionsMessages.insufficientPrivilege,
-        ttl: 0,
-      });
+      if (needAlert) {
+        this._alert.danger({
+          message: permissionsMessages.insufficientPrivilege,
+          ttl: 0,
+        });
+      }
+
       return null;
     }
     if (!this._callingSettings.callingMode === callingModes.webphone) {
-      this._alert.danger({
-        message: conferenceErrors.modeError,
-        ttl: 0,
-      });
+      if (needAlert) {
+        this._alert.danger({
+          message: conferenceErrors.modeError,
+          ttl: 0,
+        });
+      }
+
       return null;
     }
     try {
@@ -295,9 +306,12 @@ export default class ConferenceCall extends RcModule {
         type: this.actionTypes.makeConferenceFailed,
         message: e.toString()
       });
-      this._alert.warning({
-        message: conferenceErrors.makeConferenceFailed,
-      });
+
+      if (needAlert) {
+        this._alert.warning({
+          message: conferenceErrors.makeConferenceFailed,
+        });
+      }
       // need to propagate to out side try...catch block
       throw e;
     }
