@@ -270,6 +270,11 @@ export default class ConferenceCall extends RcModule {
 
       return null;
     }
+    const session = await this._makeConference(needAlert);
+    return session;
+  }
+
+  async _makeConference(needAlert = true) {
     try {
       this.store.dispatch({
         type: this.actionTypes.makeConference,
