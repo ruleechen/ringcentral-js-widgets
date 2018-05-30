@@ -268,7 +268,7 @@ export default class CallMonitor extends RcModule {
       this._selectors._activeCurrentCalls,
       (_activeOnHoldCalls, _activeCurrentCalls) => (
         (_activeOnHoldCalls.length && !_activeCurrentCalls.length) ?
-          _activeOnHoldCalls.splice(1) :
+          _activeOnHoldCalls.slice(1) :
           _activeOnHoldCalls
       ),
     );
@@ -278,7 +278,7 @@ export default class CallMonitor extends RcModule {
       this._selectors._activeOnHoldCalls,
       (_activeCurrentCalls, _activeOnHoldCalls) => (
         (!_activeCurrentCalls.length && _activeOnHoldCalls.length) ?
-          _activeOnHoldCalls.splice(0, 1) :
+          _activeOnHoldCalls.slice(0, 1) :
           _activeCurrentCalls
       )
     );
