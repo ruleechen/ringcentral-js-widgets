@@ -18,9 +18,7 @@ export default class ActiveCallsPanel extends Component {
     };
 
     this.mergeToConference = async (...args) => {
-      this.setState({
-        showSpinner: true
-      });
+      this.setState({ showSpinner: true });
       await this.props.mergeToConference(...args);
       // need to hide the spinner after the merge
       setTimeout(() => {
@@ -51,7 +49,8 @@ export default class ActiveCallsPanel extends Component {
   }
 
   componentDidMount() {
-    if (!this.hasCalls(this.props) &&
+    if (
+      !this.hasCalls(this.props) &&
       typeof this.props.onCallsEmpty === 'function'
     ) {
       this.props.onCallsEmpty();
@@ -107,97 +106,38 @@ export default class ActiveCallsPanel extends Component {
       activeCurrentCalls,
     } = this.props;
 
-    return (<ActiveCallList
-      isOnWebRTC={
-        callingMode === callingModes.webphone
-      }
-      isConferenceCall={
-        isConferenceCall
-      }
-      conference={
-        conference
-      }
-      title={
-        title
-      }
-      calls={
-        calls
-      }
-      currentLocale={
-        currentLocale
-      }
-      areaCode={
-        areaCode
-      }
-      countryCode={
-        countryCode
-      }
-      brand={
-        brand
-      }
-      showContactDisplayPlaceholder={
-        showContactDisplayPlaceholder
-      }
-      formatPhone={
-        formatPhone
-      }
-      onClickToSms={
-        onClickToSms
-      }
-      onCreateContact={
-        onCreateContact
-      }
-      onViewContact={
-        onViewContact
-      }
-      mergeToConference={
-        this.mergeToConference
-      }
-      outboundSmsPermission={
-        outboundSmsPermission
-      }
-      internalSmsPermission={
-        internalSmsPermission
-      }
-      isLoggedContact={
-        isLoggedContact
-      }
-      onLogCall={
-        onLogCall
-      }
-      autoLog={
-        autoLog
-      }
-      loggingMap={
-        loggingMap
-      }
-      webphoneAnswer={
-        webphoneAnswer
-      }
-      webphoneReject={
-        webphoneReject
-      }
-      webphoneHangup={
-        webphoneHangup
-      }
-      webphoneResume={
-        webphoneResume
-      }
-      webphoneToVoicemail={
-        webphoneToVoicemail
-      }
-      enableContactFallback={
-        enableContactFallback
-      }
-      sourceIcons={
-        sourceIcons
-      }
-      activeCurrentCalls={
-        activeCurrentCalls
-      }
-      onConfirmMergeCall={
-        this.showConfirmMergeModal
-      }
+    return (
+      <ActiveCallList
+        isOnWebRTC={callingMode === callingModes.webphone}
+        isConferenceCall={isConferenceCall}
+        conference={conference}
+        title={title}
+        calls={calls}
+        currentLocale={currentLocale}
+        areaCode={areaCode}
+        countryCode={countryCode}
+        brand={brand}
+        showContactDisplayPlaceholder={showContactDisplayPlaceholder}
+        formatPhone={formatPhone}
+        onClickToSms={onClickToSms}
+        onCreateContact={onCreateContact}
+        onViewContact={onViewContact}
+        mergeToConference={this.mergeToConference}
+        outboundSmsPermission={outboundSmsPermission}
+        internalSmsPermission={internalSmsPermission}
+        isLoggedContact={isLoggedContact}
+        onLogCall={onLogCall}
+        autoLog={autoLog}
+        loggingMap={loggingMap}
+        webphoneAnswer={webphoneAnswer}
+        webphoneReject={webphoneReject}
+        webphoneHangup={webphoneHangup}
+        webphoneResume={webphoneResume}
+        webphoneToVoicemail={webphoneToVoicemail}
+        enableContactFallback={enableContactFallback}
+        sourceIcons={sourceIcons}
+        activeCurrentCalls={activeCurrentCalls}
+        onConfirmMergeCall={this.showConfirmMergeModal}
       />
     );
   }
@@ -212,51 +152,27 @@ export default class ActiveCallsPanel extends Component {
       currentLocale,
     } = this.props;
     if (!this.hasCalls()) {
-      return (<div className={
-            classnames(styles.root, className)
-          } >
-        <p className={
-            styles.noCalls
-          } > {
-            i18n.getString('noActiveCalls', currentLocale)
-          }
-        </p> {
-            this.state.showSpinner && <SpinnerOverlay className={
-              styles.spinner
-            }
-            />}
-              </div>
+      return (
+        <div className={classnames(styles.root, className)}>
+          <p className={styles.noCalls}>{i18n.getString('noActiveCalls', currentLocale)}</p>
+          {this.state.showSpinner && <SpinnerOverlay className={styles.spinner} />}
+        </div>
       );
     }
-    return (<div className={
-            classnames(styles.root, className)
-          } > {
-            this.getCallList(activeRingCalls, i18n.getString('ringCall', currentLocale))
-          } {
-            this.getCallList(activeCurrentCalls, i18n.getString('currentCall', currentLocale))
-          } {
-            this.getCallList(activeOnHoldCalls, i18n.getString('onHoldCall', currentLocale))
-          } {
-            this.getCallList(otherDeviceCalls, i18n.getString('otherDeviceCall', currentLocale))
-          } <ConfirmMergeModal
-            currentLocale={
-            currentLocale
-          }
-            show={
-            this.state.isModalOpen
-          }
-            onMerge={
-            this.confirmMergeCall
-          }
-            onCancel={
-            this.hideConfirmMergeModal
-          }
-          /> {
-            this.state.showSpinner && <SpinnerOverlay className={
-              styles.spinner
-            }
-            />}
-            </div>
+    return (
+      <div className={classnames(styles.root, className)}>
+        {this.getCallList(activeRingCalls, i18n.getString('ringCall', currentLocale))}
+        {this.getCallList(activeCurrentCalls, i18n.getString('currentCall', currentLocale))}
+        {this.getCallList(activeOnHoldCalls, i18n.getString('onHoldCall', currentLocale))}
+        {this.getCallList(otherDeviceCalls, i18n.getString('otherDeviceCall', currentLocale))}
+        <ConfirmMergeModal
+          currentLocale={currentLocale}
+          show={this.state.isModalOpen}
+          onMerge={this.confirmMergeCall}
+          onCancel={this.hideConfirmMergeModal}
+        />
+        {this.state.showSpinner && <SpinnerOverlay className={styles.spinner} />}
+      </div>
     );
   }
 }
