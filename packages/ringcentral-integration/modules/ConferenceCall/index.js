@@ -11,6 +11,7 @@ import ensureExist from '../../lib/ensureExist';
 import callingModes from '../CallingSettings/callingModes';
 
 const DEFAULT_TTL = 5000;
+const DEFAULT_WAIT = 700;
 
 /**
  * @class
@@ -72,6 +73,7 @@ export default class ConferenceCall extends RcModule {
     this._ttl = DEFAULT_TTL;
     this._timers = {};
     this._pulling = pulling;
+    this._isMerging = false;
   }
 
   // only can be used after webphone._onCallStartFunc
@@ -274,6 +276,50 @@ export default class ConferenceCall extends RcModule {
     return session;
   }
 
+  initialize() {
+    this.store.subscribe(() => this._onStateChange());
+  }
+
+  async mergeToConference(calls = []) {
+    this._isMerging = true;
+    const conferenceState = Object.values(this.conferences)[0];
+    try {
+      if (conferenceState) {
+        const conferenceId = conferenceState.conference.id;
+        this.stopPollingConferenceStatus(conferenceId);
+        await Promise.all(
+          calls.map(
+            call => this.bringInToConference(conferenceId, call, true)
+          )
+        );
+        this.startPollingConferenceStatus(conferenceId);
+        return conferenceId;
+      }
+      const { id } = await this.makeConference(true);
+      /**
+       * HACK: 700ms came from exprience, if we try to bring other calls into the conference
+       * immediately, the api will throw 403 error which says: can't find the host of the
+       * conference.
+       */
+      await new Promise(resolve => setTimeout(resolve, DEFAULT_WAIT));
+      const mergedId = await this.mergeToConference(calls);
+
+      // if create conference successfully but failed to bring-in, then terminate the conference.
+      if (mergedId !== id) {
+        this.terminateConference(id);
+        return null;
+      }
+      return id;
+    } catch (e) {
+      alert.warning({
+        message: conferenceErrors.bringInFailed,
+      });
+      return null;
+    } finally {
+      this._isMerging = false;
+    }
+  }
+
   async _makeConference(propagate = false) {
     try {
       this.store.dispatch({
@@ -305,6 +351,7 @@ export default class ConferenceCall extends RcModule {
           type: this.actionTypes.makeConferenceFailed,
         });
       }
+
       return conference;
     } catch (e) {
       this.store.dispatch({
@@ -321,10 +368,6 @@ export default class ConferenceCall extends RcModule {
       // need to propagate to out side try...catch block
       throw e;
     }
-  }
-
-  initialize() {
-    this.store.subscribe(() => this._onStateChange());
   }
 
   async _onStateChange() {
@@ -443,5 +486,9 @@ export default class ConferenceCall extends RcModule {
 
   get conferenceCallStatus() {
     return this.state.conferenceCallStatus;
+  }
+
+  get isMerging() {
+    return this._isMerging;
   }
 }

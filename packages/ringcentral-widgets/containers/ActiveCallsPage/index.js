@@ -1,11 +1,8 @@
 import { connect } from 'react-redux';
 import formatNumber from 'ringcentral-integration/lib/formatNumber';
-import conferenceErrors from 'ringcentral-integration/modules/ConferenceCall/conferenceCallErrors';
 import withPhone from '../../lib/withPhone';
 
 import ActiveCallsPanel from '../../components/ActiveCallsPanel';
-
-const DEFAULT_WAIT = 700;
 
 function mapToProps(_, {
   phone: {
@@ -67,43 +64,6 @@ function mapToFunctions(_, {
   onViewContact,
   showViewContact = true,
 }) {
-  const mergeToConference = async (calls = []) => {
-    const conferenceState = Object.values(conferenceCall.conferences)[0];
-    try {
-      if (conferenceState) {
-        const conferenceId = conferenceState.conference.id;
-        conferenceCall.stopPollingConferenceStatus(conferenceId);
-        await Promise.all(
-          calls.map(
-            call => conferenceCall.bringInToConference(conferenceId, call, true)
-          )
-        );
-        conferenceCall.startPollingConferenceStatus(conferenceId);
-        return conferenceId;
-      }
-      const { id } = await conferenceCall.makeConference(true);
-      /**
-       * HACK: 700ms came from exprience, if we try to bring other calls into the conference
-       * immediately, the api will throw 403 error which says: can't find the host of the
-       * conference.
-       */
-      await new Promise(resolve => setTimeout(resolve, DEFAULT_WAIT));
-      const mergedId = await mergeToConference(calls);
-
-      // if create conference successfully but failed to bring-in, then terminate the conference.
-      if (mergedId !== id) {
-        conferenceCall.terminateConference(id);
-        return null;
-      }
-      return id;
-    } catch (e) {
-      alert.warning({
-        message: conferenceErrors.bringInFailed,
-      });
-      return null;
-    }
-  };
-
   return {
     formatPhone: phoneNumber => formatNumber({
       phoneNumber,
@@ -170,7 +130,7 @@ function mapToFunctions(_, {
      * else make one and merge into it;
      * @param {[string]} sessionIds
      */
-    mergeToConference,
+    mergeToConference: (...args) => conferenceCall.mergeToConference(...args),
   };
 }
 
