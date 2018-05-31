@@ -30,6 +30,7 @@ const MAXIMUM_CAPACITY = 11;
     'CallingSettings',
     'Client',
     'RolesAndPermissions',
+    'Webphone',
     {
       dep: 'ConferenceCallOptions',
       optional: true
@@ -50,6 +51,7 @@ export default class ConferenceCall extends RcModule {
     callingSettings,
     client,
     rolesAndPermissions,
+    webphone,
     pulling = true,
     ...options
   }) {
@@ -61,6 +63,7 @@ export default class ConferenceCall extends RcModule {
       client,
       rolesAndPermissions,
       pulling,
+      webphone,
       ...options,
       actionTypes,
     });
@@ -69,6 +72,7 @@ export default class ConferenceCall extends RcModule {
     this._call = this::ensureExist(call, 'call');
     this._callingSettings = this::ensureExist(callingSettings, 'callingSettings');
     this._client = this::ensureExist(client, 'client');
+    this._webphone = this::ensureExist(webphone, 'webphone');
     this._rolesAndPermissions = this::ensureExist(rolesAndPermissions, 'rolesAndPermissions');
     // we need the constructed actions
     this._reducer = getConferenceCallReducer(this.actionTypes);
@@ -138,14 +142,23 @@ export default class ConferenceCall extends RcModule {
       type: this.actionTypes.terminateConference,
       conference: this.state.conferences[id],
     });
+    const conferenceData = this.conferences[id];
 
     try {
-      await this._client.service.platform()
-        .delete(`/account/~/telephony/sessions/${id}`);
-      this.store.dispatch({
-        type: this.actionTypes.terminateConferenceSucceeded,
-        conference: this.state.conferences[id],
-      });
+      // FIXME: should use this api to hangup when it's ok
+      // await this._client.service.platform()
+      //   .delete(`/account/~/telephony/sessions/${id}`);
+      if (conferenceData) {
+        this._webphone.hangup(conferenceData.session.id);
+        this.store.dispatch({
+          type: this.actionTypes.terminateConferenceSucceeded,
+          conference: conferenceData.conference,
+        });
+      } else {
+        this.store.dispatch({
+          type: this.actionTypes.terminateConferenceFailed,
+        });
+      }
     } catch (e) {
       // TODO:this._alert.warning
       this.store.dispatch({
@@ -154,7 +167,7 @@ export default class ConferenceCall extends RcModule {
       });
     } finally {
       // eslint-disable-next-line no-unsafe-finally
-      return this.state.conferences[id];
+      return conferenceData;
     }
   }
 
