@@ -75,13 +75,13 @@ function mapToFunctions(_, {
         conferenceCall.stopPollingConferenceStatus(conferenceId);
         await Promise.all(
           calls.map(
-            call => conferenceCall.bringInToConference(conferenceId, call, false)
+            call => conferenceCall.bringInToConference(conferenceId, call, true)
           )
         );
         conferenceCall.startPollingConferenceStatus(conferenceId);
         return conferenceId;
       }
-      const { id } = await conferenceCall.makeConference(false);
+      const { id } = await conferenceCall.makeConference(true);
       /**
        * HACK: 700ms came from exprience, if we try to bring other calls into the conference
        * immediately, the api will throw 403 error which says: can't find the host of the

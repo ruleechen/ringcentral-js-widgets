@@ -163,7 +163,7 @@ export default class ConferenceCall extends RcModule {
    * }
    */
   @proxify
-  async bringInToConference(id, partyCall, needAlert = true) {
+  async bringInToConference(id, partyCall, propagete = false) {
     const conference = this.state.conferences[id];
     if (
       !conference
@@ -171,7 +171,7 @@ export default class ConferenceCall extends RcModule {
         || partyCall.direction !== callDirections.outbound
         || conference.conference.parties.length >= 11
     ) {
-      if (needAlert) {
+      if (!propagete) {
         this._alert.warning({
           message: conferenceErrors.bringInFailed,
         });
@@ -194,18 +194,18 @@ export default class ConferenceCall extends RcModule {
         type: this.actionTypes.bringInConferenceSucceeded,
         conference,
       });
+      return id;
     } catch (e) {
-      if (needAlert) {
-        this._alert.warning({
-          message: conferenceErrors.bringInFailed,
-        });
-      }
-
       this.store.dispatch({
         type: this.actionTypes.bringInConferenceFailed,
         message: e.toString()
       });
-
+      if (!propagete) {
+        this._alert.warning({
+          message: conferenceErrors.bringInFailed,
+        });
+        return null;
+      }
       throw e;
     }
   }
@@ -246,12 +246,12 @@ export default class ConferenceCall extends RcModule {
    * start a conference call, return the session
    */
   @proxify
-  async makeConference(needAlert = true) {
+  async makeConference(propagate = false) {
     if (!this.ready) {
       return null;
     }
     if (!this._checkPermission()) {
-      if (needAlert) {
+      if (!propagate) {
         this._alert.danger({
           message: permissionsMessages.insufficientPrivilege,
           ttl: 0,
@@ -261,7 +261,7 @@ export default class ConferenceCall extends RcModule {
       return null;
     }
     if (!this._callingSettings.callingMode === callingModes.webphone) {
-      if (needAlert) {
+      if (!propagate) {
         this._alert.danger({
           message: conferenceErrors.modeError,
           ttl: 0,
@@ -270,11 +270,11 @@ export default class ConferenceCall extends RcModule {
 
       return null;
     }
-    const session = await this._makeConference(needAlert);
+    const session = await this._makeConference(propagate);
     return session;
   }
 
-  async _makeConference(needAlert = true) {
+  async _makeConference(propagate = false) {
     try {
       this.store.dispatch({
         type: this.actionTypes.makeConference,
@@ -312,10 +312,11 @@ export default class ConferenceCall extends RcModule {
         message: e.toString()
       });
 
-      if (needAlert) {
+      if (!propagate) {
         this._alert.warning({
           message: conferenceErrors.makeConferenceFailed,
         });
+        return null;
       }
       // need to propagate to out side try...catch block
       throw e;
