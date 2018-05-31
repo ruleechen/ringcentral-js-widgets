@@ -37,10 +37,12 @@ function ActiveCallList({
   isOnWebRTC,
   activeCurrentCalls,
   onConfirmMergeCall,
+  disableMerge,
 }) {
   if (!calls.length) {
     return null;
   }
+
   return (
     <div className={classnames(styles.list, className)}>
       <div className={styles.listTitle}>
@@ -68,7 +70,7 @@ function ActiveCallList({
                 if (isOnConferenceCall) {
                   onMergeCall = () => mergeToConference([currentCall]);
                 } else {
-                  onMergeCall = () => mergeToConference([call]);
+                  onMergeCall = () => onConfirmMergeCall(call);
                 }
               } else {
                 showMergeCall = true;
@@ -96,7 +98,6 @@ function ActiveCallList({
               call={call}
               key={call.id}
               showMergeCall={showMergeCall}
-              conference={conference}
               isOnConferenceCall={isOnConferenceCall}
               currentLocale={currentLocale}
               areaCode={areaCode}
@@ -121,6 +122,7 @@ function ActiveCallList({
               enableContactFallback={enableContactFallback}
               autoLog={autoLog}
               sourceIcons={sourceIcons}
+              disableMerge={disableMerge}
             />
           );
         })
@@ -130,6 +132,7 @@ function ActiveCallList({
 }
 
 ActiveCallList.propTypes = {
+  disableMerge: PropTypes.bool,
   isOnWebRTC: PropTypes.bool.isRequired,
   currentLocale: PropTypes.string.isRequired,
   className: PropTypes.string,
@@ -173,6 +176,7 @@ ActiveCallList.propTypes = {
 };
 
 ActiveCallList.defaultProps = {
+  disableMerge: false,
   className: undefined,
   brand: 'RingCentral',
   showContactDisplayPlaceholder: true,

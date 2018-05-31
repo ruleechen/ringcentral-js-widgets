@@ -18,9 +18,17 @@ function mapToProps(_, {
   showContactDisplayPlaceholder = false,
 }) {
   const conferenceList = Object.values(conferenceCall.conferences);
+  const conference = conferenceList.length ? conferenceList[0] : null;
+  let disableMerge;
+
+  if (conference) {
+    disableMerge = conferenceCall.isOverload(conference.conference.id);
+  } else {
+    disableMerge = false;
+  }
   return {
     // only one conference can exist for now
-    conference: conferenceList.length ? conferenceList[0] : null,
+    conference,
     currentLocale: locale.currentLocale,
     callingMode,
     activeRingCalls: callMonitor.activeRingCalls,
@@ -40,6 +48,7 @@ function mapToProps(_, {
     brand: brand.fullName,
     showContactDisplayPlaceholder,
     autoLog: !!(callLogger && callLogger.autoLog),
+    disableMerge,
   };
 }
 
@@ -53,7 +62,6 @@ function mapToFunctions(_, {
     routerInteraction,
     webphone,
     conferenceCall,
-    alert,
   },
   composeTextRoute = '/composeText',
   callCtrlRoute = '/calls/active',
