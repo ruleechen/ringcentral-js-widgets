@@ -96,11 +96,7 @@ export default (auth, client, conferenceCall, alert, account) => {
       });
 
       it('Should Have No Records of Conference', async () => {
-        try {
-          await conferenceCall._makeConference();
-        } catch (e) {
-          // skip the error that were throwed intentinally
-        }
+        await conferenceCall._makeConference(false);
         expect(conferenceCall.conferences).to.be.an('object').that.is.empty;
       });
 
