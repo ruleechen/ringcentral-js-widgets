@@ -30,7 +30,10 @@ const MAXIMUM_CAPACITY = 11;
     'CallingSettings',
     'Client',
     'RolesAndPermissions',
-    'Webphone',
+    {
+      dep: 'Webphone',
+      optional: true
+    },
     {
       dep: 'ConferenceCallOptions',
       optional: true
@@ -72,7 +75,8 @@ export default class ConferenceCall extends RcModule {
     this._call = this::ensureExist(call, 'call');
     this._callingSettings = this::ensureExist(callingSettings, 'callingSettings');
     this._client = this::ensureExist(client, 'client');
-    this._webphone = this::ensureExist(webphone, 'webphone');
+    // in order to run the integeration test, we need it to be optional
+    this._webphone = webphone;
     this._rolesAndPermissions = this::ensureExist(rolesAndPermissions, 'rolesAndPermissions');
     // we need the constructed actions
     this._reducer = getConferenceCallReducer(this.actionTypes);
@@ -145,18 +149,24 @@ export default class ConferenceCall extends RcModule {
     const conferenceData = this.conferences[id];
 
     try {
-      // FIXME: should use this api to hangup when it's ok
-      // await this._client.service.platform()
-      //   .delete(`/account/~/telephony/sessions/${id}`);
-      if (conferenceData) {
-        this._webphone.hangup(conferenceData.session.id);
+      if (this._webphone) {
+        if (conferenceData) {
+          this._webphone.hangup(conferenceData.session.id);
+          this.store.dispatch({
+            type: this.actionTypes.terminateConferenceSucceeded,
+            conference: conferenceData.conference,
+          });
+        } else {
+          this.store.dispatch({
+            type: this.actionTypes.terminateConferenceFailed,
+          });
+        }
+      } else {
+        await this._client.service.platform()
+          .delete(`/account/~/telephony/sessions/${id}`);
         this.store.dispatch({
           type: this.actionTypes.terminateConferenceSucceeded,
           conference: conferenceData.conference,
-        });
-      } else {
-        this.store.dispatch({
-          type: this.actionTypes.terminateConferenceFailed,
         });
       }
     } catch (e) {
