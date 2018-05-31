@@ -104,6 +104,7 @@ export default class ActiveCallsPanel extends Component {
       isConferenceCall,
       callingMode,
       activeCurrentCalls,
+      disableMerge,
     } = this.props;
 
     return (
@@ -138,6 +139,7 @@ export default class ActiveCallsPanel extends Component {
         sourceIcons={sourceIcons}
         activeCurrentCalls={activeCurrentCalls}
         onConfirmMergeCall={this.showConfirmMergeModal}
+        disableMerge={disableMerge}
       />
     );
   }
@@ -178,6 +180,7 @@ export default class ActiveCallsPanel extends Component {
 }
 
 ActiveCallsPanel.propTypes = {
+  disableMerge: PropTypes.bool,
   callingMode: PropTypes.string.isRequired,
   currentLocale: PropTypes.string.isRequired,
   className: PropTypes.string,
@@ -213,6 +216,7 @@ ActiveCallsPanel.propTypes = {
 };
 
 ActiveCallsPanel.defaultProps = {
+  disableMerge: false,
   className: undefined,
   brand: 'RingCentral',
   showContactDisplayPlaceholder: true,

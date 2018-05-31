@@ -74,6 +74,7 @@ function WebphoneButtons({
   webphoneResume,
   showMergeCall,
   onMergeCall,
+  disableMerge,
 }) {
   if (!session || !webphoneAnswer || !webphoneHangup) {
     return null;
@@ -84,7 +85,7 @@ function WebphoneButtons({
   const mergeIcon = MergeIntoConferenceIcon;
   let rejectTitle = i18n.getString('hangup');
   const acceptTitle = i18n.getString('accept');
-  const mergeTitle = i18n.getString('addToConference');
+  const mergeTitle = i18n.getString('mergeToConference');
   if (
     session.direction === callDirections.inbound &&
     session.callStatus === sessionStatus.connecting
@@ -100,7 +101,9 @@ function WebphoneButtons({
         showMergeCall ?
           <span title={mergeTitle} className={styles.webphoneButton}>
             <CircleButton
-              className={styles.mergeButton}
+              className={disableMerge
+                ? classnames(styles.mergeButton, styles.disabled)
+                : styles.mergeButton}
               onClick={(e) => {
                 e.stopPropagation();
                 onMergeCall();
@@ -109,6 +112,7 @@ function WebphoneButtons({
               iconX={120}
               icon={mergeIcon}
               showBorder={false}
+              disabled={disableMerge}
             />
           </span>
           : null
@@ -149,9 +153,11 @@ WebphoneButtons.propTypes = {
   webphoneResume: PropTypes.func,
   showMergeCall: PropTypes.bool,
   onMergeCall: PropTypes.func,
+  disableMerge: PropTypes.bool,
 };
 
 WebphoneButtons.defaultProps = {
+  disableMerge: false,
   session: undefined,
   webphoneAnswer: undefined,
   webphoneReject: undefined,
@@ -409,6 +415,7 @@ export default class ActiveCallItem extends Component {
       contactDisplayStyle,
       showMergeCall,
       onMergeCall,
+      disableMerge
     } = this.props;
     const phoneNumber = this.getPhoneNumber();
     const parsedInfo = parseNumber(phoneNumber);
@@ -481,6 +488,7 @@ export default class ActiveCallItem extends Component {
             webphoneResume={webphoneResume}
             showMergeCall={showMergeCall}
             onMergeCall={onMergeCall}
+            disableMerge={disableMerge}
           />
           {extraButton}
         </div>
@@ -565,6 +573,7 @@ ActiveCallItem.propTypes = {
   renderContactName: PropTypes.func,
   renderExtraButton: PropTypes.func,
   contactDisplayStyle: PropTypes.string,
+  disableMerge: PropTypes.bool,
 };
 
 ActiveCallItem.defaultProps = {
@@ -592,4 +601,5 @@ ActiveCallItem.defaultProps = {
   renderExtraButton: undefined,
   contactDisplayStyle: undefined,
   isOnConferenceCall: false,
+  disableMerge: false,
 };

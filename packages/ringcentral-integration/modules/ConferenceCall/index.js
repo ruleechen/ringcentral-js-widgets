@@ -2,6 +2,7 @@ import { Module } from '../../lib/di';
 import callDirections from '../../enums/callDirections';
 import RcModule from '../../lib/RcModule';
 import actionTypes from './actionTypes';
+import partyStatusCode from './partyStatusCode';
 import getConferenceCallReducer from './getConferenceCallReducer';
 import proxify from '../../lib/proxy/proxify';
 import permissionsMessages from '../RolesAndPermissions/permissionsMessages';
@@ -11,7 +12,8 @@ import ensureExist from '../../lib/ensureExist';
 import callingModes from '../CallingSettings/callingModes';
 
 const DEFAULT_TTL = 5000;
-const DEFAULT_WAIT = 700;
+const DEFAULT_WAIT = 800;
+const MAXIMUM_CAPACITY = 11;
 
 /**
  * @class
@@ -74,6 +76,7 @@ export default class ConferenceCall extends RcModule {
     this._timers = {};
     this._pulling = pulling;
     this._isMerging = false;
+    this.capacity = MAXIMUM_CAPACITY;
   }
 
   // only can be used after webphone._onCallStartFunc
@@ -171,7 +174,7 @@ export default class ConferenceCall extends RcModule {
       !conference
         || !partyCall
         || partyCall.direction !== callDirections.outbound
-        || conference.conference.parties.length >= 11
+        || conference.conference.parties.length >= MAXIMUM_CAPACITY
     ) {
       if (!propagete) {
         this._alert.warning({
@@ -311,7 +314,7 @@ export default class ConferenceCall extends RcModule {
       }
       return id;
     } catch (e) {
-      alert.warning({
+      this._alert.warning({
         message: conferenceErrors.bringInFailed,
       });
       return null;
@@ -378,6 +381,58 @@ export default class ConferenceCall extends RcModule {
     }
   }
 
+  getOnlineParties(id) {
+    const conferenceData = this.conferences[id];
+    if (conferenceData) {
+      return conferenceData.conference.parties.filter(
+        p => p.status.code.toLowerCase() !== partyStatusCode.disconnected
+      );
+    }
+    return null;
+  }
+
+  countOnlineParties(id) {
+    const res = this.getOnlineParties(id);
+    return Array.isArray(res) ? res.length : null;
+  }
+
+  isOverload(id) {
+    return this.countOnlineParties(id) >= this.capacity;
+  }
+
+  async startPollingConferenceStatus(id) {
+    if (this._timers[id] || !this._pulling) {
+      return;
+    }
+    await this.updateConferenceStatus(id);
+    this._timers[id] = setTimeout(
+      async () => {
+        await this.updateConferenceStatus(id);
+        this.stopPollingConferenceStatus(id);
+        if (this.conferences[id]) {
+          this.startPollingConferenceStatus(id);
+        }
+      },
+      this._ttl);
+  }
+
+  stopPollingConferenceStatus(id) {
+    clearTimeout(this._timers[id]);
+    delete this._timers[id];
+  }
+
+  openPulling() {
+    this._pulling = true;
+  }
+
+  closePulling() {
+    this._pulling = false;
+  }
+
+  togglePulling() {
+    this._pulling = !this.pulling;
+  }
+
   _init() {
     this.store.dispatch({
       type: this.actionTypes.initSuccess
@@ -441,39 +496,6 @@ export default class ConferenceCall extends RcModule {
         this.stopPollingConferenceStatus(conference.id);
       })
     );
-  }
-
-  async startPollingConferenceStatus(id) {
-    if (this._timers[id] || !this._pulling) {
-      return;
-    }
-    await this.updateConferenceStatus(id);
-    this._timers[id] = setTimeout(
-      async () => {
-        await this.updateConferenceStatus(id);
-        this.stopPollingConferenceStatus(id);
-        if (this.conferences[id]) {
-          this.startPollingConferenceStatus(id);
-        }
-      },
-      this._ttl);
-  }
-
-  stopPollingConferenceStatus(id) {
-    clearTimeout(this._timers[id]);
-    delete this._timers[id];
-  }
-
-  openPulling() {
-    this._pulling = true;
-  }
-
-  closePulling() {
-    this._pulling = false;
-  }
-
-  togglePulling() {
-    this._pulling = !this.pulling;
   }
 
   get status() {
