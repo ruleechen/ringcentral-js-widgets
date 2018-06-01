@@ -57,6 +57,10 @@ function ActiveCallList({
           const isOnConferenceCall = call.webphoneSession
             ? isConferenceCall(call.webphoneSession.id)
             : false;
+          const isCurrentCallAConf = currentCall
+            ? isConferenceCall(currentCall.webphoneSession.id)
+            : false;
+
           if (!isOnWebRTC) {
             showMergeCall = false;
           } else if (currentCall) {
@@ -69,6 +73,8 @@ function ActiveCallList({
                 showMergeCall = true;
                 if (isOnConferenceCall) {
                   onMergeCall = () => mergeToConference([currentCall]);
+                } else if (isCurrentCallAConf) {
+                  onMergeCall = () => mergeToConference([call]);
                 } else {
                   onMergeCall = () => onConfirmMergeCall(call);
                 }
