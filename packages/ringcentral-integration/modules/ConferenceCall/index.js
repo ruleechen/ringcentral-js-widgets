@@ -314,7 +314,6 @@ export default class ConferenceCall extends RcModule {
    */
   async mergeToConference(calls = []) {
     this._isMerging = true;
-    const conferenceState = Object.values(this.conferences)[0];
     let sipInstances;
 
     if (this._webphone) {
@@ -337,6 +336,16 @@ export default class ConferenceCall extends RcModule {
       });
     }
 
+    await this._mergeToConference(calls);
+
+    if (!sipInstances) {
+      this._isMerging = false;
+    }
+  }
+
+  async _mergeToConference(calls = []) {
+    const conferenceState = Object.values(this.conferences)[0];
+
     try {
       if (conferenceState) {
         const conferenceId = conferenceState.conference.id;
@@ -356,7 +365,7 @@ export default class ConferenceCall extends RcModule {
        * conference.
        */
       await new Promise(resolve => setTimeout(resolve, DEFAULT_WAIT));
-      const mergedId = await this.mergeToConference(calls);
+      const mergedId = await this._mergeToConference(calls);
 
       // if create conference successfully but failed to bring-in, then terminate the conference.
       if (mergedId !== id) {
@@ -369,10 +378,6 @@ export default class ConferenceCall extends RcModule {
         message: conferenceErrors.bringInFailed,
       });
       return null;
-    } finally {
-      if (!sipInstances) {
-        this._isMerging = false;
-      }
     }
   }
 
