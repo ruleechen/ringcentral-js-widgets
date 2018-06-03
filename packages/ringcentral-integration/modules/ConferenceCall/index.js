@@ -306,9 +306,37 @@ export default class ConferenceCall extends RcModule {
     this.store.subscribe(() => this._onStateChange());
   }
 
+  /**
+   * Merge calls to (or create) a conference.
+   * @param {callMonitor.calls} calls
+   * FIXME: dynamically construct this function during the construction
+   * to avoid `this._webphone` criterias to improve performance ahead of time
+   */
   async mergeToConference(calls = []) {
     this._isMerging = true;
     const conferenceState = Object.values(this.conferences)[0];
+    let sipInstances;
+
+    if (this._webphone) {
+      /**
+       * Because the concurrency behaviour of the server,
+       * we cannot sure the merging process is over when
+       * the function's procedure has finshed.
+       */
+      sipInstances = calls.map(c => this._webphone._sessions.get(c.webphoneSession.id));
+      const pSips = sipInstances.map((instance) => {
+        const p = new Promise((resolve) => {
+          instance.on('terminated', () => {
+            resolve();
+          });
+        });
+        return p;
+      });
+      Promise.all(pSips).then(() => {
+        this._isMerging = false;
+      });
+    }
+
     try {
       if (conferenceState) {
         const conferenceId = conferenceState.conference.id;
@@ -342,7 +370,9 @@ export default class ConferenceCall extends RcModule {
       });
       return null;
     } finally {
-      this._isMerging = false;
+      if (!sipInstances) {
+        this._isMerging = false;
+      }
     }
   }
 
