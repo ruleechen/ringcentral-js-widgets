@@ -150,7 +150,6 @@ export default class ActiveCallsPanel extends Component {
       return (
         <div
           className={classnames(styles.root, className)}
-          style={isMerging ? { overflow: 'hidden' } : { overflow: 'auto' }}
         >
           <p className={styles.noCalls}>{i18n.getString('noActiveCalls', currentLocale)}</p>
           {isMerging && <SpinnerOverlay className={styles.spinner} />}
@@ -158,20 +157,22 @@ export default class ActiveCallsPanel extends Component {
       );
     }
     return (
-      <div
-        className={classnames(styles.root, className)}
-        style={isMerging ? { overflow: 'hidden' } : { overflow: 'auto' }}
-      >
-        {this.getCallList(activeRingCalls, i18n.getString('ringCall', currentLocale))}
-        {this.getCallList(activeCurrentCalls, i18n.getString('currentCall', currentLocale))}
-        {this.getCallList(activeOnHoldCalls, i18n.getString('onHoldCall', currentLocale))}
-        {this.getCallList(otherDeviceCalls, i18n.getString('otherDeviceCall', currentLocale))}
-        <ConfirmMergeModal
-          currentLocale={currentLocale}
-          show={this.state.isModalOpen}
-          onMerge={this.confirmMergeCall}
-          onCancel={this.hideConfirmMergeModal}
-        />
+      <div className={styles.root}>
+        <div
+          className={classnames(styles.root, className)}
+          ref={(target) => { this.container = target; }}
+        >
+          {this.getCallList(activeRingCalls, i18n.getString('ringCall', currentLocale))}
+          {this.getCallList(activeCurrentCalls, i18n.getString('currentCall', currentLocale))}
+          {this.getCallList(activeOnHoldCalls, i18n.getString('onHoldCall', currentLocale))}
+          {this.getCallList(otherDeviceCalls, i18n.getString('otherDeviceCall', currentLocale))}
+          <ConfirmMergeModal
+            currentLocale={currentLocale}
+            show={this.state.isModalOpen}
+            onMerge={this.confirmMergeCall}
+            onCancel={this.hideConfirmMergeModal}
+          />
+        </div>
         {isMerging && <SpinnerOverlay className={styles.spinner} />}
       </div>
     );
