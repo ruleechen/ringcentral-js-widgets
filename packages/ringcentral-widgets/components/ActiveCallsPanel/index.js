@@ -148,31 +148,39 @@ export default class ActiveCallsPanel extends Component {
     } = this.props;
     if (!this.hasCalls()) {
       return (
-        <div className={classnames(styles.root, className)}>
+        <div
+          className={classnames(styles.root, className)}
+        >
           <p className={styles.noCalls}>{i18n.getString('noActiveCalls', currentLocale)}</p>
-          {this.props.isMerging && <SpinnerOverlay className={styles.spinner} />}
+          {isMerging && <SpinnerOverlay className={styles.spinner} />}
         </div>
       );
     }
     return (
-      <div className={classnames(styles.root, className)}>
-        {this.getCallList(activeRingCalls, i18n.getString('ringCall', currentLocale))}
-        {this.getCallList(activeCurrentCalls, i18n.getString('currentCall', currentLocale))}
-        {this.getCallList(activeOnHoldCalls, i18n.getString('onHoldCall', currentLocale))}
-        {this.getCallList(otherDeviceCalls, i18n.getString('otherDeviceCall', currentLocale))}
-        <ConfirmMergeModal
-          currentLocale={currentLocale}
-          show={this.state.isModalOpen}
-          onMerge={this.confirmMergeCall}
-          onCancel={this.hideConfirmMergeModal}
-        />
-        {this.props.isMerging && <SpinnerOverlay className={styles.spinner} />}
+      <div className={styles.root}>
+        <div
+          className={classnames(styles.root, className)}
+          ref={(target) => { this.container = target; }}
+        >
+          {this.getCallList(activeRingCalls, i18n.getString('ringCall', currentLocale))}
+          {this.getCallList(activeCurrentCalls, i18n.getString('currentCall', currentLocale))}
+          {this.getCallList(activeOnHoldCalls, i18n.getString('onHoldCall', currentLocale))}
+          {this.getCallList(otherDeviceCalls, i18n.getString('otherDeviceCall', currentLocale))}
+          <ConfirmMergeModal
+            currentLocale={currentLocale}
+            show={this.state.isModalOpen}
+            onMerge={this.confirmMergeCall}
+            onCancel={this.hideConfirmMergeModal}
+          />
+        </div>
+        {isMerging && <SpinnerOverlay className={styles.spinner} />}
       </div>
     );
   }
 }
 
 ActiveCallsPanel.propTypes = {
+  isMerging: PropTypes.bool,
   disableMerge: PropTypes.bool,
   callingMode: PropTypes.string.isRequired,
   currentLocale: PropTypes.string.isRequired,
@@ -206,7 +214,6 @@ ActiveCallsPanel.propTypes = {
   onCallsEmpty: PropTypes.func,
   sourceIcons: PropTypes.object,
   conference: PropTypes.object,
-  isMerging: PropTypes.bool,
 };
 
 ActiveCallsPanel.defaultProps = {
