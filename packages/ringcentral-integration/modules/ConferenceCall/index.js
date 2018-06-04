@@ -56,7 +56,7 @@ export default class ConferenceCall extends RcModule {
     rolesAndPermissions,
     webphone,
     pulling = true,
-    capacity = MAXIMUM_CAPACITY
+    capacity = MAXIMUM_CAPACITY,
     ...options
   }) {
     super({
@@ -508,6 +508,9 @@ export default class ConferenceCall extends RcModule {
     } catch (e) {
       this._alert.warning({
         message: conferenceErrors.bringInFailed,
+      });
+      this.store.dispatch({
+        type: this.actionTypes.mergeEnd,
       });
       return null;
     }
