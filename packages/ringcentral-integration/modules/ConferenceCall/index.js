@@ -56,6 +56,7 @@ export default class ConferenceCall extends RcModule {
     rolesAndPermissions,
     webphone,
     pulling = true,
+    capacity = MAXIMUM_CAPACITY
     ...options
   }) {
     super({
@@ -83,7 +84,7 @@ export default class ConferenceCall extends RcModule {
     this._ttl = DEFAULT_TTL;
     this._timers = {};
     this._pulling = pulling;
-    this.capacity = MAXIMUM_CAPACITY;
+    this.capacity = capacity;
   }
 
   // only can be used after webphone._onCallStartFunc
@@ -196,7 +197,7 @@ export default class ConferenceCall extends RcModule {
       !conference
         || !partyCall
         || partyCall.direction !== callDirections.outbound
-        || conference.conference.parties.length >= MAXIMUM_CAPACITY
+        || this.isOverload(conference.id) >= this.capacity
     ) {
       if (!propagete) {
         this._alert.warning({
