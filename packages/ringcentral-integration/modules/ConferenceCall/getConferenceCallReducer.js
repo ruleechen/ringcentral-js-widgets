@@ -58,10 +58,24 @@ export function getMakeConferenceCallReducer(types) {
   };
 }
 
+export function getMergingStatusReducer(types) {
+  return (state = false, { type }) => {
+    switch (type) {
+      case types.mergeStart:
+        return true;
+      case types.mergeEnd:
+        return false;
+      default:
+        return state;
+    }
+  };
+}
+
 export default function getConferenceCallReducer(types) {
   return combineReducers({
     status: getModuleStatusReducer(types),
     conferences: getMakeConferenceCallReducer(types),
     conferenceCallStatus: getConferenceCallStatusReducer(types),
+    isMerging: getMergingStatusReducer(types),
   });
 }

@@ -12,20 +12,12 @@ export default class ActiveCallsPanel extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      showSpinner: false,
       isModalOpen: false,
       callOfModal: null,
     };
 
     this.mergeToConference = async (...args) => {
-      this.setState({ showSpinner: true });
       await this.props.mergeToConference(...args);
-      // need to hide the spinner after the merge
-      setTimeout(() => {
-        this.setState({
-          showSpinner: false,
-        });
-      }, 500);
     };
 
     this.showConfirmMergeModal = (call) => {
@@ -152,12 +144,13 @@ export default class ActiveCallsPanel extends Component {
       otherDeviceCalls,
       className,
       currentLocale,
+      isMerging,
     } = this.props;
     if (!this.hasCalls()) {
       return (
         <div className={classnames(styles.root, className)}>
           <p className={styles.noCalls}>{i18n.getString('noActiveCalls', currentLocale)}</p>
-          {this.state.showSpinner && <SpinnerOverlay className={styles.spinner} />}
+          {this.props.isMerging && <SpinnerOverlay className={styles.spinner} />}
         </div>
       );
     }
@@ -173,7 +166,7 @@ export default class ActiveCallsPanel extends Component {
           onMerge={this.confirmMergeCall}
           onCancel={this.hideConfirmMergeModal}
         />
-        {this.state.showSpinner && <SpinnerOverlay className={styles.spinner} />}
+        {this.props.isMerging && <SpinnerOverlay className={styles.spinner} />}
       </div>
     );
   }
@@ -213,9 +206,11 @@ ActiveCallsPanel.propTypes = {
   onCallsEmpty: PropTypes.func,
   sourceIcons: PropTypes.object,
   conference: PropTypes.object,
+  isMerging: PropTypes.bool,
 };
 
 ActiveCallsPanel.defaultProps = {
+  isMerging: false,
   disableMerge: false,
   className: undefined,
   brand: 'RingCentral',

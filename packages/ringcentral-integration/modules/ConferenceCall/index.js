@@ -83,7 +83,6 @@ export default class ConferenceCall extends RcModule {
     this._ttl = DEFAULT_TTL;
     this._timers = {};
     this._pulling = pulling;
-    this._isMerging = false;
     this.capacity = MAXIMUM_CAPACITY;
   }
 
@@ -313,7 +312,10 @@ export default class ConferenceCall extends RcModule {
    * to avoid `this._webphone` criterias to improve performance ahead of time
    */
   async mergeToConference(calls = []) {
-    this._isMerging = true;
+    this.store.dispatch({
+      type: this.actionTypes.mergeStart,
+    });
+
     let sipInstances;
 
     if (this._webphone) {
@@ -332,14 +334,18 @@ export default class ConferenceCall extends RcModule {
         return p;
       });
       Promise.all(pSips).then(() => {
-        this._isMerging = false;
+        this.store.dispatch({
+          type: this.actionTypes.mergeEnd,
+        });
       });
     }
 
     await this._mergeToConference(calls);
 
     if (!sipInstances) {
-      this._isMerging = false;
+      this.store.dispatch({
+        type: this.actionTypes.mergeEnd,
+      });
     }
   }
 
@@ -570,6 +576,6 @@ export default class ConferenceCall extends RcModule {
   }
 
   get isMerging() {
-    return this._isMerging;
+    return this.state.isMerging;
   }
 }

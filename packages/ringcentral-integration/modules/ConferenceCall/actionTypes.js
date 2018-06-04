@@ -3,6 +3,8 @@ import moduleActionTypes from '../../enums/moduleActionTypes';
 
 export default new Enum([
   ...Object.keys(moduleActionTypes),
+  'mergeStart',
+  'mergeEnd',
   // make conference call
   'makeConference',
   'makeConferenceSucceeded',
