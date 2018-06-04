@@ -4,7 +4,10 @@ import i18n from './i18n';
 import styles from './styles.scss';
 import Modal from '../Modal';
 import Button from '../Button';
+import CircleButton from '../CircleButton';
 import CloseIcon from '../../assets/images/CloseIcon.svg';
+import ConferenceCallIcon from '../../assets/images/ConferenceCallIcon.svg';
+import MergeIntoConferenceIcon from '../../assets/images/MergeIntoConferenceIcon.svg';
 
 export default function ConfirmMergeModal({
   currentLocale,
@@ -15,14 +18,13 @@ export default function ConfirmMergeModal({
   return (
     <Modal
       show={show}
+      headerClassName={styles.header}
       currentLocale={currentLocale}
-      onConfirm={onMerge}
-      onCancel={onCancel}
       className={styles.confirmMergeModal}
       modalClassName={styles.confirmMergeModal}
       cancelBtnClassName={styles.cancelBtn}
       confirmBtnClassName={styles.confirmBtn}
-      // title={i18n.getString('confirmation', currentLocale)}
+      title={i18n.getString('confirmation', currentLocale)}
       closeBtn={
         <Button
           className={styles.closeBtn}
@@ -34,6 +36,22 @@ export default function ConfirmMergeModal({
     >
       <div className={styles.contentText}>
         {i18n.getString('confirmMergeToConference', currentLocale)}
+      </div>
+      <div className={styles.content}>
+        <p className={styles.contentText}><ConferenceCallIcon /><span>{i18n.getString('conferenceCall')}</span></p>
+        <span title={i18n.getString('mergeToConference')} className={styles.webphoneButton}>
+          <CircleButton
+            className={styles.mergeButton}
+            onClick={(e) => {
+                e.stopPropagation();
+                onMerge();
+            }}
+            iconWidth={260}
+            iconX={120}
+            icon={MergeIntoConferenceIcon}
+            showBorder={false}
+          />
+        </span>
       </div>
     </Modal>
   );

@@ -22,21 +22,65 @@
 .confirmMergeModal {
   min-width: 260px;
 
+  .header{
+    text-align: center;
+  }
+
   .contentText {
     margin-top: 5px;
+    font-weight: bold;
+
+    span{
+      font-weight: normal;
+    }
   }
+
   .cancelBtn {
-    width: 70px;
-    height: 28px;
+    display: none;
   }
+
   .confirmBtn {
-    width: 70px;
-    height: 28px;
-    margin-left: 10px;
+    display: none;
   }
+
   .closeBtn {
-    margin-top: 10px;
-    margin-right: 11px;
-    text-align: right;
+    position: absolute;
+    top: 15px;
+    right: 11px;
+  }
+
+  .content{
+    overflow: hidden;
+    .contentText{
+      float: left;
+      svg{
+        margin-bottom: -2px;
+      }
+      svg+span{
+        margin-left:5px;
+      }
+    }
+
+    .webphoneButton{   
+      float: right;
+    }
+
+    .mergeButton{
+      width: 26px;
+      g,
+      path {
+        fill: #ffffff;
+      }
+    }
+    
+    .mergeButton {
+      circle {
+        fill: #ff8800;
+      }
+    }
+
+    &::after{
+      clear: both;
+    }
   }
 }
