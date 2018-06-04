@@ -341,9 +341,9 @@ export default class ConferenceCall extends RcModule {
       });
     }
 
-    await this._mergeToConference(calls);
+    const conferenceId = await this._mergeToConference(calls);
 
-    if (!sipInstances) {
+    if (!sipInstances || conferenceId === null) {
       this.store.dispatch({
         type: this.actionTypes.mergeEnd,
       });
@@ -508,9 +508,6 @@ export default class ConferenceCall extends RcModule {
     } catch (e) {
       this._alert.warning({
         message: conferenceErrors.bringInFailed,
-      });
-      this.store.dispatch({
-        type: this.actionTypes.mergeEnd,
       });
       return null;
     }
