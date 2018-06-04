@@ -343,94 +343,6 @@ export default class ConferenceCall extends RcModule {
     }
   }
 
-  async _mergeToConference(calls = []) {
-    const conferenceState = Object.values(this.conferences)[0];
-
-    try {
-      if (conferenceState) {
-        const conferenceId = conferenceState.conference.id;
-        this.stopPollingConferenceStatus(conferenceId);
-        await Promise.all(
-          calls.map(
-            call => this.bringInToConference(conferenceId, call, true)
-          )
-        );
-        this.startPollingConferenceStatus(conferenceId);
-        return conferenceId;
-      }
-      const { id } = await this.makeConference(true);
-      /**
-       * HACK: 700ms came from exprience, if we try to bring other calls into the conference
-       * immediately, the api will throw 403 error which says: can't find the host of the
-       * conference.
-       */
-      await new Promise(resolve => setTimeout(resolve, DEFAULT_WAIT));
-      const mergedId = await this._mergeToConference(calls);
-
-      // if create conference successfully but failed to bring-in, then terminate the conference.
-      if (mergedId !== id) {
-        this.terminateConference(id);
-        return null;
-      }
-      return id;
-    } catch (e) {
-      this._alert.warning({
-        message: conferenceErrors.bringInFailed,
-      });
-      return null;
-    }
-  }
-
-  async _makeConference(propagate = false) {
-    try {
-      this.store.dispatch({
-        type: this.actionTypes.makeConference,
-      });
-
-      // TODO: replace with SDK function chaining calls
-      const rawResponse = await this._client.service.platform()
-        .post('/account/~/telephony/conference', {});
-      const response = rawResponse.json();
-      const conference = response.session;
-      const phoneNumber = conference.voiceCallToken;
-      // whether to mutate the session to mark the conference?
-      const session = await this._call.call({
-        phoneNumber
-      }, true);
-
-      if (typeof session === 'object' &&
-        Object.prototype.toString.call(session.on).toLowerCase() === '[object function]') {
-        this._hookConference(conference, session);
-
-        this.store.dispatch({
-          type: this.actionTypes.makeConferenceSucceeded,
-          conference,
-          session
-        });
-      } else {
-        this.store.dispatch({
-          type: this.actionTypes.makeConferenceFailed,
-        });
-      }
-
-      return conference;
-    } catch (e) {
-      this.store.dispatch({
-        type: this.actionTypes.makeConferenceFailed,
-        message: e.toString()
-      });
-
-      if (!propagate) {
-        this._alert.warning({
-          message: conferenceErrors.makeConferenceFailed,
-        });
-        return null;
-      }
-      // need to propagate to out side try...catch block
-      throw e;
-    }
-  }
-
   async _onStateChange() {
     if (this._shouldInit()) {
       this._init();
@@ -555,6 +467,95 @@ export default class ConferenceCall extends RcModule {
       })
     );
   }
+
+  async _mergeToConference(calls = []) {
+    const conferenceState = Object.values(this.conferences)[0];
+
+    try {
+      if (conferenceState) {
+        const conferenceId = conferenceState.conference.id;
+        this.stopPollingConferenceStatus(conferenceId);
+        await Promise.all(
+          calls.map(
+            call => this.bringInToConference(conferenceId, call, true)
+          )
+        );
+        this.startPollingConferenceStatus(conferenceId);
+        return conferenceId;
+      }
+      const { id } = await this.makeConference(true);
+      /**
+       * HACK: 800ms came from exprience, if we try to bring other calls into the conference
+       * immediately, the api will throw 403 error which says: can't find the host of the
+       * conference.
+       */
+      await new Promise(resolve => setTimeout(resolve, DEFAULT_WAIT));
+      const mergedId = await this._mergeToConference(calls);
+
+      // if create conference successfully but failed to bring-in, then terminate the conference.
+      if (mergedId !== id) {
+        this.terminateConference(id);
+        return null;
+      }
+      return id;
+    } catch (e) {
+      this._alert.warning({
+        message: conferenceErrors.bringInFailed,
+      });
+      return null;
+    }
+  }
+
+  async _makeConference(propagate = false) {
+    try {
+      this.store.dispatch({
+        type: this.actionTypes.makeConference,
+      });
+
+      // TODO: replace with SDK function chaining calls
+      const rawResponse = await this._client.service.platform()
+        .post('/account/~/telephony/conference', {});
+      const response = rawResponse.json();
+      const conference = response.session;
+      const phoneNumber = conference.voiceCallToken;
+      // whether to mutate the session to mark the conference?
+      const session = await this._call.call({
+        phoneNumber
+      }, true);
+
+      if (typeof session === 'object' &&
+        Object.prototype.toString.call(session.on).toLowerCase() === '[object function]') {
+        this._hookConference(conference, session);
+
+        this.store.dispatch({
+          type: this.actionTypes.makeConferenceSucceeded,
+          conference,
+          session
+        });
+      } else {
+        this.store.dispatch({
+          type: this.actionTypes.makeConferenceFailed,
+        });
+      }
+
+      return conference;
+    } catch (e) {
+      this.store.dispatch({
+        type: this.actionTypes.makeConferenceFailed,
+        message: e.toString()
+      });
+
+      if (!propagate) {
+        this._alert.warning({
+          message: conferenceErrors.makeConferenceFailed,
+        });
+        return null;
+      }
+      // need to propagate to out side try...catch block
+      throw e;
+    }
+  }
+
 
   get status() {
     return this.state.status;
