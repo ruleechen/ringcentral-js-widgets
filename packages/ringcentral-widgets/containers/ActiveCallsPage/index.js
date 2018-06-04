@@ -49,6 +49,7 @@ function mapToProps(_, {
     showContactDisplayPlaceholder,
     autoLog: !!(callLogger && callLogger.autoLog),
     disableMerge,
+    isMerging: conferenceCall.isMerging,
   };
 }
 
