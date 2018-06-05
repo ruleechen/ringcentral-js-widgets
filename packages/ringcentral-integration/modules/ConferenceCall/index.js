@@ -318,6 +318,7 @@ export default class ConferenceCall extends RcModule {
     });
 
     let sipInstances;
+    let conferenceId = null;
 
     if (this._webphone) {
       /**
@@ -335,13 +336,15 @@ export default class ConferenceCall extends RcModule {
         return p;
       });
       Promise.all(pSips).then(() => {
-        this.store.dispatch({
-          type: this.actionTypes.mergeEnd,
-        });
+        if (conferenceId !== null) {
+          this.store.dispatch({
+            type: this.actionTypes.mergeEnd,
+          });
+        }
       });
     }
 
-    const conferenceId = await this._mergeToConference(calls);
+    conferenceId = await this._mergeToConference(calls);
 
     if (!sipInstances || conferenceId === null) {
       this.store.dispatch({
