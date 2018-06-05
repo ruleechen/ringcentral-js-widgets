@@ -413,6 +413,10 @@ export default class ConferenceCall extends RcModule {
     this._pulling = !this.pulling;
   }
 
+  setCapatity(capacity = MAXIMUM_CAPACITY) {
+    this.capacity = capacity;
+  }
+
   _init() {
     this.store.dispatch({
       type: this.actionTypes.initSuccess
