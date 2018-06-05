@@ -197,7 +197,7 @@ export default class ConferenceCall extends RcModule {
       !conference
         || !partyCall
         || partyCall.direction !== callDirections.outbound
-        || this.isOverload(conference.id) >= this.capacity
+        || this.isOverload(conference.id)
     ) {
       if (!propagete) {
         this._alert.warning({
