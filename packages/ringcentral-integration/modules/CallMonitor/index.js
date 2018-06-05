@@ -5,9 +5,7 @@ import RcModule from '../../lib/RcModule';
 import moduleStatuses from '../../enums/moduleStatuses';
 import actionTypes from './actionTypes';
 import callDirections from '../../enums/callDirections';
-import getCallMonitorReducer, {
-  getCallMatchedReducer
-} from './getCallMonitorReducer';
+import getCallMonitorReducer, { getCallMatchedReducer } from './getCallMonitorReducer';
 import normalizeNumber from '../../lib/normalizeNumber';
 import {
   isRinging,

@@ -11,8 +11,9 @@ import conferenceErrors from './conferenceCallErrors';
 import ensureExist from '../../lib/ensureExist';
 import callingModes from '../CallingSettings/callingModes';
 
-const DEFAULT_TTL = 5000;
-const DEFAULT_WAIT = 800;
+const DEFAULT_TTL = 5000;// timer to update the conference information
+const DEFAULT_WAIT = 800;// timer to bring-in after conference creation
+const DEFAULT_TERMINATION_SPAN = 100;// timer to initiatively terminate the session after bring-in
 const MAXIMUM_CAPACITY = 11;
 
 /**
@@ -57,6 +58,7 @@ export default class ConferenceCall extends RcModule {
     webphone,
     pulling = true,
     capacity = MAXIMUM_CAPACITY,
+    spanForBringIn = DEFAULT_WAIT,
     ...options
   }) {
     super({
@@ -84,6 +86,7 @@ export default class ConferenceCall extends RcModule {
     this._ttl = DEFAULT_TTL;
     this._timers = {};
     this._pulling = pulling;
+    this._spanForBringIn = spanForBringIn;
     this.capacity = capacity;
   }
 
@@ -335,21 +338,53 @@ export default class ConferenceCall extends RcModule {
         });
         return p;
       });
-      Promise.all(pSips).then(() => {
-        if (conferenceId !== null) {
+
+      Promise.all([this._mergeToConference(calls), ...pSips])
+        .then(() => {
           this.store.dispatch({
             type: this.actionTypes.mergeEnd,
           });
+        }, () => {
+          const conferenceState = Object.values(this.conferences)[0];
+          /**
+           * if create conference successfully but failed to bring-in,
+           *  then terminate the conference.
+           */
+          if (conferenceState && conferenceState.conference.parties.length < 2) {
+            this.terminateConference(conferenceState.conference.id);
+          }
+          this._alert.warning({
+            message: conferenceErrors.bringInFailed,
+          });
+          this.store.dispatch({
+            type: this.actionTypes.mergeEnd,
+          });
+        });
+    } else {
+      try {
+        conferenceId = await this._mergeToConference(calls);
+
+        this.store.dispatch({
+          type: this.actionTypes.mergeEnd,
+        });
+      } catch (e) {
+        const conferenceState = Object.values(this.conferences)[0];
+        /**
+         * if create conference successfully but failed to bring-in,
+         *  then terminate the conference.
+         */
+        if (conferenceState && conferenceState.conference.parties.length < 2) {
+          this.terminateConference(conferenceState.conference.id);
         }
-      });
-    }
-
-    conferenceId = await this._mergeToConference(calls);
-
-    if (!sipInstances || conferenceId === null) {
-      this.store.dispatch({
-        type: this.actionTypes.mergeEnd,
-      });
+        this._alert.warning({
+          message: conferenceErrors.bringInFailed,
+        });
+      }
+      if (!sipInstances || conferenceId === null) {
+        this.store.dispatch({
+          type: this.actionTypes.mergeEnd,
+        });
+      }
     }
   }
 
@@ -415,6 +450,10 @@ export default class ConferenceCall extends RcModule {
 
   setCapatity(capacity = MAXIMUM_CAPACITY) {
     this.capacity = capacity;
+  }
+
+  setSpanForBringIn(span = DEFAULT_WAIT) {
+    this._spanForBringIn = span;
   }
 
   _init() {
@@ -485,39 +524,40 @@ export default class ConferenceCall extends RcModule {
   async _mergeToConference(calls = []) {
     const conferenceState = Object.values(this.conferences)[0];
 
-    try {
-      if (conferenceState) {
-        const conferenceId = conferenceState.conference.id;
-        this.stopPollingConferenceStatus(conferenceId);
-        await Promise.all(
-          calls.map(
-            call => this.bringInToConference(conferenceId, call, true)
-          )
-        );
-        this.startPollingConferenceStatus(conferenceId);
-        return conferenceId;
-      }
-      const { id } = await this.makeConference(true);
-      /**
-       * HACK: 800ms came from exprience, if we try to bring other calls into the conference
-       * immediately, the api will throw 403 error which says: can't find the host of the
-       * conference.
-       */
-      await new Promise(resolve => setTimeout(resolve, DEFAULT_WAIT));
-      const mergedId = await this._mergeToConference(calls);
+    if (conferenceState) {
+      const conferenceId = conferenceState.conference.id;
+      this.stopPollingConferenceStatus(conferenceId);
+      await Promise.all(
+        calls.map(
+          call => this.bringInToConference(conferenceId, call, true)
+        )
+      );
 
-      // if create conference successfully but failed to bring-in, then terminate the conference.
-      if (mergedId !== id) {
-        this.terminateConference(id);
-        return null;
-      }
-      return id;
-    } catch (e) {
-      this._alert.warning({
-        message: conferenceErrors.bringInFailed,
-      });
-      return null;
+      /**
+       * HACK: terminate the session initiatively to avoid:
+       * 1. remaining session when duplicated session exsisting in a conference.
+       */
+      setTimeout(() => {
+        calls.forEach((call) => {
+          if (call.webphoneSession && call.webphoneSession.id) {
+            this._webphone.hangup(call.webphoneSession.id);
+          }
+        });
+      }, DEFAULT_TERMINATION_SPAN);
+
+      this.startPollingConferenceStatus(conferenceId);
+      return conferenceId;
     }
+    const { id } = await this.makeConference(true);
+    /**
+     * HACK: 800ms came from exprience, if we try to bring other calls into the conference
+     * immediately, the api will throw 403 error which says: can't find the host of the
+     * conference.
+     */
+    await new Promise(resolve => setTimeout(resolve, this._spanForBringIn));
+    await this._mergeToConference(calls);
+
+    return id;
   }
 
   async _makeConference(propagate = false) {
