@@ -25,6 +25,7 @@ class ActiveCallPanel extends React.Component {
 
   handleResize() {
     const { isOnConference, conferenceData } = this.props;
+    const MAXIMUM_AVATARS = 4;
     // todo: handle width calculation
     if (isOnConference) {
       let profiles;
@@ -34,9 +35,11 @@ class ActiveCallPanel extends React.Component {
       } else {
         profiles = this.props.getOnlineProfiles(conferenceData.conference.id);
       }
-      const displayedProfiles = (profiles.length >= 4 ? profiles.slice(0, 4) : profiles)
+      const displayedProfiles = (profiles.length >= MAXIMUM_AVATARS
+        ? profiles.slice(0, MAXIMUM_AVATARS)
+        : profiles)
         .map(({ avatarUrl, toUserName }) => ({ avatarUrl, toUserName }));
-      const remains = profiles.length <= 4 ? 0 : profiles.length - 4;
+      const remains = profiles.length <= MAXIMUM_AVATARS ? 0 : profiles.length - MAXIMUM_AVATARS;
       this.setState(prev => ({
         ...prev,
         displayedProfiles,
