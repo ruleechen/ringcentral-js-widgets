@@ -87,6 +87,8 @@ class CallCtrlPanel extends Component {
     }
     return (
       <ActiveCallPanel
+        getOnlineProfiles={this.props.getOnlineProfiles}
+        getAvatarUrl={this.props.getAvatarUrl}
         conferenceData={this.props.conferenceData}
         isOnConference={this.props.isOnConference}
         backButtonLabel={this.props.backButtonLabel}
@@ -132,6 +134,7 @@ class CallCtrlPanel extends Component {
 }
 
 CallCtrlPanel.propTypes = {
+  getOnlineProfiles: PropTypes.func.isRequired,
   callStatus: PropTypes.string,
   sessionId: PropTypes.string,
   phoneNumber: PropTypes.string,
@@ -177,9 +180,11 @@ CallCtrlPanel.propTypes = {
   phoneTypeRenderer: PropTypes.func,
   recipientsContactInfoRenderer: PropTypes.func,
   recipientsContactPhoneRenderer: PropTypes.func,
+  getAvatarUrl: PropTypes.func,
 };
 
 CallCtrlPanel.defaultProps = {
+  getAvatarUrl: null,
   startTime: null,
   conferenceData: null,
   isOnConference: false,

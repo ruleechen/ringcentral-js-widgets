@@ -47,6 +47,20 @@ $conferenceCallBtnPaddingLeft: ($conferenceCallBtnWidth - $callBtnWidth)/2;
   }
 }
 
+.button{
+  display: inline-block;
+  padding: $conferenceCallBtnPaddingLeft;
+}
+
+.mergeButton {
+  circle {
+    fill: #5fb95c;
+  }
+  g, path {
+    fill: #ffffff;
+  }
+}
+
 .stopButton {
   circle {
     fill: #ff4646;

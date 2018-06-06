@@ -1,187 +1,182 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
+import throttle from 'ringcentral-integration/lib/throttle';
 
+import CallInfo from './CallInfo';
+import ConferenceInfo from './ConferenceInfo';
 import BackHeader from '../BackHeader';
 import Panel from '../Panel';
 import DurationCounter from '../DurationCounter';
 import ActiveCallPad from '../ActiveCallPad';
-import ContactDisplay from '../ContactDisplay';
 import dynamicsFont from '../../assets/DynamicsFont/DynamicsFont.scss';
 import styles from './styles.scss';
 
-function CallInfo(props) {
-  let avatar;
-  // todo: conference avatars
-  if (props.avatarUrl) {
-    avatar = (<img src={props.avatarUrl} alt="avatar" />);
-  } else {
-    avatar = (<i className={classnames(dynamicsFont.portrait, styles.icon)} />);
+class ActiveCallPanel extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      displayedProfiles: [],
+      remains: 0,
+      isPartiesModalOpen: false,
+      resizeFunc: throttle(this::this.handleResize),
+    };
   }
-  return (
-    <div className={styles.userInfo}>
-      <div className={styles.avatarContainer}>
-        <div className={styles.avatar}>
-          {avatar}
-        </div>
-      </div>
-      <div className={styles.userName}>
-        <ContactDisplay
-          className={styles.contactDisplay}
-          selectClassName={styles.dropdown}
-          contactMatches={props.nameMatches}
-          phoneNumber={props.phoneNumber}
-          fallBackName={props.fallBackName}
-          currentLocale={props.currentLocale}
-          areaCode={props.areaCode}
-          countryCode={props.countryCode}
-          showType={false}
-          disabled={false}
-          selected={props.selectedMatcherIndex}
-          onSelectContact={props.onSelectMatcherName}
-          isLogging={false}
-          enableContactFallback
-          brand={props.brand}
-          showPlaceholder={props.showContactDisplayPlaceholder}
-          sourceIcons={props.sourceIcons}
-        />
-      </div>
-      <div className={styles.userPhoneNumber}>
-        {props.formatPhone(props.phoneNumber)}
-      </div>
-    </div>
-  );
-}
 
-CallInfo.propTypes = {
-  phoneNumber: PropTypes.string,
-  formatPhone: PropTypes.func.isRequired,
-  nameMatches: PropTypes.array.isRequired,
-  fallBackName: PropTypes.string.isRequired,
-  areaCode: PropTypes.string.isRequired,
-  countryCode: PropTypes.string.isRequired,
-  currentLocale: PropTypes.string.isRequired,
-  selectedMatcherIndex: PropTypes.number.isRequired,
-  onSelectMatcherName: PropTypes.func.isRequired,
-  avatarUrl: PropTypes.string,
-  brand: PropTypes.string,
-  showContactDisplayPlaceholder: PropTypes.bool,
-  sourceIcons: PropTypes.object,
-};
+  handleResize() {
+    const { isOnConference, conferenceData } = this.props;
+    // todo: handle width calculation
+    if (isOnConference) {
+      let profiles;
+      // conference is just created and waiting for parties data to return
+      if (conferenceData.conference.parties.length === 0) {
+        profiles = conferenceData.profiles;
+      } else {
+        profiles = this.props.getOnlineProfiles(conferenceData.conference.id);
+      }
+      const displayedProfiles = (profiles.length >= 4 ? profiles.slice(0, 5) : profiles)
+        .map(({ avatarUrl, toUserName }) => ({ avatarUrl, toUserName }));
+      const remains = profiles.length <= 4 ? 0 : profiles.length - 4;
+      this.setState(prev => ({
+        ...prev,
+        displayedProfiles,
+        remains
+      }));
+    }
+  }
 
-CallInfo.defaultProps = {
-  phoneNumber: null,
-  avatarUrl: null,
-  brand: 'RingCentral',
-  showContactDisplayPlaceholder: true,
-  sourceIcons: undefined,
-};
+  componentDidMount() {
+    this.handleResize();
+    window.addEventListener('resize', this.state.resizeFunc);
+  }
 
-function ActiveCallPanel({
-  onBackButtonClick,
-  backButtonLabel,
-  currentLocale,
-  nameMatches,
-  fallBackName,
-  phoneNumber,
-  formatPhone,
-  startTime,
-  startTimeOffset,
-  areaCode,
-  countryCode,
-  selectedMatcherIndex,
-  onSelectMatcherName,
-  avatarUrl,
-  isOnMute,
-  isOnHold,
-  isOnConference,
-  conferenceData,
-  recordStatus,
-  onMute,
-  onUnmute,
-  onHold,
-  onUnhold,
-  onRecord,
-  onStopRecord,
-  onShowKeyPad,
-  onHangup,
-  onPark,
-  onAdd,
-  onShowFlipPanel,
-  onToggleTransferPanel,
-  children,
-  showContactDisplayPlaceholder,
-  brand,
-  flipNumbers,
-  calls,
-  sourceIcons,
-}) {
-  const timeCounter = startTime ?
-    (
-      <span className={styles.timeCounter}>
-        <DurationCounter startTime={startTime} offset={startTimeOffset} />
-      </span>
-    ) : null;
-  const backHeader = (calls.length > 1 || isOnConference) ? (
-    <BackHeader
-      onBackClick={onBackButtonClick}
-      backButton={(
-        <span className={styles.backButton}>
-          <i className={classnames(dynamicsFont.arrow, styles.backIcon)} />
-          <span className={styles.backLabel}>{backButtonLabel}</span>
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.state.resizeFunc);
+  }
+
+  openPartiesModal() {
+    // todo;
+  }
+
+  render() {
+    const {
+      onBackButtonClick,
+      backButtonLabel,
+      currentLocale,
+      nameMatches,
+      fallBackName,
+      phoneNumber,
+      formatPhone,
+      startTime,
+      startTimeOffset,
+      areaCode,
+      countryCode,
+      selectedMatcherIndex,
+      onSelectMatcherName,
+      avatarUrl,
+      isOnMute,
+      isOnHold,
+      isOnConference,
+      recordStatus,
+      onMute,
+      onUnmute,
+      onHold,
+      onUnhold,
+      onRecord,
+      onStopRecord,
+      onShowKeyPad,
+      onHangup,
+      onPark,
+      onAdd,
+      onShowFlipPanel,
+      onToggleTransferPanel,
+      children,
+      showContactDisplayPlaceholder,
+      brand,
+      flipNumbers,
+      calls,
+      sourceIcons,
+    } = this.props;
+
+    const timeCounter = startTime ?
+      (
+        <span className={styles.timeCounter}>
+          <DurationCounter startTime={startTime} offset={startTimeOffset} />
         </span>
+      ) : null;
+    const backHeader = (calls.length > 1 || isOnConference) ? (
+      <BackHeader
+        onBackClick={onBackButtonClick}
+        backButton={(
+          <span className={styles.backButton}>
+            <i className={classnames(dynamicsFont.arrow, styles.backIcon)} />
+            <span className={styles.backLabel}>{backButtonLabel}</span>
+          </span>
       )}
     />
-  ) : <BackHeader className={styles.hidden} />;
-  return (
-    <div className={styles.root}>
-      {backHeader}
-      <Panel className={styles.panel}>
-        {timeCounter}
-        <CallInfo
-          currentLocale={currentLocale}
-          nameMatches={nameMatches}
-          fallBackName={fallBackName}
-          phoneNumber={phoneNumber}
-          formatPhone={formatPhone}
-          startTime={startTime}
-          areaCode={areaCode}
-          countryCode={countryCode}
-          selectedMatcherIndex={selectedMatcherIndex}
-          onSelectMatcherName={onSelectMatcherName}
-          avatarUrl={avatarUrl}
-          brand={brand}
-          showContactDisplayPlaceholder={showContactDisplayPlaceholder}
-          sourceIcons={sourceIcons}
+    ) : <BackHeader className={styles.hidden} />;
+
+    return (
+      <div className={styles.root}>
+        {backHeader}
+        <Panel className={styles.panel}>
+          {timeCounter}
+          {
+          isOnConference
+          ? (
+            <ConferenceInfo
+              displayedProfiles={this.state.displayedProfiles}
+              remains={this.state.remains}
+              onClick={() => this.openPartiesModal()}
+            />
+          )
+          : (<CallInfo
+            currentLocale={currentLocale}
+            nameMatches={nameMatches}
+            fallBackName={fallBackName}
+            phoneNumber={phoneNumber}
+            formatPhone={formatPhone}
+            startTime={startTime}
+            areaCode={areaCode}
+            countryCode={countryCode}
+            selectedMatcherIndex={selectedMatcherIndex}
+            onSelectMatcherName={onSelectMatcherName}
+            avatarUrl={avatarUrl}
+            brand={brand}
+            showContactDisplayPlaceholder={showContactDisplayPlaceholder}
+            sourceIcons={sourceIcons}
+          />)
+        }
+          <ActiveCallPad
+            className={styles.callPad}
+            currentLocale={currentLocale}
+            isOnMute={isOnMute}
+            isOnHold={isOnHold}
+            isOnConference={isOnConference}
+            recordStatus={recordStatus}
+            onMute={onMute}
+            onUnmute={onUnmute}
+            onHold={onHold}
+            onUnhold={onUnhold}
+            onRecord={onRecord}
+            onStopRecord={onStopRecord}
+            onShowKeyPad={onShowKeyPad}
+            onHangup={onHangup}
+            onAdd={onAdd}
+            onShowFlipPanel={onShowFlipPanel}
+            onToggleTransferPanel={onToggleTransferPanel}
+            flipNumbers={flipNumbers}
+            onPark={onPark}
         />
-        <ActiveCallPad
-          className={styles.callPad}
-          currentLocale={currentLocale}
-          isOnMute={isOnMute}
-          isOnHold={isOnHold}
-          isOnConference={isOnConference}
-          recordStatus={recordStatus}
-          onMute={onMute}
-          onUnmute={onUnmute}
-          onHold={onHold}
-          onUnhold={onUnhold}
-          onRecord={onRecord}
-          onStopRecord={onStopRecord}
-          onShowKeyPad={onShowKeyPad}
-          onHangup={onHangup}
-          onAdd={onAdd}
-          onShowFlipPanel={onShowFlipPanel}
-          onToggleTransferPanel={onToggleTransferPanel}
-          flipNumbers={flipNumbers}
-          onPark={onPark}
-        />
-        {children}
-      </Panel>
-    </div>
-  );
+          {children}
+        </Panel>
+      </div>
+    );
+  }
 }
 
 ActiveCallPanel.propTypes = {
+  getOnlineProfiles: PropTypes.func.isRequired,
   phoneNumber: PropTypes.string,
   nameMatches: PropTypes.array.isRequired,
   fallBackName: PropTypes.string.isRequired,

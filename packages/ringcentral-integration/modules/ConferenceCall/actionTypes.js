@@ -17,6 +17,10 @@ export default new Enum([
   'updateConference',
   'updateConferenceSucceeded',
   'updateConferenceFailed',
+  // get party
+  'getParty',
+  'getPartySucceeded',
+  'getPartyFailed',
   // bring-in
   'bringInConference',
   'bringInConferenceSucceeded',
