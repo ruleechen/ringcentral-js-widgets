@@ -39,10 +39,10 @@ export default function ConferenceInfo({
 }
 
 ConferenceInfo.propTypes = {
-  displayedProfiles: PropTypes.arrayOf({
+  displayedProfiles: PropTypes.arrayOf(PropTypes.shape({
     avatarUrl: PropTypes.string,
     toUserName: PropTypes.string,
-  }).isRequired,
+  })).isRequired,
   remains: PropTypes.number,
   onClick: PropTypes.func
 };
