@@ -3,6 +3,7 @@ import callDirections from '../../enums/callDirections';
 import RcModule from '../../lib/RcModule';
 import actionTypes from './actionTypes';
 import partyStatusCode from './partyStatusCode';
+import conferenceRole from './conferenceRole';
 import getConferenceCallReducer from './getConferenceCallReducer';
 import proxify from '../../lib/proxy/proxify';
 import permissionsMessages from '../RolesAndPermissions/permissionsMessages';
@@ -32,6 +33,14 @@ const MAXIMUM_CAPACITY = 11;
     'Client',
     'RolesAndPermissions',
     {
+      dep: 'Contacts',
+      optional: true
+    },
+    {
+      dep: 'ContactMatcher',
+      optional: true
+    },
+    {
       dep: 'Webphone',
       optional: true
     },
@@ -55,6 +64,8 @@ export default class ConferenceCall extends RcModule {
     callingSettings,
     client,
     rolesAndPermissions,
+    contacts,
+    contactMatcher,
     webphone,
     pulling = true,
     capacity = MAXIMUM_CAPACITY,
@@ -69,6 +80,8 @@ export default class ConferenceCall extends RcModule {
       client,
       rolesAndPermissions,
       pulling,
+      contacts,
+      contactMatcher,
       webphone,
       ...options,
       actionTypes,
@@ -80,6 +93,8 @@ export default class ConferenceCall extends RcModule {
     this._client = this::ensureExist(client, 'client');
     // in order to run the integeration test, we need it to be optional
     this._webphone = webphone;
+    this._contacts = contacts;
+    this._contactMatcher = contactMatcher;
     this._rolesAndPermissions = this::ensureExist(rolesAndPermissions, 'rolesAndPermissions');
     // we need the constructed actions
     this._reducer = getConferenceCallReducer(this.actionTypes);
@@ -195,12 +210,12 @@ export default class ConferenceCall extends RcModule {
    */
   @proxify
   async bringInToConference(id, partyCall, propagete = false) {
-    const conference = this.state.conferences[id];
+    const conferenceState = this.state.conferences[id];
     if (
-      !conference
+      !conferenceState
         || !partyCall
         || partyCall.direction !== callDirections.outbound
-        || this.isOverload(conference.id)
+        || this.isOverload(id)
     ) {
       if (!propagete) {
         this._alert.warning({
@@ -210,20 +225,24 @@ export default class ConferenceCall extends RcModule {
 
       return null;
     }
+    const { conference, session } = conferenceState;
     this.store.dispatch({
       type: this.actionTypes.bringInConference,
       conference,
+      session,
     });
     const sessionData = partyCall.webphoneSession.data;
     try {
       await this._client.service.platform()
         .post(`/account/~/telephony/sessions/${id}/parties/bring-in`, sessionData);
       await this.updateConferenceStatus(id);
-
+      const partyProfile = await this._getProfile(partyCall.webphoneSession);
       // let the contact match to do the matching of the parties.
       this.store.dispatch({
         type: this.actionTypes.bringInConferenceSucceeded,
         conference,
+        session,
+        partyProfile,
       });
       return id;
     } catch (e) {
@@ -394,6 +413,23 @@ export default class ConferenceCall extends RcModule {
     } else if (this._shouldReset()) {
       this._reset();
     }
+  }
+
+  getOnlinePartyProfiles(id) {
+    const conferenceData = this.conferences[id];
+    if (conferenceData) {
+      return conferenceData.conference.parties
+        .filter(party => party.conferenceRole.toLowerCase() !== conferenceRole.host)
+        .reduce((accum, party, idx) => {
+          if (party.status.code.toLowerCase() !== partyStatusCode.disconnected) {
+            // 0 position is the host
+            accum.push(idx);
+          }
+          return accum;
+        }, [])
+        .map(idx => conferenceData.profiles[idx]);
+    }
+    return null;
   }
 
   getOnlineParties(id) {
@@ -584,7 +620,8 @@ export default class ConferenceCall extends RcModule {
         this.store.dispatch({
           type: this.actionTypes.makeConferenceSucceeded,
           conference,
-          session
+          session,
+          parties: [],
         });
       } else {
         this.store.dispatch({
@@ -610,6 +647,27 @@ export default class ConferenceCall extends RcModule {
     }
   }
 
+  async _getProfile(session) {
+    const { toUserName, to } = session;
+    let avatarUrl;
+    if (this._contacts && this._contactMatcher && this._contactMatcher.dataMapping) {
+      const contactMapping = this._contactMatcher.dataMapping;
+      let contact = session.contactMatch;
+      const nameMatches = (contactMapping && contactMapping[session.to]) || [];
+
+      if (!contact) {
+        contact = nameMatches && nameMatches[0];
+      }
+      if (contact) {
+        avatarUrl = await this._contacts.getProfileImage(contact);
+      }
+    }
+    return {
+      avatarUrl,
+      toUserName,
+      to
+    };
+  }
 
   get status() {
     return this.state.status;

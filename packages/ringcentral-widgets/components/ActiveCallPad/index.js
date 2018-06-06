@@ -14,6 +14,7 @@ import RecordIcon from '../../assets/images/Record.svg';
 import TransferIcon from '../../assets/images/Transfer.svg';
 import FlipIcon from '../../assets/images/Flip.svg';
 import EndIcon from '../../assets/images/End.svg';
+import CombineIcon from '../../assets/images/Combine.svg';
 import styles from './styles.scss';
 import i18n from './i18n';
 
@@ -143,6 +144,20 @@ export default function ActiveCallPad(props) {
         </div>
       </div>
       <div className={classnames(styles.buttonRow, styles.stopButtonGroup)}>
+        {
+          isOnConference ?
+            <div className={styles.button}>
+              <CircleButton
+                className={styles.mergeButton}
+                // onClick={props.onHangup}
+                icon={CombineIcon}
+                showBorder={false}
+                iconWidth={250}
+                iconX={125}
+          />
+            </div>
+          : null
+        }
         <div className={styles.button}>
           <CircleButton
             className={styles.stopButton}

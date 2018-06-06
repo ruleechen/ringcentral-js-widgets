@@ -12,6 +12,7 @@ export function getConferenceCallStatusReducer(types) {
       case types.updateConference:
       case types.bringInConference:
       case types.removeFromConference:
+      case types.getParty:
         return conferenceCallStatus.requesting;
 
       case types.makeConferenceSucceeded:
@@ -24,6 +25,9 @@ export function getConferenceCallStatusReducer(types) {
       case types.bringInConferenceFailed:
       case types.removeFromConferenceSucceeded:
       case types.removeFromConferenceFailed:
+      case types.getPartySucceeded:
+      case types.getPartyFailed:
+      case types.resetSuccess:
         return conferenceCallStatus.idle;
 
       default:
@@ -38,6 +42,7 @@ export function getMakeConferenceCallReducer(types) {
     type,
     conference, // platform conference session data
     session, // SIP.inviteClientContext instance
+    partyProfile,
   }) => {
     const res = {
       ...state
@@ -47,7 +52,18 @@ export function getMakeConferenceCallReducer(types) {
         return {};
       case types.makeConferenceSucceeded:
       case types.updateConferenceSucceeded:
-        res[conference.id] = { conference, session };
+        res[conference.id] = {
+          conference,
+          session,
+          profiles: (res[conference.id] && res[conference.id].profiles) || []
+        };
+        return res;
+      case types.bringInConferenceSucceeded:
+        res[conference.id] = {
+          conference,
+          session,
+          profiles: [...res[conference.id].profiles, partyProfile]
+        };
         return res;
       case types.terminateConferenceSucceeded:
         delete res[conference.id];
@@ -64,6 +80,7 @@ export function getMergingStatusReducer(types) {
       case types.mergeStart:
         return true;
       case types.mergeEnd:
+      case types.resetSuccess:
         return false;
       default:
         return state;

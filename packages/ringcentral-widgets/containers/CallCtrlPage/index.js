@@ -118,19 +118,13 @@ class CallCtrlPage extends Component {
       fallbackUserName = i18n.getString('unknown', this.props.currentLocale);
     }
 
-    let backButtonLabel;
-    if (this.props.isOnConference) {
-      backButtonLabel = i18n.getString('conferenceCall', this.props.currentLocale);
-    } else {
-      // The label of back button is customizable
-      // the property `backButtonLabel` should be internationalizational
-      backButtonLabel = this.props.backButtonLabel
-        ? this.props.backButtonLabel
-        : i18n.getString('activeCalls', this.props.currentLocale);
-    }
+    const backButtonLabel = this.props.backButtonLabel
+      ? this.props.backButtonLabel
+      : i18n.getString('activeCalls', this.props.currentLocale);
 
     return (
       <CallCtrlPanel
+        getOnlineProfiles={this.props.getOnlineProfiles}
         isOnConference={this.props.isOnConference}
         conferenceData={this.props.conferenceData}
         backButtonLabel={backButtonLabel}
@@ -196,6 +190,7 @@ CallCtrlPage.propTypes = {
     from: PropTypes.string,
     contactMatch: PropTypes.object,
   }).isRequired,
+  getOnlineProfiles: PropTypes.func.isRequired,
   isOnConference: PropTypes.bool.isRequired,
   conferenceData: PropTypes.object,
   currentLocale: PropTypes.string.isRequired,
@@ -286,6 +281,7 @@ function mapToFunctions(_, {
     webphone,
     regionSettings,
     contactSearch,
+    conferenceCall,
   },
   getAvatarUrl,
   onBackButtonClick,
@@ -300,6 +296,7 @@ function mapToFunctions(_, {
       areaCode: regionSettings.areaCode,
       countryCode: regionSettings.countryCode,
     }),
+    getOnlineProfiles: id => conferenceCall.getOnlinePartyProfiles(id),
     onHangup: sessionId => webphone.hangup(sessionId),
     onMute: sessionId => webphone.mute(sessionId),
     onUnmute: sessionId => webphone.unmute(sessionId),
