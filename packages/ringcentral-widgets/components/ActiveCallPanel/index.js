@@ -34,7 +34,7 @@ class ActiveCallPanel extends React.Component {
       } else {
         profiles = this.props.getOnlineProfiles(conferenceData.conference.id);
       }
-      const displayedProfiles = (profiles.length >= 4 ? profiles.slice(0, 5) : profiles)
+      const displayedProfiles = (profiles.length >= 4 ? profiles.slice(0, 4) : profiles)
         .map(({ avatarUrl, toUserName }) => ({ avatarUrl, toUserName }));
       const remains = profiles.length <= 4 ? 0 : profiles.length - 4;
       this.setState(prev => ({
