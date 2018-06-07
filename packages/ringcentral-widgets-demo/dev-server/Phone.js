@@ -205,15 +205,18 @@ export default class BasePhone extends RcModule {
       routerInteraction.goBack();
     };
     webphone._onCallStartFunc = () => {
-      if (routerInteraction.currentPath === '/calls/active') {
-        return;
+      if (routerInteraction.currentPath.indexOf('/conferenceCall/dialer') === 0) {
+        routerInteraction.push('/conferenceCall/mergeCtrl');
       }
-      routerInteraction.push('/calls/active');
+      else if (
+        routerInteraction.currentPath !== '/calls/active' &&
+        routerInteraction.currentPath !== '/conferenceCall/mergeCtrl'
+      ) {
+        routerInteraction.push('/calls/active');
+      }
     };
     webphone._onCallRingFunc = () => {
-      if (
-        webphone.ringSessions.length > 1
-      ) {
+      if (webphone.ringSessions.length > 1) {
         if (routerInteraction.currentPath !== '/calls') {
           routerInteraction.push('/calls');
         }
@@ -343,6 +346,6 @@ export function createPhone({
       },
     ]
   })
-  class Phone extends BasePhone {}
+  class Phone extends BasePhone { }
   return Phone.create();
 }

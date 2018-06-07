@@ -325,4 +325,9 @@ CallCtrlContainer.defaultProps = {
   sourceIcons: undefined,
 };
 
-export default CallCtrlContainer;
+export {
+  mapToProps,
+  mapToFunctions,
+  CallCtrlPage,
+  CallCtrlContainer as default,
+};
