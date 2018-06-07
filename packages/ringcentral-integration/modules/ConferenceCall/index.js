@@ -15,7 +15,7 @@ import callingModes from '../CallingSettings/callingModes';
 const DEFAULT_TTL = 5000;// timer to update the conference information
 const DEFAULT_WAIT = 800;// timer to bring-in after conference creation
 const DEFAULT_TERMINATION_SPAN = 100;// timer to initiatively terminate the session after bring-in
-const MAXIMUM_CAPACITY = 11;
+const MAXIMUM_CAPACITY = 10;
 
 /**
  * @class

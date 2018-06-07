@@ -87,6 +87,11 @@ class CallCtrlPanel extends Component {
     }
     return (
       <ActiveCallPanel
+        mergeToConference={this.props.mergeToConference}
+        gotoConferenceCallDialer={this.props.gotoConferenceCallDialer}
+        direction={this.props.direction}
+        mergeDisabled={this.props.mergeDisabled}
+        simple={this.props.simple}
         getOnlineProfiles={this.props.getOnlineProfiles}
         getAvatarUrl={this.props.getAvatarUrl}
         conferenceData={this.props.conferenceData}
@@ -134,6 +139,9 @@ class CallCtrlPanel extends Component {
 }
 
 CallCtrlPanel.propTypes = {
+  direction: PropTypes.string,
+  mergeDisabled: PropTypes.bool,
+  simple: PropTypes.bool,
   getOnlineProfiles: PropTypes.func.isRequired,
   callStatus: PropTypes.string,
   sessionId: PropTypes.string,
@@ -181,9 +189,14 @@ CallCtrlPanel.propTypes = {
   recipientsContactInfoRenderer: PropTypes.func,
   recipientsContactPhoneRenderer: PropTypes.func,
   getAvatarUrl: PropTypes.func,
+  gotoConferenceCallDialer: PropTypes.func,
+  mergeToConference: PropTypes.func,
 };
 
 CallCtrlPanel.defaultProps = {
+  direction: null,
+  mergeDisabled: false,
+  simple: null,
   getAvatarUrl: null,
   startTime: null,
   conferenceData: null,
@@ -205,6 +218,8 @@ CallCtrlPanel.defaultProps = {
   phoneTypeRenderer: undefined,
   recipientsContactInfoRenderer: undefined,
   recipientsContactPhoneRenderer: undefined,
+  gotoConferenceCallDialer: i => i,
+  mergeToConference: i => i,
 };
 
 export default CallCtrlPanel;

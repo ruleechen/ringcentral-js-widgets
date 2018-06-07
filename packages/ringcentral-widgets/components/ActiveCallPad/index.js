@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import recordStatus from 'ringcentral-integration/modules/Webphone/recordStatus';
+import callDirections from 'ringcentral-integration/enums/callDirections';
 import CircleButton from '../CircleButton';
 import ActiveCallButton from '../ActiveCallButton';
 import MuteIcon from '../../assets/images/Mute.svg';
@@ -15,6 +16,7 @@ import TransferIcon from '../../assets/images/Transfer.svg';
 import FlipIcon from '../../assets/images/Flip.svg';
 import EndIcon from '../../assets/images/End.svg';
 import CombineIcon from '../../assets/images/Combine.svg';
+import MergeIcon from '../../assets/images/MergeIntoConferenceIcon.svg';
 import styles from './styles.scss';
 import i18n from './i18n';
 
@@ -31,7 +33,7 @@ export default function ActiveCallPad(props) {
     i18n.getString('record', props.currentLocale);
   const isRecordButtonActive = props.recordStatus === recordStatus.recording;
   const isRecordDisabled = props.recordStatus === recordStatus.pending;
-  const { isOnConference } = props;
+  const { isOnConference, simple, mergeDisabled } = props;
   const btnClassName = isOnConference ? styles.conferenceCallButton : styles.callButton;
   const muteButton = props.isOnMute ?
     (
@@ -50,9 +52,9 @@ export default function ActiveCallPad(props) {
         icon={UnmuteIcon}
       />
     );
-
-  const buttons = isOnConference
-    ? [
+  let buttons;
+  if (isOnConference) {
+    buttons = [
       muteButton,
       <ActiveCallButton
         onClick={props.onShowKeyPad}
@@ -83,8 +85,34 @@ export default function ActiveCallPad(props) {
         iconX={190}
         iconY={165}
     />,
-    ]
-    : [
+    ];
+  } else if (simple) {
+    buttons = [
+      muteButton,
+      <ActiveCallButton
+        onClick={props.onShowKeyPad}
+        className={btnClassName}
+        icon={KeypadIcon}
+        title={i18n.getString('keypad', props.currentLocale)}
+    />,
+      <ActiveCallButton
+        onClick={onHoldClicked}
+        className={btnClassName}
+        title={
+        props.isOnHold ?
+        i18n.getString('onHold', props.currentLocale) :
+        i18n.getString('hold', props.currentLocale)
+      }
+        active={props.isOnHold}
+        icon={HoldIcon}
+        iconWidth={120}
+        iconHeight={160}
+        iconX={190}
+        iconY={165}
+    />,
+    ];
+  } else {
+    buttons = [
       muteButton,
       <ActiveCallButton
         onClick={props.onShowKeyPad}
@@ -135,6 +163,38 @@ export default function ActiveCallPad(props) {
         iconY={142}
       />,
     ];
+  }
+
+  let conferenceCallButton;
+  if (props.direction === callDirections.inbound) {
+    conferenceCallButton = null;
+  } else {
+    conferenceCallButton = simple ?
+      (
+        <div className={styles.button}>
+          <CircleButton
+            className={classnames(styles.mergeButtonmergeDisabled ? styles.disabled : null)}
+            onClick={props.mergeToConference}
+            icon={MergeIcon}
+            showBorder={false}
+            iconWidth={250}
+            iconX={125}
+      />
+        </div>
+      )
+      : (
+        <div className={styles.button}>
+          <CircleButton
+            className={classnames(styles.combineButton, mergeDisabled ? styles.disabled : null)}
+            onClick={props.gotoConferenceCallDialer}
+            icon={CombineIcon}
+            showBorder={false}
+            iconWidth={250}
+            iconX={125}
+      />
+        </div>
+      );
+  }
 
   return (
     <div className={classnames(styles.root, props.className)}>
@@ -144,20 +204,7 @@ export default function ActiveCallPad(props) {
         </div>
       </div>
       <div className={classnames(styles.buttonRow, styles.stopButtonGroup)}>
-        {
-          isOnConference ?
-            <div className={styles.button}>
-              <CircleButton
-                className={styles.mergeButton}
-                // onClick={props.onHangup}
-                icon={CombineIcon}
-                showBorder={false}
-                iconWidth={250}
-                iconX={125}
-          />
-            </div>
-          : null
-        }
+        {conferenceCallButton}
         <div className={styles.button}>
           <CircleButton
             className={styles.stopButton}
@@ -174,6 +221,9 @@ export default function ActiveCallPad(props) {
 }
 
 ActiveCallPad.propTypes = {
+  direction: PropTypes.string,
+  mergeDisabled: PropTypes.bool,
+  simple: PropTypes.bool,
   currentLocale: PropTypes.string.isRequired,
   className: PropTypes.string,
   isOnMute: PropTypes.bool,
@@ -193,11 +243,18 @@ ActiveCallPad.propTypes = {
   onShowFlipPanel: PropTypes.func.isRequired,
   onToggleTransferPanel: PropTypes.func.isRequired,
   flipNumbers: PropTypes.array.isRequired,
+  mergeToConference: PropTypes.func,
+  gotoConferenceCallDialer: PropTypes.func,
 };
 
 ActiveCallPad.defaultProps = {
+  direction: null,
+  mergeDisabled: null,
+  simple: null,
   className: null,
   isOnMute: false,
   isOnHold: false,
   isOnConference: false,
+  mergeToConference: i => i,
+  gotoConferenceCallDialer: i => i,
 };
