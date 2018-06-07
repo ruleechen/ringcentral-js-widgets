@@ -87,6 +87,7 @@ class CallCtrlPanel extends Component {
     }
     return (
       <ActiveCallPanel
+        simple={this.props.simple}
         getOnlineProfiles={this.props.getOnlineProfiles}
         getAvatarUrl={this.props.getAvatarUrl}
         conferenceData={this.props.conferenceData}
@@ -134,6 +135,7 @@ class CallCtrlPanel extends Component {
 }
 
 CallCtrlPanel.propTypes = {
+  simple: PropTypes.bool,
   getOnlineProfiles: PropTypes.func.isRequired,
   callStatus: PropTypes.string,
   sessionId: PropTypes.string,
@@ -184,6 +186,7 @@ CallCtrlPanel.propTypes = {
 };
 
 CallCtrlPanel.defaultProps = {
+  simple: null,
   getAvatarUrl: null,
   startTime: null,
   conferenceData: null,

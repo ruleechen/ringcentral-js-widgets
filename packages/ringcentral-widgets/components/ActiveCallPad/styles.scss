@@ -52,6 +52,7 @@ $conferenceCallBtnPaddingLeft: ($conferenceCallBtnWidth - $callBtnWidth)/2;
   padding: $conferenceCallBtnPaddingLeft;
 }
 
+.combineButton,
 .mergeButton {
   circle {
     fill: #5fb95c;

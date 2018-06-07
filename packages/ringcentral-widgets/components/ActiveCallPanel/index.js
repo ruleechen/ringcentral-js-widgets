@@ -99,6 +99,7 @@ class ActiveCallPanel extends React.Component {
       flipNumbers,
       calls,
       sourceIcons,
+      simple,
     } = this.props;
 
     const timeCounter = startTime ?
@@ -151,6 +152,7 @@ class ActiveCallPanel extends React.Component {
           />)
         }
           <ActiveCallPad
+            simple={simple}
             className={styles.callPad}
             currentLocale={currentLocale}
             isOnMute={isOnMute}
@@ -179,6 +181,7 @@ class ActiveCallPanel extends React.Component {
 }
 
 ActiveCallPanel.propTypes = {
+  simple: PropTypes.bool,
   getOnlineProfiles: PropTypes.func.isRequired,
   phoneNumber: PropTypes.string,
   nameMatches: PropTypes.array.isRequired,
@@ -220,6 +223,7 @@ ActiveCallPanel.propTypes = {
 };
 
 ActiveCallPanel.defaultProps = {
+  simple: null,
   startTime: null,
   startTimeOffset: 0,
   isOnMute: false,

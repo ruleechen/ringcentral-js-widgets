@@ -124,6 +124,7 @@ class CallCtrlPage extends Component {
 
     return (
       <CallCtrlPanel
+        simple={!!this.props.simple}
         getOnlineProfiles={this.props.getOnlineProfiles}
         isOnConference={this.props.isOnConference}
         conferenceData={this.props.conferenceData}
@@ -225,6 +226,7 @@ CallCtrlPage.propTypes = {
   phoneTypeRenderer: PropTypes.func,
   recipientsContactInfoRenderer: PropTypes.func,
   recipientsContactPhoneRenderer: PropTypes.func,
+  simple: PropTypes.bool,
 };
 
 CallCtrlPage.defaultProps = {
@@ -235,6 +237,7 @@ CallCtrlPage.defaultProps = {
   recipientsContactInfoRenderer: undefined,
   recipientsContactPhoneRenderer: undefined,
   conferenceData: null,
+  simple: null,
 };
 
 function mapToProps(_, {
@@ -248,6 +251,9 @@ function mapToProps(_, {
     callMonitor,
     contactSearch,
     conferenceCall,
+  },
+  params: {
+    simple
   },
 }) {
   const currentSession = webphone.activeSession || {};
@@ -273,6 +279,7 @@ function mapToProps(_, {
     searchContactList: contactSearch.sortedResult,
     isOnConference,
     conferenceData,
+    simple,
   };
 }
 
