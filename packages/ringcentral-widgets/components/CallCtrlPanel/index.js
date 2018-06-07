@@ -87,6 +87,8 @@ class CallCtrlPanel extends Component {
     }
     return (
       <ActiveCallPanel
+        direction={this.props.direction}
+        mergeDisabled={this.props.mergeDisabled}
         simple={this.props.simple}
         getOnlineProfiles={this.props.getOnlineProfiles}
         getAvatarUrl={this.props.getAvatarUrl}
@@ -135,6 +137,8 @@ class CallCtrlPanel extends Component {
 }
 
 CallCtrlPanel.propTypes = {
+  direction: PropTypes.string,
+  mergeDisabled: PropTypes.bool,
   simple: PropTypes.bool,
   getOnlineProfiles: PropTypes.func.isRequired,
   callStatus: PropTypes.string,
@@ -186,6 +190,8 @@ CallCtrlPanel.propTypes = {
 };
 
 CallCtrlPanel.defaultProps = {
+  direction: null,
+  mergeDisabled: false,
   simple: null,
   getAvatarUrl: null,
   startTime: null,

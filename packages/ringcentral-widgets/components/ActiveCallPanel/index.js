@@ -100,6 +100,8 @@ class ActiveCallPanel extends React.Component {
       calls,
       sourceIcons,
       simple,
+      mergeDisabled,
+      direction,
     } = this.props;
 
     const timeCounter = startTime ?
@@ -152,6 +154,7 @@ class ActiveCallPanel extends React.Component {
           />)
         }
           <ActiveCallPad
+            direction={direction}
             simple={simple}
             className={styles.callPad}
             currentLocale={currentLocale}
@@ -172,6 +175,7 @@ class ActiveCallPanel extends React.Component {
             onToggleTransferPanel={onToggleTransferPanel}
             flipNumbers={flipNumbers}
             onPark={onPark}
+            mergeDisabled={mergeDisabled}
         />
           {children}
         </Panel>
@@ -181,6 +185,8 @@ class ActiveCallPanel extends React.Component {
 }
 
 ActiveCallPanel.propTypes = {
+  direction: PropTypes.string,
+  mergeDisabled: PropTypes.bool,
   simple: PropTypes.bool,
   getOnlineProfiles: PropTypes.func.isRequired,
   phoneNumber: PropTypes.string,
@@ -223,6 +229,8 @@ ActiveCallPanel.propTypes = {
 };
 
 ActiveCallPanel.defaultProps = {
+  direction: null,
+  mergeDisabled: false,
   simple: null,
   startTime: null,
   startTimeOffset: 0,

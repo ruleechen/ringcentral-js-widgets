@@ -124,6 +124,8 @@ class CallCtrlPage extends Component {
 
     return (
       <CallCtrlPanel
+        direction={session.direction}
+        mergeDisabled={this.props.mergeDisabled}
         simple={!!this.props.simple}
         getOnlineProfiles={this.props.getOnlineProfiles}
         isOnConference={this.props.isOnConference}
@@ -227,6 +229,7 @@ CallCtrlPage.propTypes = {
   recipientsContactInfoRenderer: PropTypes.func,
   recipientsContactPhoneRenderer: PropTypes.func,
   simple: PropTypes.bool,
+  mergeDisabled: PropTypes.bool,
 };
 
 CallCtrlPage.defaultProps = {
@@ -238,6 +241,7 @@ CallCtrlPage.defaultProps = {
   recipientsContactPhoneRenderer: undefined,
   conferenceData: null,
   simple: null,
+  mergeDisabled: false,
 };
 
 function mapToProps(_, {
@@ -263,9 +267,10 @@ function mapToProps(_, {
   const nameMatches =
     currentSession.direction === callDirections.outbound ? toMatches : fromMatches;
   const isOnConference = conferenceCall.isConferenceSession(currentSession.id);
-  const conferenceData = isOnConference
-    ? conferenceCall.findConferenceWithSession(currentSession.id)
-    : null;
+  const conferenceData = Object.values(conferenceCall.conferences)[0];
+  const mergeDisabled = conferenceData
+    ? conferenceCall.isOverload(conferenceData.conference.id)
+    : false;
 
   return {
     brand: brand.fullName,
@@ -279,6 +284,7 @@ function mapToProps(_, {
     searchContactList: contactSearch.sortedResult,
     isOnConference,
     conferenceData,
+    mergeDisabled,
     simple,
   };
 }
