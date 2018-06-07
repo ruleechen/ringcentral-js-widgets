@@ -91,6 +91,7 @@ class CallCtrlPanel extends Component {
         gotoConferenceCallDialer={this.props.gotoConferenceCallDialer}
         direction={this.props.direction}
         mergeDisabled={this.props.mergeDisabled}
+        addDisabled={this.props.addDisabled}
         simple={this.props.simple}
         getOnlineProfiles={this.props.getOnlineProfiles}
         getAvatarUrl={this.props.getAvatarUrl}
@@ -191,11 +192,13 @@ CallCtrlPanel.propTypes = {
   getAvatarUrl: PropTypes.func,
   gotoConferenceCallDialer: PropTypes.func,
   mergeToConference: PropTypes.func,
+  addDisabled: PropTypes.bool,
 };
 
 CallCtrlPanel.defaultProps = {
   direction: null,
   mergeDisabled: false,
+  addDisabled: false,
   simple: null,
   getAvatarUrl: null,
   startTime: null,

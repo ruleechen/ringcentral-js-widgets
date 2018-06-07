@@ -420,6 +420,7 @@ export default class ConferenceCall extends RcModule {
     if (conferenceData) {
       return conferenceData.conference.parties
         .filter(party => party.conferenceRole.toLowerCase() !== conferenceRole.host)
+        .sort((last, next) => +last.id.split('-')[1] - (+next.id.split('-')[1]))
         .reduce((accum, party, idx) => {
           if (party.status.code.toLowerCase() !== partyStatusCode.disconnected) {
             // 0 position is the host
@@ -427,7 +428,8 @@ export default class ConferenceCall extends RcModule {
           }
           return accum;
         }, [])
-        .map(idx => conferenceData.profiles[idx]);
+        .map(idx => conferenceData.profiles[idx])
+        .filter(i => !!i);
     }
     return null;
   }

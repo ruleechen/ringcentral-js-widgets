@@ -206,11 +206,13 @@ export default class BasePhone extends RcModule {
 
 
     webphone._onCallEndFunc = (session) => {
+      const currentSession = webphone.activeSession;
+      if(currentSession && routerInteraction.currentPath === '/conferenceCall/mergeCtrl'){
+        return routerInteraction.push('/calls/active');
+      }
       if (
-        routerInteraction.currentPath === '/calls/active' ||
-        routerInteraction.currentPath === '/conferenceCall/mergeCtrl'
+        routerInteraction.currentPath === '/calls/active'
       ) {
-        const currentSession = webphone.activeSession;
         if (currentSession && session.id !== currentSession.id) {
           return;
         }

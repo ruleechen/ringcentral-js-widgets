@@ -133,6 +133,7 @@ class CallCtrlPage extends Component {
         mergeToConference={() => mergeToConference(mergeList)}
         gotoConferenceCallDialer={() => gotoConferenceCallDialer(currentCall.from.phoneNumber)}
         direction={session.direction}
+        addDisabled={this.props.addDisabled}
         mergeDisabled={this.props.mergeDisabled}
         simple={!!this.props.simple}
         getOnlineProfiles={this.props.getOnlineProfiles}
@@ -238,6 +239,7 @@ CallCtrlPage.propTypes = {
   recipientsContactPhoneRenderer: PropTypes.func,
   simple: PropTypes.bool,
   mergeDisabled: PropTypes.bool,
+  addDisabled: PropTypes.bool,
   gotoConferenceCallDialer: PropTypes.func,
   currentCall: PropTypes.object,
   callToMergeWith: PropTypes.object,
@@ -254,6 +256,7 @@ CallCtrlPage.defaultProps = {
   conferenceData: null,
   simple: null,
   mergeDisabled: false,
+  addDisabled: false,
   gotoConferenceCallDialer: i => i,
   mergeToConference: i => i,
   currentCall: null,
@@ -271,6 +274,7 @@ function mapToProps(_, {
     callMonitor,
     contactSearch,
     conferenceCall,
+    routerInteraction,
   },
   simple,
 }) {
@@ -286,13 +290,24 @@ function mapToProps(_, {
   const currentCall = callMonitor.calls.find(call => (
     call.webphoneSession ? call.webphoneSession.id === currentSession.id : false
   ));
+
   let mergeDisabled;
   if (conferenceData) {
     mergeDisabled = conferenceCall.isOverload(conferenceData.conference.id);
-  } else if (callMonitor.activeOnHoldCalls[0]) {
+  } else if (!callMonitor.activeOnHoldCalls[0] || !currentCall) {
     mergeDisabled = true;
+    // if (!callMonitor.activeOnHoldCalls[0]) {
+    //   routerInteraction.push('/calls/active');
+    // }
   } else {
     mergeDisabled = false;
+  }
+
+  let addDisabled = false;
+  if (conferenceData) {
+    addDisabled = conferenceCall.isOverload(conferenceData.conference.id);
+  } else if (!currentCall) {
+    addDisabled = true;
   }
 
   let callToMergeWith;
@@ -316,6 +331,7 @@ function mapToProps(_, {
     isOnConference,
     conferenceData,
     mergeDisabled,
+    addDisabled,
     simple,
     callToMergeWith,
   };
