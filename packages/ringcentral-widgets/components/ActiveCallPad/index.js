@@ -174,8 +174,7 @@ export default function ActiveCallPad(props) {
         <div className={styles.button}>
           <CircleButton
             className={classnames(styles.mergeButtonmergeDisabled ? styles.disabled : null)}
-          // todo
-          // onClick={props.onHangup}
+            onClick={props.mergeToConference}
             icon={MergeIcon}
             showBorder={false}
             iconWidth={250}
@@ -187,8 +186,7 @@ export default function ActiveCallPad(props) {
         <div className={styles.button}>
           <CircleButton
             className={classnames(styles.combineButton, mergeDisabled ? styles.disabled : null)}
-        // todo
-        // onClick={props.onHangup}
+            onClick={props.gotoConferenceCallDialer}
             icon={CombineIcon}
             showBorder={false}
             iconWidth={250}
@@ -245,6 +243,8 @@ ActiveCallPad.propTypes = {
   onShowFlipPanel: PropTypes.func.isRequired,
   onToggleTransferPanel: PropTypes.func.isRequired,
   flipNumbers: PropTypes.array.isRequired,
+  mergeToConference: PropTypes.func,
+  gotoConferenceCallDialer: PropTypes.func,
 };
 
 ActiveCallPad.defaultProps = {
@@ -255,4 +255,6 @@ ActiveCallPad.defaultProps = {
   isOnMute: false,
   isOnHold: false,
   isOnConference: false,
+  mergeToConference: i => i,
+  gotoConferenceCallDialer: i => i,
 };

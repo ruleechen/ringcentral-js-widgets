@@ -102,6 +102,8 @@ class ActiveCallPanel extends React.Component {
       simple,
       mergeDisabled,
       direction,
+      gotoConferenceCallDialer,
+      mergeToConference,
     } = this.props;
 
     const timeCounter = startTime ?
@@ -176,6 +178,8 @@ class ActiveCallPanel extends React.Component {
             flipNumbers={flipNumbers}
             onPark={onPark}
             mergeDisabled={mergeDisabled}
+            gotoConferenceCallDialer={gotoConferenceCallDialer}
+            mergeToConference={mergeToConference}
         />
           {children}
         </Panel>
@@ -185,9 +189,6 @@ class ActiveCallPanel extends React.Component {
 }
 
 ActiveCallPanel.propTypes = {
-  direction: PropTypes.string,
-  mergeDisabled: PropTypes.bool,
-  simple: PropTypes.bool,
   getOnlineProfiles: PropTypes.func.isRequired,
   phoneNumber: PropTypes.string,
   nameMatches: PropTypes.array.isRequired,
@@ -226,12 +227,14 @@ ActiveCallPanel.propTypes = {
   calls: PropTypes.array.isRequired,
   onToggleTransferPanel: PropTypes.func,
   sourceIcons: PropTypes.object,
+  gotoConferenceCallDialer: PropTypes.func,
+  direction: PropTypes.string,
+  mergeDisabled: PropTypes.bool,
+  simple: PropTypes.bool,
+  mergeToConference: PropTypes.func,
 };
 
 ActiveCallPanel.defaultProps = {
-  direction: null,
-  mergeDisabled: false,
-  simple: null,
   startTime: null,
   startTimeOffset: 0,
   isOnMute: false,
@@ -248,6 +251,11 @@ ActiveCallPanel.defaultProps = {
   onShowFlipPanel: () => null,
   onToggleTransferPanel: () => null,
   sourceIcons: undefined,
+  gotoConferenceCallDialer: i => i,
+  direction: null,
+  mergeDisabled: false,
+  simple: null,
+  mergeToConference: i => i,
 };
 
 export default ActiveCallPanel;
