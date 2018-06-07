@@ -142,12 +142,12 @@ import ProxyFrameOAuth from 'ringcentral-widgets/modules/ProxyFrameOAuth';
     Feedback,
     UserGuide,
     ConferenceCall,
-    // { 
+    // {
     //   provide: 'ConferenceCallOptions',
     //   useValue: {
     //     pulling: false,
     //   },
-    //   spread: true, 
+    //   spread: true,
     // },
   ]
 })
@@ -206,32 +206,38 @@ export default class BasePhone extends RcModule {
 
 
     webphone._onCallEndFunc = (session) => {
-      if (routerInteraction.currentPath !== '/calls/active') {
-        return;
+      if (
+        routerInteraction.currentPath === '/calls/active' ||
+        routerInteraction.currentPath === '/conferenceCall/mergeCtrl'
+      ) {
+        const currentSession = webphone.activeSession;
+        if (currentSession && session.id !== currentSession.id) {
+          return;
+        }
+        routerInteraction.goBack();
       }
-      const currentSession = webphone.activeSession;
-      if (currentSession && session.id !== currentSession.id) {
-        return;
-      }
-      routerInteraction.goBack();
     };
 
     /**
      * HACK: webphone._onCallStartFunc happens before session's accepted event,
      * so we can't use conferenceCall.isConferenceSession()
-     * @param {object} session 
+     * @param {object} session
      */
     webphone._onCallStartFunc = (session) => {
-      if (routerInteraction.currentPath === '/calls/active'
-      || (
-        session.callStatus === 'webphone-session-connecting'
-        && session.to.indexOf('conf_') === 0
-        && conferenceCall.conferenceCallStatus === conferenceCallStatus.requesting
-        && routerInteraction.currentPath === '/calls'
-      )) {
-        return;
+      if (routerInteraction.currentPath.indexOf('/conferenceCall/dialer') === 0) {
+        routerInteraction.push('/conferenceCall/mergeCtrl');
       }
-      routerInteraction.push('/calls/active');
+      else if (
+        routerInteraction.currentPath !== '/calls/active' &&
+        routerInteraction.currentPath !== '/conferenceCall/mergeCtrl' && !(
+          session.callStatus === 'webphone-session-connecting'
+          && session.to.indexOf('conf_') === 0
+          && conferenceCall.conferenceCallStatus === conferenceCallStatus.requesting
+          && routerInteraction.currentPath === '/calls'
+        )
+      ) {
+        routerInteraction.push('/calls/active');
+      }
     };
     webphone._onCallRingFunc = () => {
       if (
@@ -366,6 +372,6 @@ export function createPhone({
       },
     ]
   })
-  class Phone extends BasePhone {}
+  class Phone extends BasePhone { }
   return Phone.create();
 }

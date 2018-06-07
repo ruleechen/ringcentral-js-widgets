@@ -28,6 +28,7 @@ import ContactDetailsPage from 'ringcentral-widgets/containers/ContactDetailsPag
 import FeedbackPage from 'ringcentral-widgets/containers/FeedbackPage';
 import UserGuidePage from 'ringcentral-widgets/containers/UserGuidePage';
 import ConferenceCallDialerPage from 'ringcentral-widgets/containers/ConferenceCallDialerPage';
+import ConferenceCallMergeCtrlPage from 'ringcentral-widgets/containers/ConferenceCallMergeCtrlPage';
 
 import ContactSourceFilter from 'ringcentral-widgets/components/ContactSourceFilter';
 import MeetingScheduleButton from 'ringcentral-widgets/components/MeetingScheduleButton';
@@ -42,6 +43,10 @@ export default function App({
 }) {
   const sourceIcons = {
     brandIcon: icon
+  };
+  const getAvatarUrl = async (contact) => {
+    const avatarUrl = await phone.contacts.getProfileImage(contact, false);
+    return avatarUrl;
   };
   return (
     <PhoneProvider phone={phone}>
@@ -62,12 +67,7 @@ export default function App({
                 <IncomingCallPage
                   showContactDisplayPlaceholder={false}
                   sourceIcons={sourceIcons}
-                  getAvatarUrl={
-                    async (contact) => {
-                      const avatarUrl = await phone.contacts.getProfileImage(contact, false);
-                      return avatarUrl;
-                    }
-                  }
+                  getAvatarUrl={getAvatarUrl}
                 >
                   <AlertContainer
                     callingSettingsUrl="/settings/calling"
@@ -151,18 +151,13 @@ export default function App({
                   <CallCtrlPage
                     showContactDisplayPlaceholder={false}
                     sourceIcons={sourceIcons}
+                    getAvatarUrl={getAvatarUrl}
                     onAdd={() => {
                       phone.routerInteraction.push('/dialer');
                     }}
                     onBackButtonClick={() => {
                       phone.routerInteraction.push('/calls');
                     }}
-                    getAvatarUrl={
-                      async (contact) => {
-                        const avatarUrl = await phone.contacts.getProfileImage(contact, false);
-                        return avatarUrl;
-                      }
-                    }
                   >
                     <RecentActivityContainer
                       getSession={() => (phone.webphone.activeSession || {})}
@@ -261,6 +256,18 @@ export default function App({
                     onBack={() => {
                       phone.routerInteraction.goBack();
                     }} />
+                )} />
+              <Route
+                path="/conferenceCall/mergeCtrl"
+                component={() => (
+                  <ConferenceCallMergeCtrlPage
+                    showContactDisplayPlaceholder={false}
+                    sourceIcons={sourceIcons}
+                    getAvatarUrl={getAvatarUrl}
+                    onBackButtonClick={() => {
+                      phone.routerInteraction.push('/calls');
+                    }}
+                  />
                 )} />
             </Route>
           </Route>

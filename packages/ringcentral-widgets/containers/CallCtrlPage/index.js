@@ -348,4 +348,9 @@ CallCtrlContainer.defaultProps = {
   conferenceData: null,
 };
 
-export default CallCtrlContainer;
+export {
+  mapToProps,
+  mapToFunctions,
+  CallCtrlPage,
+  CallCtrlContainer as default,
+};
