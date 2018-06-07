@@ -202,7 +202,8 @@ export default class Call extends RcModule {
   @proxify
   async call({
     phoneNumber,
-    recipient
+    recipient,
+    fromNumber,
   }, isConference = false) {
     if (this.isIdle) {
       const toNumber = recipient && (recipient.phoneNumber || recipient.extension) || phoneNumber;
@@ -223,7 +224,8 @@ export default class Call extends RcModule {
         try {
           const validatedNumbers = await this._getValidatedNumbers({
             toNumber,
-            isConference
+            fromNumber,
+            isConference,
           });
 
           if (validatedNumbers) {
@@ -274,13 +276,19 @@ export default class Call extends RcModule {
   @proxify
   async _getValidatedNumbers({
     toNumber,
-    isConference
+    fromNumber,
+    isConference,
   }) {
     const isWebphone = (this._callingSettings.callingMode === callingModes.webphone);
-    const fromNumber = isWebphone ?
-      this._callingSettings.fromNumber :
-      this._callingSettings.myLocation;
-    if (isWebphone && (fromNumber === null || fromNumber === '')) return null;
+    const theFromNumber = fromNumber || (
+      isWebphone ?
+        this._callingSettings.fromNumber :
+        this._callingSettings.myLocation
+    );
+
+    if (isWebphone && (theFromNumber === null || theFromNumber === '')) {
+      return null;
+    }
 
     let waitingValidateNumbers;
     if (isConference) {
@@ -290,11 +298,11 @@ export default class Call extends RcModule {
     }
 
     if (
-      fromNumber &&
-      fromNumber.length > 0 &&
-      !(isWebphone && fromNumber === 'anonymous')
+      theFromNumber &&
+      theFromNumber.length > 0 &&
+      !(isWebphone && theFromNumber === 'anonymous')
     ) {
-      waitingValidateNumbers.push(fromNumber);
+      waitingValidateNumbers.push(theFromNumber);
     }
     const validatedResult = await this._numberValidate.validateNumbers(waitingValidateNumbers);
     if (!validatedResult.result) {
@@ -316,10 +324,11 @@ export default class Call extends RcModule {
         parsedNumbers[0] ? parsedNumbers[0].e164 : '';
       // add ext back if any
       if (parsedFromNumber !== '') {
-        parsedFromNumber = (parsedNumbers[0].subAddress) ? [parsedNumbers[0].e164, parsedNumbers[0].subAddress].join('*') :
+        parsedFromNumber = (parsedNumbers[0].subAddress) ?
+          [parsedNumbers[0].e164, parsedNumbers[0].subAddress].join('*') :
           parsedNumbers[0].e164;
       }
-      if (isWebphone && fromNumber === 'anonymous') {
+      if (isWebphone && theFromNumber === 'anonymous') {
         parsedFromNumber = 'anonymous';
       }
       return {
@@ -343,10 +352,11 @@ export default class Call extends RcModule {
       parsedNumbers[1] ? parsedNumbers[1].e164 : '';
     // add ext back if any
     if (parsedFromNumber !== '') {
-      parsedFromNumber = (parsedNumbers[1].subAddress) ? [parsedNumbers[1].e164, parsedNumbers[1].subAddress].join('*') :
+      parsedFromNumber = (parsedNumbers[1].subAddress) ?
+        [parsedNumbers[1].e164, parsedNumbers[1].subAddress].join('*') :
         parsedNumbers[1].e164;
     }
-    if (isWebphone && fromNumber === 'anonymous') {
+    if (isWebphone && theFromNumber === 'anonymous') {
       parsedFromNumber = 'anonymous';
     }
     return {
@@ -354,6 +364,7 @@ export default class Call extends RcModule {
       fromNumber: parsedFromNumber,
     };
   }
+
   @proxify
   async _makeCall({
     toNumber,
