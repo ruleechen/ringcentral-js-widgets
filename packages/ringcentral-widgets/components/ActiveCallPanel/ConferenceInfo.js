@@ -15,8 +15,10 @@ export default function ConferenceInfo({
       className={styles.conferenceCallInfoContainer}
       onClick={(e) => { e.preventDefault(); onClick(); }}
     >
-      <div className={styles.avatarContainer}>
-        {displayedProfiles.map(
+      {
+        Array.isArray(displayedProfiles) ? (
+          <div className={styles.avatarContainer}>
+            {displayedProfiles.map(
           ({ avatarUrl, toUserName }, idx) => (
             <div
               key={`${toUserName}_${idx}`}
@@ -25,12 +27,14 @@ export default function ConferenceInfo({
               {avatarUrl ? null : <i className={classnames(dynamicsFont.portrait, styles.icon)} /> }
             </div>
         ))}
-        {
+            {
           remains ? (
             <div className={classnames(styles.avatar, styles.remains)}>{`+${remains}`}</div>
           ) : null
         }
-      </div>
+          </div>
+        ) : null
+      }
       <p className={styles.info}>
         {i18n.getString('conferenceCall')}
       </p>

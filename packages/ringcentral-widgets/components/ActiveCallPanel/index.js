@@ -19,12 +19,12 @@ class ActiveCallPanel extends React.Component {
       displayedProfiles: [],
       remains: 0,
       isPartiesModalOpen: false,
-      resizeFunc: throttle(this::this.handleResize),
+      resizeFunc: throttle(() => this.handleResize(this.props)),
     };
   }
 
-  handleResize() {
-    const { isOnConference, conferenceData } = this.props;
+  handleResize(props) {
+    const { isOnConference, conferenceData } = props;
     const MAXIMUM_AVATARS = 4;
     // todo: handle width calculation
     if (isOnConference) {
@@ -49,12 +49,16 @@ class ActiveCallPanel extends React.Component {
   }
 
   componentDidMount() {
-    this.handleResize();
+    this.handleResize(this.props);
     window.addEventListener('resize', this.state.resizeFunc);
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.state.resizeFunc);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.handleResize(nextProps);
   }
 
   openPartiesModal() {
@@ -104,6 +108,7 @@ class ActiveCallPanel extends React.Component {
       direction,
       gotoConferenceCallDialer,
       mergeToConference,
+      addDisabled,
     } = this.props;
 
     const timeCounter = startTime ?
@@ -178,6 +183,7 @@ class ActiveCallPanel extends React.Component {
             flipNumbers={flipNumbers}
             onPark={onPark}
             mergeDisabled={mergeDisabled}
+            addDisabled={addDisabled}
             gotoConferenceCallDialer={gotoConferenceCallDialer}
             mergeToConference={mergeToConference}
         />
@@ -232,6 +238,7 @@ ActiveCallPanel.propTypes = {
   mergeDisabled: PropTypes.bool,
   simple: PropTypes.bool,
   mergeToConference: PropTypes.func,
+  addDisabled: PropTypes.bool,
 };
 
 ActiveCallPanel.defaultProps = {
@@ -256,6 +263,7 @@ ActiveCallPanel.defaultProps = {
   mergeDisabled: false,
   simple: null,
   mergeToConference: i => i,
+  addDisabled: false,
 };
 
 export default ActiveCallPanel;

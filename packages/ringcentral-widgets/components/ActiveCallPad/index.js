@@ -33,7 +33,9 @@ export default function ActiveCallPad(props) {
     i18n.getString('record', props.currentLocale);
   const isRecordButtonActive = props.recordStatus === recordStatus.recording;
   const isRecordDisabled = props.recordStatus === recordStatus.pending;
-  const { isOnConference, simple, mergeDisabled } = props;
+  const {
+    isOnConference, simple, mergeDisabled, addDisabled
+  } = props;
   const btnClassName = isOnConference ? styles.conferenceCallButton : styles.callButton;
   const muteButton = props.isOnMute ?
     (
@@ -173,23 +175,25 @@ export default function ActiveCallPad(props) {
       (
         <div className={styles.button}>
           <CircleButton
-            className={classnames(styles.mergeButton, mergeDisabled ? styles.disabled : null)}
-            onClick={props.mergeToConference}
+            className={mergeDisabled ? styles.disabled : styles.mergeButton}
+            onClick={mergeDisabled ? i => i : props.mergeToConference}
             icon={MergeIcon}
             showBorder={false}
             iconWidth={250}
             iconX={125}
+            disabled={mergeDisabled}
       />
         </div>
       )
       : (
         <div className={styles.button}>
           <CircleButton
-            className={classnames(styles.combineButton, mergeDisabled ? styles.disabled : null)}
-            onClick={props.gotoConferenceCallDialer}
+            className={addDisabled ? styles.disabled : styles.combineButton}
+            onClick={addDisabled ? i => i : props.gotoConferenceCallDialer}
             icon={CombineIcon}
             showBorder={false}
             iconWidth={250}
+            disabled={addDisabled}
             iconX={125}
       />
         </div>
@@ -221,9 +225,6 @@ export default function ActiveCallPad(props) {
 }
 
 ActiveCallPad.propTypes = {
-  direction: PropTypes.string,
-  mergeDisabled: PropTypes.bool,
-  simple: PropTypes.bool,
   currentLocale: PropTypes.string.isRequired,
   className: PropTypes.string,
   isOnMute: PropTypes.bool,
@@ -245,6 +246,10 @@ ActiveCallPad.propTypes = {
   flipNumbers: PropTypes.array.isRequired,
   mergeToConference: PropTypes.func,
   gotoConferenceCallDialer: PropTypes.func,
+  direction: PropTypes.string,
+  mergeDisabled: PropTypes.bool,
+  addDisabled: PropTypes.bool,
+  simple: PropTypes.bool,
 };
 
 ActiveCallPad.defaultProps = {
@@ -257,4 +262,5 @@ ActiveCallPad.defaultProps = {
   isOnConference: false,
   mergeToConference: i => i,
   gotoConferenceCallDialer: i => i,
+  addDisabled: false,
 };
