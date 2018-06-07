@@ -15,6 +15,7 @@ function mapToProps(_, {
   });
   return {
     ...baseProps,
+    simple: true,
   };
 }
 

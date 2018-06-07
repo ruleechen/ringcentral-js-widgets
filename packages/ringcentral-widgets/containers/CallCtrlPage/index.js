@@ -38,7 +38,7 @@ class CallCtrlPage extends Component {
           });
         }
       }
-      : () => {};
+      : () => { };
 
     this.onMute = () =>
       this.props.onMute(this.props.session.id);
@@ -272,9 +272,7 @@ function mapToProps(_, {
     contactSearch,
     conferenceCall,
   },
-  params: {
-    simple
-  },
+  simple,
 }) {
   const currentSession = webphone.activeSession || {};
   const contactMapping = contactMatcher && contactMatcher.dataMapping;

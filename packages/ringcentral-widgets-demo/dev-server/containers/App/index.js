@@ -147,15 +147,11 @@ export default function App({
                 )} />
               <Route
                 path="/calls/active"
-                component={routerProps => (
+                component={() => (
                   <CallCtrlPage
                     showContactDisplayPlaceholder={false}
                     sourceIcons={sourceIcons}
-<<<<<<< HEAD
                     getAvatarUrl={getAvatarUrl}
-=======
-                    params={routerProps.location.query}
->>>>>>> feat(App, CallCtrlPage, ActiveCallPanel, ActiveCallPad, ConferenceCall): add call control page for m
                     onAdd={() => {
                       phone.routerInteraction.push('/dialer');
                     }}

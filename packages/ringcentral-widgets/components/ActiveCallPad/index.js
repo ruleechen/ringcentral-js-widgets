@@ -173,7 +173,7 @@ export default function ActiveCallPad(props) {
       (
         <div className={styles.button}>
           <CircleButton
-            className={classnames(styles.mergeButtonmergeDisabled ? styles.disabled : null)}
+            className={classnames(styles.mergeButton, mergeDisabled ? styles.disabled : null)}
             onClick={props.mergeToConference}
             icon={MergeIcon}
             showBorder={false}
