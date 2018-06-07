@@ -17,6 +17,12 @@ const DEFAULT_WAIT = 800;// timer to bring-in after conference creation
 const DEFAULT_TERMINATION_SPAN = 100;// timer to initiatively terminate the session after bring-in
 const MAXIMUM_CAPACITY = 10;
 
+
+function ascendSortParties(parties) {
+  return parties
+    .filter(party => party.conferenceRole.toLowerCase() !== conferenceRole.host)
+    .sort((last, next) => +last.id.split('-')[1] - (+next.id.split('-')[1]));
+}
 /**
  * @class
  * @description ConferenceCall managing module
@@ -236,7 +242,10 @@ export default class ConferenceCall extends RcModule {
       await this._client.service.platform()
         .post(`/account/~/telephony/sessions/${id}/parties/bring-in`, sessionData);
       await this.updateConferenceStatus(id);
+      const conferenceState = this.state.conferences[id];
+      const newParties = ascendSortParties(conferenceState.conference.parties);
       const partyProfile = await this._getProfile(partyCall.webphoneSession);
+      partyProfile.id = newParties[newParties.length - 1];
       // let the contact match to do the matching of the parties.
       this.store.dispatch({
         type: this.actionTypes.bringInConferenceSucceeded,
@@ -417,18 +426,17 @@ export default class ConferenceCall extends RcModule {
 
   getOnlinePartyProfiles(id) {
     const conferenceData = this.conferences[id];
+
     if (conferenceData) {
-      return conferenceData.conference.parties
-        .filter(party => party.conferenceRole.toLowerCase() !== conferenceRole.host)
-        .sort((last, next) => +last.id.split('-')[1] - (+next.id.split('-')[1]))
+      return ascendSortParties(conferenceData.conference.parties)
         .reduce((accum, party, idx) => {
           if (party.status.code.toLowerCase() !== partyStatusCode.disconnected) {
             // 0 position is the host
-            accum.push(idx);
+            accum.push({ idx, party });
           }
           return accum;
         }, [])
-        .map(idx => conferenceData.profiles[idx])
+        .map(({ idx, party }) => ({ ...party, ...conferenceData.profiles[idx] }))
         .filter(i => !!i);
     }
     return null;
