@@ -38,7 +38,7 @@ class ActiveCallPanel extends React.Component {
       const displayedProfiles = (profiles.length >= MAXIMUM_AVATARS
         ? profiles.slice(0, MAXIMUM_AVATARS)
         : profiles)
-        .map(({ avatarUrl, toUserName }) => ({ avatarUrl, toUserName }));
+        .map(({ avatarUrl, toUserName, id }) => ({ avatarUrl, toUserName, id }));
       const remains = profiles.length <= MAXIMUM_AVATARS ? 0 : profiles.length - MAXIMUM_AVATARS;
       this.setState(prev => ({
         ...prev,
