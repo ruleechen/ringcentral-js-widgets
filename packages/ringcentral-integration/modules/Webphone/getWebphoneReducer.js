@@ -164,6 +164,21 @@ export function getSessionsReducer(types) {
   };
 }
 
+export function getOnholdSessionIdsStack(types) {
+  return (state = [], { type, session = {} }) => {
+    switch (type) {
+      case types.updateOnholdSession:
+        return [session.id].concat(state);
+      case types.allHangup:
+        return [];
+      case types.callEnd:
+        return state.filter(id => id !== session.id);
+      default:
+        return state;
+    }
+  };
+}
+
 export default function getWebphoneReducer(types) {
   return combineReducers({
     status: getModuleStatusReducer(types),
@@ -176,5 +191,6 @@ export default function getWebphoneReducer(types) {
     ringSessionId: getRingSessionIdReducer(types),
     sessions: getSessionsReducer(types),
     lastEndedSessions: getLastEndedSessionsReducer(types),
+    onholdSessionStack: getOnholdSessionIdsStack(types),
   });
 }

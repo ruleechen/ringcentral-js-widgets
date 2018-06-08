@@ -843,6 +843,10 @@ export default class Webphone extends RcModule {
     }
     try {
       await session.hold();
+      this.store.dispatch({
+        type: this.actionTypes.updateOnholdSession,
+        session,
+      });
       this._updateSessions();
       return true;
     } catch (e) {
@@ -1239,6 +1243,11 @@ export default class Webphone extends RcModule {
     });
     if (typeof this._onCallEndFunc === 'function') {
       this._onCallEndFunc(normalizedSession, this.activeSession);
+    }
+    if (!this.sessions.length) {
+      this.store.dispatch({
+        type: this.actionTypes.allHangup,
+      });
     }
   }
 
