@@ -239,13 +239,13 @@ export default class ConferenceCall extends RcModule {
     });
     const sessionData = partyCall.webphoneSession.data;
     try {
+      const partyProfile = await this._getProfile(partyCall.webphoneSession);
       await this._client.service.platform()
         .post(`/account/~/telephony/sessions/${id}/parties/bring-in`, sessionData);
       await this.updateConferenceStatus(id);
       const conferenceState = this.state.conferences[id];
       const newParties = ascendSortParties(conferenceState.conference.parties);
-      const partyProfile = await this._getProfile(partyCall.webphoneSession);
-      partyProfile.id = newParties[newParties.length - 1];
+      partyProfile.id = newParties[newParties.length - 1].id;
       // let the contact match to do the matching of the parties.
       this.store.dispatch({
         type: this.actionTypes.bringInConferenceSucceeded,
@@ -658,8 +658,11 @@ export default class ConferenceCall extends RcModule {
   }
 
   async _getProfile(session) {
-    const { toUserName, to } = session;
+    const { to } = session;
+    let toUserName = session.toUserName;
     let avatarUrl;
+    let rcId;
+
     if (this._contacts && this._contactMatcher && this._contactMatcher.dataMapping) {
       const contactMapping = this._contactMatcher.dataMapping;
       let contact = session.contactMatch;
@@ -670,12 +673,15 @@ export default class ConferenceCall extends RcModule {
       }
       if (contact) {
         avatarUrl = await this._contacts.getProfileImage(contact);
+        toUserName = contact.name;
+        rcId = contact.id;
       }
     }
     return {
       avatarUrl,
       toUserName,
-      to
+      to,
+      rcId,
     };
   }
 
