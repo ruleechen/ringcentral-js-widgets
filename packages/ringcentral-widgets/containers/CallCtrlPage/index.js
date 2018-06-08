@@ -71,7 +71,7 @@ class CallCtrlPage extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.simple && nextProps.session.direction === callDirections.inbound) {
-      nextProps.routerInteraction.push('/calls/active');
+      nextProps.gotoNormalCallCtrl();
     }
     if (this.props.session.id !== nextProps.session.id) {
       this._updateAvatarAndMatchIndex(nextProps);
@@ -113,7 +113,6 @@ class CallCtrlPage extends Component {
       currentCall,
       callToMergeWith,
       mergeToConference,
-      routerInteraction,
     } = this.props;
     if (!session.id) {
       return null;
@@ -134,7 +133,6 @@ class CallCtrlPage extends Component {
       : i18n.getString('activeCalls', this.props.currentLocale);
     return (
       <CallCtrlPanel
-        routerInteraction={routerInteraction}
         mergeToConference={() => mergeToConference(mergeList)}
         gotoConferenceCallDialer={() => gotoConferenceCallDialer(currentCall.from.phoneNumber)}
         direction={session.direction}
@@ -249,9 +247,7 @@ CallCtrlPage.propTypes = {
   currentCall: PropTypes.object,
   callToMergeWith: PropTypes.object,
   mergeToConference: PropTypes.func,
-  routerInteraction: PropTypes.shape({
-    push: PropTypes.func.isRequired
-  }).isRequired,
+  gotoNormalCallCtrl: PropTypes.func,
 };
 
 CallCtrlPage.defaultProps = {
@@ -269,6 +265,7 @@ CallCtrlPage.defaultProps = {
   mergeToConference: i => i,
   currentCall: null,
   callToMergeWith: null,
+  gotoNormalCallCtrl: i => i,
 };
 
 function mapToProps(_, {
@@ -391,6 +388,7 @@ function mapToFunctions(_, {
     recipientsContactInfoRenderer,
     recipientsContactPhoneRenderer,
     gotoConferenceCallDialer: fromNumber => routerInteraction.push(`/conferenceCall/dialer/${fromNumber}`),
+    gotoNormalCallCtrl: () => routerInteraction.push('/calls/active'),
     mergeToConference: calls => conferenceCall.mergeToConference(calls),
   };
 }
