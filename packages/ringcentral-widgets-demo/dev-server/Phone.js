@@ -205,18 +205,18 @@ export default class BasePhone extends RcModule {
     });
 
 
-    webphone._onCallEndFunc = (session) => {
-      const currentSession = webphone.activeSession;
-      if(currentSession && routerInteraction.currentPath === '/conferenceCall/mergeCtrl'){
-        return routerInteraction.push('/calls/active');
+    webphone._onCallEndFunc = (session, currentSession) => {
+      if (currentSession && routerInteraction.currentPath === '/conferenceCall/mergeCtrl') {
+        routerInteraction.push('/calls/active');
+        return;
       }
+
       if (
-        routerInteraction.currentPath === '/calls/active'
+        routerInteraction.currentPath === '/calls/active' &&
+        (!currentSession || session.id === currentSession.id)
       ) {
-        if (currentSession && session.id !== currentSession.id) {
-          return;
-        }
         routerInteraction.goBack();
+        return;
       }
     };
 
@@ -226,10 +226,12 @@ export default class BasePhone extends RcModule {
      * @param {object} session
      */
     webphone._onCallStartFunc = (session) => {
-      if (routerInteraction.currentPath.indexOf('/conferenceCall/dialer') === 0) {
+      if (routerInteraction.currentPath.indexOf('/conferenceCall/dialer/') === 0) {
         routerInteraction.push('/conferenceCall/mergeCtrl');
+        return;
       }
-      else if (
+
+      if (
         routerInteraction.currentPath !== '/calls/active' &&
         routerInteraction.currentPath !== '/conferenceCall/mergeCtrl' && !(
           session.callStatus === 'webphone-session-connecting'
@@ -239,12 +241,12 @@ export default class BasePhone extends RcModule {
         )
       ) {
         routerInteraction.push('/calls/active');
+        return;
       }
     };
+
     webphone._onCallRingFunc = () => {
-      if (
-        webphone.ringSessions.length > 1
-      ) {
+      if (webphone.ringSessions.length > 1) {
         if (routerInteraction.currentPath !== '/calls') {
           routerInteraction.push('/calls');
         }
