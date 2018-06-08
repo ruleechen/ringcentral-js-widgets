@@ -23,6 +23,7 @@ function ascendSortParties(parties) {
     .filter(party => party.conferenceRole.toLowerCase() !== conferenceRole.host)
     .sort((last, next) => +last.id.split('-')[1] - (+next.id.split('-')[1]));
 }
+
 /**
  * @class
  * @description ConferenceCall managing module
