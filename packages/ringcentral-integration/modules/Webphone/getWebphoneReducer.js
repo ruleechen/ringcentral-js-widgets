@@ -168,7 +168,7 @@ export function getOnholdSessionIdsStack(types) {
   return (state = [], { type, session = {} }) => {
     switch (type) {
       case types.updateOnholdSession:
-        return [session.id].concat(state);
+        return state[0] === session.id ? state : [session.id].concat(state);
       case types.allHangup:
         return [];
       case types.callEnd:

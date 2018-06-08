@@ -323,7 +323,8 @@ function mapToProps(_, {
   if (conferenceData) {
     sessionToMergeWith = null;
   } else {
-    sessionToMergeWith = webphone._sessions.get(webphone.state.onholdSessionStack[0]);
+    const idx = currentSession.isOnHold ? 1 : 0;
+    sessionToMergeWith = webphone._sessions.get(webphone.state.onholdSessionStack[idx]);
   }
 
   return {
