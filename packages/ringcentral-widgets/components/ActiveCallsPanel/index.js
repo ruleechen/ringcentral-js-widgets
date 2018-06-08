@@ -35,7 +35,7 @@ export default class ActiveCallsPanel extends Component {
     };
 
     this.confirmMergeCall = () => {
-      this.mergeToConference([this.state.callOfModal]);
+      this.mergeToConference([this.state.callOfModal.webphoneSession]);
       this.hideConfirmMergeModal();
     };
   }

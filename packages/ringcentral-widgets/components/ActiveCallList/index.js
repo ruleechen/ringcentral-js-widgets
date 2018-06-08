@@ -72,15 +72,18 @@ function ActiveCallList({
               if (hasConference) {
                 showMergeCall = true;
                 if (isOnConferenceCall) {
-                  onMergeCall = () => mergeToConference([currentCall]);
+                  onMergeCall = () => mergeToConference([currentCall.webphoneSession]);
                 } else if (isCurrentCallAConf) {
-                  onMergeCall = () => mergeToConference([call]);
+                  onMergeCall = () => mergeToConference([call.webphoneSession]);
                 } else {
                   onMergeCall = () => onConfirmMergeCall(call);
                 }
               } else {
                 showMergeCall = true;
-                const partyCalls = [call, activeCurrentCalls[0]];
+                const partyCalls = [
+                    call.webphoneSession,
+                    activeCurrentCalls[0].webphoneSession
+                  ];
                 onMergeCall = () => mergeToConference(partyCalls);
               }
             } else if (hasConference) {

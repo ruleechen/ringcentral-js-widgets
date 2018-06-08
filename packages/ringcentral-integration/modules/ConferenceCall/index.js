@@ -209,19 +209,19 @@ export default class ConferenceCall extends RcModule {
   /**
    * Bring-in an outbound call into conference.
    * @param {string} id: conference id
-   * @param {call} partyCall: get it from callMonitor.\w+Calls[\d+]
+   * @param {webphone.session} webphoneSession: get it from callMonitor.\w+Calls[\d+]
    * interface SessionData{
    *  "party-id": String,
    *  "session-id": String
    * }
    */
   @proxify
-  async bringInToConference(id, partyCall, propagete = false) {
+  async bringInToConference(id, webphoneSession, propagete = false) {
     const conferenceState = this.state.conferences[id];
     if (
       !conferenceState
-        || !partyCall
-        || partyCall.direction !== callDirections.outbound
+        || !webphoneSession
+        || webphoneSession.direction !== callDirections.outbound
         || this.isOverload(id)
     ) {
       if (!propagete) {
@@ -238,9 +238,9 @@ export default class ConferenceCall extends RcModule {
       conference,
       session,
     });
-    const sessionData = partyCall.webphoneSession.data;
+    const sessionData = webphoneSession.data;
     try {
-      const partyProfile = await this._getProfile(partyCall.webphoneSession);
+      const partyProfile = await this._getProfile(webphoneSession);
       await this._client.service.platform()
         .post(`/account/~/telephony/sessions/${id}/parties/bring-in`, sessionData);
       await this.updateConferenceStatus(id);
@@ -340,11 +340,11 @@ export default class ConferenceCall extends RcModule {
 
   /**
    * Merge calls to (or create) a conference.
-   * @param {callMonitor.calls} calls
+   * @param {webphone.sessions} webphoneSessions
    * FIXME: dynamically construct this function during the construction
    * to avoid `this._webphone` criterias to improve performance ahead of time
    */
-  async mergeToConference(calls = []) {
+  async mergeToConference(webphoneSessions = []) {
     this.store.dispatch({
       type: this.actionTypes.mergeStart,
     });
@@ -358,7 +358,8 @@ export default class ConferenceCall extends RcModule {
        * we cannot sure the merging process is over when
        * the function's procedure has finshed.
        */
-      sipInstances = calls.map(c => this._webphone._sessions.get(c.webphoneSession.id));
+      sipInstances = webphoneSessions
+        .map(webphoneSession => this._webphone._sessions.get(webphoneSession.id));
       const pSips = sipInstances.map((instance) => {
         const p = new Promise((resolve) => {
           instance.on('terminated', () => {
@@ -368,7 +369,7 @@ export default class ConferenceCall extends RcModule {
         return p;
       });
 
-      Promise.all([this._mergeToConference(calls), ...pSips])
+      Promise.all([this._mergeToConference(webphoneSessions), ...pSips])
         .then(() => {
           this.store.dispatch({
             type: this.actionTypes.mergeEnd,
@@ -391,7 +392,7 @@ export default class ConferenceCall extends RcModule {
         });
     } else {
       try {
-        conferenceId = await this._mergeToConference(calls);
+        conferenceId = await this._mergeToConference(webphoneSessions);
 
         this.store.dispatch({
           type: this.actionTypes.mergeEnd,
@@ -568,15 +569,15 @@ export default class ConferenceCall extends RcModule {
     );
   }
 
-  async _mergeToConference(calls = []) {
+  async _mergeToConference(webphoneSessions = []) {
     const conferenceState = Object.values(this.conferences)[0];
 
     if (conferenceState) {
       const conferenceId = conferenceState.conference.id;
       this.stopPollingConferenceStatus(conferenceId);
       await Promise.all(
-        calls.map(
-          call => this.bringInToConference(conferenceId, call, true)
+        webphoneSessions.map(
+          webphoneSession => this.bringInToConference(conferenceId, webphoneSession, true)
         )
       );
 
@@ -585,9 +586,9 @@ export default class ConferenceCall extends RcModule {
        * 1. remaining session when duplicated session exsisting in a conference.
        */
       setTimeout(() => {
-        calls.forEach((call) => {
-          if (call.webphoneSession && call.webphoneSession.id) {
-            this._webphone.hangup(call.webphoneSession.id);
+        webphoneSessions.forEach((webphoneSession) => {
+          if (webphoneSession && webphoneSession.id) {
+            this._webphone.hangup(webphoneSession.id);
           }
         });
       }, DEFAULT_TERMINATION_SPAN);
@@ -602,7 +603,7 @@ export default class ConferenceCall extends RcModule {
      * conference.
      */
     await new Promise(resolve => setTimeout(resolve, this._spanForBringIn));
-    await this._mergeToConference(calls);
+    await this._mergeToConference(webphoneSessions);
 
     return id;
   }

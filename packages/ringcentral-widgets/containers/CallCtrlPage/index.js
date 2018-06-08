@@ -111,7 +111,7 @@ class CallCtrlPage extends Component {
       session,
       gotoConferenceCallDialer,
       currentCall,
-      callToMergeWith,
+      sessionToMergeWith,
       mergeToConference,
     } = this.props;
     if (!session.id) {
@@ -127,7 +127,9 @@ class CallCtrlPage extends Component {
       fallbackUserName = i18n.getString('unknown', this.props.currentLocale);
     }
 
-    const mergeList = callToMergeWith ? [callToMergeWith, currentCall] : [currentCall];
+    const mergeList = sessionToMergeWith
+      ? [sessionToMergeWith, session]
+      : [session];
     const backButtonLabel = this.props.backButtonLabel
       ? this.props.backButtonLabel
       : i18n.getString('activeCalls', this.props.currentLocale);
@@ -245,7 +247,7 @@ CallCtrlPage.propTypes = {
   addDisabled: PropTypes.bool,
   gotoConferenceCallDialer: PropTypes.func,
   currentCall: PropTypes.object,
-  callToMergeWith: PropTypes.object,
+  sessionToMergeWith: PropTypes.object,
   mergeToConference: PropTypes.func,
   gotoNormalCallCtrl: PropTypes.func,
 };
@@ -264,7 +266,7 @@ CallCtrlPage.defaultProps = {
   gotoConferenceCallDialer: i => i,
   mergeToConference: i => i,
   currentCall: null,
-  callToMergeWith: null,
+  sessionToMergeWith: null,
   gotoNormalCallCtrl: i => i,
 };
 
@@ -296,30 +298,32 @@ function mapToProps(_, {
     call.webphoneSession ? call.webphoneSession.id === currentSession.id : false
   ));
 
-  let mergeDisabled;
+  let mergeDisabled = false;
   if (conferenceData) {
     mergeDisabled = conferenceCall.isOverload(conferenceData.conference.id);
-  } else if (!callMonitor.activeOnHoldCalls[0] || !currentCall) {
-    mergeDisabled = true;
-    // if (!callMonitor.activeOnHoldCalls[0]) {
-    //   routerInteraction.push('/calls/active');
-    // }
-  } else {
-    mergeDisabled = false;
   }
+  // else if (!callMonitor.activeOnHoldCalls[0] || !currentCall) {
+  //   mergeDisabled = true;
+  //   // if (!callMonitor.activeOnHoldCalls[0]) {
+  //   //   routerInteraction.push('/calls/active');
+  //   // }
+  // } else {
+  //   mergeDisabled = false;
+  // }
 
   let addDisabled = false;
   if (conferenceData) {
     addDisabled = conferenceCall.isOverload(conferenceData.conference.id);
-  } else if (!currentCall) {
-    addDisabled = true;
   }
+  // else if (!currentCall) {
+  //   addDisabled = true;
+  // }
 
-  let callToMergeWith;
-  if (conferenceData || !callMonitor.activeOnHoldCalls.length) {
-    callToMergeWith = null;
+  let sessionToMergeWith;
+  if (conferenceData) {
+    sessionToMergeWith = null;
   } else {
-    callToMergeWith = callMonitor.activeOnHoldCalls[0];
+    sessionToMergeWith = webphone._sessions.get(webphone.state.onholdSessionStack[0]);
   }
 
   return {
@@ -338,7 +342,7 @@ function mapToProps(_, {
     mergeDisabled,
     addDisabled,
     simple,
-    callToMergeWith,
+    sessionToMergeWith,
     routerInteraction,
   };
 }
@@ -389,7 +393,7 @@ function mapToFunctions(_, {
     recipientsContactPhoneRenderer,
     gotoConferenceCallDialer: fromNumber => routerInteraction.push(`/conferenceCall/dialer/${fromNumber}`),
     gotoNormalCallCtrl: () => routerInteraction.push('/calls/active'),
-    mergeToConference: calls => conferenceCall.mergeToConference(calls),
+    mergeToConference: webphoneSessions => conferenceCall.mergeToConference(webphoneSessions),
   };
 }
 
