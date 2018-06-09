@@ -194,6 +194,7 @@ class CallCtrlPage extends Component {
         phoneTypeRenderer={this.props.phoneTypeRenderer}
         recipientsContactInfoRenderer={this.props.recipientsContactInfoRenderer}
         recipientsContactPhoneRenderer={this.props.recipientsContactPhoneRenderer}
+        isMerging={this.props.isMerging}
       >
         {this.props.children}
       </CallCtrlPanel>
@@ -258,6 +259,7 @@ CallCtrlPage.propTypes = {
   sessionToMergeWith: PropTypes.object,
   mergeToConference: PropTypes.func,
   gotoNormalCallCtrl: PropTypes.func,
+  isMerging: PropTypes.bool,
 };
 
 CallCtrlPage.defaultProps = {
@@ -276,6 +278,7 @@ CallCtrlPage.defaultProps = {
   currentCall: null,
   sessionToMergeWith: null,
   gotoNormalCallCtrl: i => i,
+  isMerging: false,
 };
 
 function mapToProps(_, {
@@ -353,6 +356,7 @@ function mapToProps(_, {
     simple,
     sessionToMergeWith,
     routerInteraction,
+    isMerging: conferenceCall.state.isMerging
   };
 }
 

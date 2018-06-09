@@ -5,6 +5,8 @@ import ActiveCallDialPad from '../ActiveCallDialPad';
 import ActiveCallPanel from '../ActiveCallPanel';
 import FlipPanel from '../FlipPanel';
 import TransferPanel from '../TransferPanel';
+import SpinnerOverlay from '../SpinnerOverlay';
+
 
 class CallCtrlPanel extends Component {
   constructor(props) {
@@ -134,6 +136,7 @@ class CallCtrlPanel extends Component {
         sourceIcons={this.props.sourceIcons}
       >
         {this.props.children}
+        {this.props.isMerging ? <SpinnerOverlay /> : null}
       </ActiveCallPanel>
     );
   }
@@ -193,6 +196,7 @@ CallCtrlPanel.propTypes = {
   gotoConferenceCallDialer: PropTypes.func,
   mergeToConference: PropTypes.func,
   addDisabled: PropTypes.bool,
+  isMerging: PropTypes.bool,
 };
 
 CallCtrlPanel.defaultProps = {
@@ -223,6 +227,7 @@ CallCtrlPanel.defaultProps = {
   recipientsContactPhoneRenderer: undefined,
   gotoConferenceCallDialer: i => i,
   mergeToConference: i => i,
+  isMerging: false,
 };
 
 export default CallCtrlPanel;
