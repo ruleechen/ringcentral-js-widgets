@@ -345,6 +345,15 @@ export default class ConferenceCall extends RcModule {
    * to avoid `this._webphone` criterias to improve performance ahead of time
    */
   async mergeToConference(webphoneSessions = []) {
+    webphoneSessions = webphoneSessions.filter(session => Object.prototype.toString.call(session).toLowerCase() === '[object object]');
+
+    if (!webphoneSessions.length) {
+      this._alert.warning({
+        message: conferenceErrors.bringInFailed,
+      });
+      return;
+    }
+
     this.store.dispatch({
       type: this.actionTypes.mergeStart,
     });
