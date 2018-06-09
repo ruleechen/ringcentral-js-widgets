@@ -62,6 +62,11 @@ class CallCtrlPage extends Component {
       this.props.onTransfer(value, this.props.session.id);
     this.onPark = () =>
       this.props.onPark(this.props.session.id);
+    this.gotoNormalCallCtrl = () => this.props.gotoNormalCallCtrl();
+
+    if (this.props.sessionToMergeWith) {
+      this.props.sessionToMergeWith.on('terminated', this.gotoNormalCallCtrl);
+    }
   }
 
   componentDidMount() {
@@ -80,6 +85,9 @@ class CallCtrlPage extends Component {
 
   componentWillUnmount() {
     this._mounted = false;
+    if (this.props.sessionToMergeWith) {
+      this.props.sessionToMergeWith.removeListener('terminated', this.gotoNormalCallCtrl);
+    }
   }
 
   _updateAvatarAndMatchIndex(props) {
