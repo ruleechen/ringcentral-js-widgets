@@ -636,8 +636,8 @@ export default class Webphone extends RcModule {
       ) {
         /**
          * interface SessionData{
-         *  "party-id": String,
-         *  "session-id": String
+         *  "partyId": String,
+         *  "sessionId": String
          * }
          */
         session.data = incomingResponse.headers['P-Rc-Api-Ids'][0].raw.split(';')
@@ -701,6 +701,10 @@ export default class Webphone extends RcModule {
     session.on('hold', () => {
       console.log('Event: hold');
       session.callStatus = sessionStatus.onHold;
+      this.store.dispatch({
+        type: this.actionTypes.updateOnholdSession,
+        session,
+      });
       this._updateSessions();
     });
     session.on('unhold', () => {
@@ -843,10 +847,6 @@ export default class Webphone extends RcModule {
     }
     try {
       await session.hold();
-      this.store.dispatch({
-        type: this.actionTypes.updateOnholdSession,
-        session,
-      });
       this._updateSessions();
       return true;
     } catch (e) {
@@ -1243,11 +1243,6 @@ export default class Webphone extends RcModule {
     });
     if (typeof this._onCallEndFunc === 'function') {
       this._onCallEndFunc(normalizedSession, this.activeSession);
-    }
-    if (!this.sessions.length) {
-      this.store.dispatch({
-        type: this.actionTypes.allHangup,
-      });
     }
   }
 

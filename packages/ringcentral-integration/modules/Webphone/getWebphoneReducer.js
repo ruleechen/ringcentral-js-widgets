@@ -165,14 +165,12 @@ export function getSessionsReducer(types) {
 }
 
 export function getOnholdSessionIdsStack(types) {
-  return (state = [], { type, session = {} }) => {
+  return (state = [], { type, session = {}, sessions = [] }) => {
     switch (type) {
       case types.updateOnholdSession:
         return state[0] === session.id ? state : [session.id].concat(state);
-      case types.allHangup:
-        return [];
       case types.callEnd:
-        return state.filter(id => id !== session.id);
+        return sessions.length ? state.filter(id => id !== session.id) : [];
       default:
         return state;
     }
