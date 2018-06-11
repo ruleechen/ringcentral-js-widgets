@@ -10,6 +10,7 @@ import permissionsMessages from '../RolesAndPermissions/permissionsMessages';
 import conferenceErrors from './conferenceCallErrors';
 // import webphoneErrors from '../Webphone/webphoneErrors';
 import ensureExist from '../../lib/ensureExist';
+import sleep from '../../lib/sleep';
 import callingModes from '../CallingSettings/callingModes';
 
 const DEFAULT_TTL = 5000;// timer to update the conference information
@@ -383,7 +384,7 @@ export default class ConferenceCall extends RcModule {
         return p;
       });
 
-      Promise.all([this._mergeToConference(webphoneSessions), ...pSips])
+      await Promise.all([this._mergeToConference(webphoneSessions), ...pSips])
         .then(() => {
           this.store.dispatch({
             type: this.actionTypes.mergeSucceeded,
@@ -616,13 +617,12 @@ export default class ConferenceCall extends RcModule {
        * HACK: terminate the session initiatively to avoid:
        * 1. remaining session when duplicated session exsisting in a conference.
        */
-      setTimeout(() => {
-        webphoneSessions.forEach((webphoneSession) => {
-          if (webphoneSession && webphoneSession.id) {
-            this._webphone.hangup(webphoneSession.id);
-          }
-        });
-      }, this._spanForTermination);
+      await sleep(this._spanForTermination);
+      webphoneSessions.forEach((webphoneSession) => {
+        if (webphoneSession && webphoneSession.id) {
+          this._webphone.hangup(webphoneSession.id);
+        }
+      });
 
       this.startPollingConferenceStatus(conferenceId);
       return conferenceId;

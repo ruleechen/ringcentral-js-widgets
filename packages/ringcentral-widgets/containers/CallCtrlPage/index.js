@@ -420,7 +420,7 @@ function mapToFunctions(_, {
          * because session termination operation in conferenceCall._mergeToConference,
          * need to wait for webphone.getActiveSessionIdReducer to update
          */
-        setTimeout(() => conferenceData.session.unhold(), conferenceCall._spanForTermination + 1);
+        conferenceData.session.unhold();
       }
     },
     setMergingFrom: from => conferenceCall.setMergeParty({ from }),
