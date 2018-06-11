@@ -89,6 +89,8 @@ class CallCtrlPanel extends Component {
     }
     return (
       <ActiveCallPanel
+        setMergingFrom={this.props.setMergingFrom}
+        setMergingTo={this.props.setMergingTo}
         mergeToConference={this.props.mergeToConference}
         gotoConferenceCallDialer={this.props.gotoConferenceCallDialer}
         direction={this.props.direction}
@@ -197,6 +199,8 @@ CallCtrlPanel.propTypes = {
   mergeToConference: PropTypes.func,
   addDisabled: PropTypes.bool,
   isMerging: PropTypes.bool,
+  setMergingFrom: PropTypes.func,
+  setMergingTo: PropTypes.func,
 };
 
 CallCtrlPanel.defaultProps = {
@@ -227,6 +231,8 @@ CallCtrlPanel.defaultProps = {
   recipientsContactPhoneRenderer: undefined,
   gotoConferenceCallDialer: i => i,
   mergeToConference: i => i,
+  setMergingFrom: i => i,
+  setMergingTo: i => i,
   isMerging: false,
 };
 

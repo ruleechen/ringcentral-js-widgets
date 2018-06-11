@@ -118,9 +118,16 @@ class CallCtrlPage extends Component {
     const {
       session,
       gotoConferenceCallDialer,
-      currentCall,
       sessionToMergeWith,
       mergeToConference,
+      setMergingFrom,
+      setMergingTo,
+      getSipInstance,
+      isOnConference,
+      getOnlineProfiles,
+      simple,
+      mergeDisabled,
+      addDisabled
     } = this.props;
     if (!session.id) {
       return null;
@@ -141,16 +148,19 @@ class CallCtrlPage extends Component {
     const backButtonLabel = this.props.backButtonLabel
       ? this.props.backButtonLabel
       : i18n.getString('activeCalls', this.props.currentLocale);
+
     return (
       <CallCtrlPanel
+        setMergingFrom={isOnConference ? i => i : () => setMergingFrom(getSipInstance(session))}
+        setMergingTo={() => setMergingTo(getSipInstance(session))}
         mergeToConference={() => mergeToConference(mergeList)}
-        gotoConferenceCallDialer={() => gotoConferenceCallDialer(currentCall.from.phoneNumber)}
+        gotoConferenceCallDialer={() => gotoConferenceCallDialer()}
         direction={session.direction}
-        addDisabled={this.props.addDisabled}
-        mergeDisabled={this.props.mergeDisabled}
-        simple={!!this.props.simple}
-        getOnlineProfiles={this.props.getOnlineProfiles}
-        isOnConference={this.props.isOnConference}
+        addDisabled={addDisabled}
+        mergeDisabled={mergeDisabled}
+        simple={!!simple}
+        getOnlineProfiles={getOnlineProfiles}
+        isOnConference={isOnConference}
         conferenceData={this.props.conferenceData}
         backButtonLabel={backButtonLabel}
         currentLocale={this.props.currentLocale}
@@ -260,6 +270,9 @@ CallCtrlPage.propTypes = {
   mergeToConference: PropTypes.func,
   gotoNormalCallCtrl: PropTypes.func,
   isMerging: PropTypes.bool,
+  setMergingFrom: PropTypes.func.isRequired,
+  setMergingTo: PropTypes.func.isRequired,
+  getSipInstance: PropTypes.func.isRequired,
 };
 
 CallCtrlPage.defaultProps = {
@@ -330,14 +343,6 @@ function mapToProps(_, {
   //   addDisabled = true;
   // }
 
-  let sessionToMergeWith;
-  if (conferenceData) {
-    sessionToMergeWith = null;
-  } else {
-    const idx = currentSession.isOnHold ? 1 : 0;
-    sessionToMergeWith = webphone._sessions.get(webphone.state.onholdSessionStack[idx]);
-  }
-
   return {
     brand: brand.fullName,
     nameMatches,
@@ -354,7 +359,7 @@ function mapToProps(_, {
     mergeDisabled,
     addDisabled,
     simple,
-    sessionToMergeWith,
+    sessionToMergeWith: conferenceCall.state.mergingPair.from,
     routerInteraction,
     isMerging: conferenceCall.state.isMerging
   };
@@ -404,9 +409,12 @@ function mapToFunctions(_, {
     phoneTypeRenderer,
     recipientsContactInfoRenderer,
     recipientsContactPhoneRenderer,
-    gotoConferenceCallDialer: fromNumber => routerInteraction.push(`/conferenceCall/dialer/${fromNumber}`),
+    gotoConferenceCallDialer: () => routerInteraction.push('/conferenceCall/dialer/'),
     gotoNormalCallCtrl: () => routerInteraction.push('/calls/active'),
     mergeToConference: webphoneSessions => conferenceCall.mergeToConference(webphoneSessions),
+    setMergingFrom: from => conferenceCall.setMergeParty({ from }),
+    setMergingTo: to => conferenceCall.setMergeParty({ to }),
+    getSipInstance: session => webphone._sessions.get(session.id),
   };
 }
 

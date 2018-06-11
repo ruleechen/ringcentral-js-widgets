@@ -18,7 +18,7 @@ class ActiveCallPanel extends React.Component {
     this.state = {
       displayedProfiles: [],
       remains: 0,
-      isPartiesModalOpen: false,
+      isPartiesModalOpen: false, // todo: for rendering the parties modal when conferecing
       resizeFunc: throttle(() => this.handleResize(this.props)),
     };
   }
@@ -109,6 +109,8 @@ class ActiveCallPanel extends React.Component {
       gotoConferenceCallDialer,
       mergeToConference,
       addDisabled,
+      setMergingFrom,
+      setMergingTo,
     } = this.props;
 
     const timeCounter = startTime ?
@@ -161,6 +163,8 @@ class ActiveCallPanel extends React.Component {
           />)
         }
           <ActiveCallPad
+            setMergingTo={setMergingTo}
+            setMergingFrom={setMergingFrom}
             direction={direction}
             simple={simple}
             className={styles.callPad}
@@ -239,6 +243,8 @@ ActiveCallPanel.propTypes = {
   simple: PropTypes.bool,
   mergeToConference: PropTypes.func,
   addDisabled: PropTypes.bool,
+  setMergingFrom: PropTypes.func,
+  setMergingTo: PropTypes.func,
 };
 
 ActiveCallPanel.defaultProps = {
@@ -263,6 +269,8 @@ ActiveCallPanel.defaultProps = {
   mergeDisabled: false,
   simple: null,
   mergeToConference: i => i,
+  setMergingFrom: i => i,
+  setMergingTo: i => i,
   addDisabled: false,
 };
 

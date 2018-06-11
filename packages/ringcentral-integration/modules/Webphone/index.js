@@ -701,10 +701,6 @@ export default class Webphone extends RcModule {
     session.on('hold', () => {
       console.log('Event: hold');
       session.callStatus = sessionStatus.onHold;
-      this.store.dispatch({
-        type: this.actionTypes.updateOnholdSession,
-        session,
-      });
       this._updateSessions();
     });
     session.on('unhold', () => {

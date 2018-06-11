@@ -23,5 +23,4 @@ export default new Enum([
   'videoElementPrepared',
   'getUserMediaSuccess',
   'getUserMediaError',
-  'updateOnholdSession',
 ], 'webphone');

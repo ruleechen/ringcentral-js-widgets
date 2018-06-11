@@ -4,7 +4,8 @@ import moduleActionTypes from '../../enums/moduleActionTypes';
 export default new Enum([
   ...Object.keys(moduleActionTypes),
   'mergeStart',
-  'mergeEnd',
+  'mergeSucceeded',
+  'mergeFailed',
   // make conference call
   'makeConference',
   'makeConferenceSucceeded',
@@ -29,4 +30,7 @@ export default new Enum([
   'removeFromConference',
   'removeFromConferenceSucceeded',
   'removeFromConferenceFailed',
+  // update merge pairs
+  'updateFromSession',
+  'updateToSession',
 ], 'conferenceCall');

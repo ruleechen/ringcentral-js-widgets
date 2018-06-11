@@ -79,9 +79,27 @@ export function getMergingStatusReducer(types) {
     switch (type) {
       case types.mergeStart:
         return true;
-      case types.mergeEnd:
+      case types.mergeSucceeded:
+      case types.mergeFailed:
       case types.resetSuccess:
         return false;
+      default:
+        return state;
+    }
+  };
+}
+
+export function getMergingPairReduce(types) {
+  return (state = {}, { type, from, to }) => {
+    switch (type) {
+      case types.updateFromSession:
+        return { from };
+      case types.updateToSession:
+        return { ...state, to };
+      case types.mergeSucceeded:
+      case types.resetSuccess:
+        return {};
+      // restore the pair when failure
       default:
         return state;
     }
@@ -94,5 +112,6 @@ export default function getConferenceCallReducer(types) {
     conferences: getMakeConferenceCallReducer(types),
     conferenceCallStatus: getConferenceCallStatusReducer(types),
     isMerging: getMergingStatusReducer(types),
+    mergingPair: getMergingPairReduce(types),
   });
 }

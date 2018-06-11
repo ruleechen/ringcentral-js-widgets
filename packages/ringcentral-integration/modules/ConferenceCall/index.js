@@ -384,7 +384,7 @@ export default class ConferenceCall extends RcModule {
       Promise.all([this._mergeToConference(webphoneSessions), ...pSips])
         .then(() => {
           this.store.dispatch({
-            type: this.actionTypes.mergeEnd,
+            type: this.actionTypes.mergeSucceeded,
           });
         }, () => {
           const conferenceState = Object.values(this.conferences)[0];
@@ -399,7 +399,7 @@ export default class ConferenceCall extends RcModule {
             message: conferenceErrors.bringInFailed,
           });
           this.store.dispatch({
-            type: this.actionTypes.mergeEnd,
+            type: this.actionTypes.mergeFailed,
           });
         });
     } else {
@@ -407,7 +407,7 @@ export default class ConferenceCall extends RcModule {
         conferenceId = await this._mergeToConference(webphoneSessions);
 
         this.store.dispatch({
-          type: this.actionTypes.mergeEnd,
+          type: this.actionTypes.mergeSucceeded,
         });
       } catch (e) {
         const conferenceState = Object.values(this.conferences)[0];
@@ -424,18 +424,27 @@ export default class ConferenceCall extends RcModule {
       }
       if (!sipInstances || conferenceId === null) {
         this.store.dispatch({
-          type: this.actionTypes.mergeEnd,
+          type: this.actionTypes.mergeFailed,
         });
       }
     }
   }
 
-  async _onStateChange() {
-    if (this._shouldInit()) {
-      this._init();
-    } else if (this._shouldReset()) {
-      this._reset();
+  /**
+   * we need to record the merge destination when merge from the call control pages
+   * @param {webphone.session} from
+   */
+  setMergeParty({ from, to }) {
+    if (from) {
+      return this.store.dispatch({
+        type: this.actionTypes.updateFromSession,
+        from,
+      });
     }
+    return this.store.dispatch({
+      type: this.actionTypes.updateToSession,
+      to,
+    });
   }
 
   getOnlinePartyProfiles(id) {
@@ -520,6 +529,14 @@ export default class ConferenceCall extends RcModule {
     this.store.dispatch({
       type: this.actionTypes.initSuccess
     });
+  }
+
+  async _onStateChange() {
+    if (this._shouldInit()) {
+      this._init();
+    } else if (this._shouldReset()) {
+      this._reset();
+    }
   }
 
   _reset() {
