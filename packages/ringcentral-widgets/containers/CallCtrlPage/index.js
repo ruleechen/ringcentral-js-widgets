@@ -79,7 +79,10 @@ class CallCtrlPage extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.layout === callCtrlLayout.mergeCtrl && nextProps.session.direction === callDirections.inbound) {
+    if (
+      nextProps.layout === callCtrlLayout.mergeCtrl &&
+      nextProps.session.direction === callDirections.inbound
+    ) {
       nextProps.gotoNormalCallCtrl();
     }
     if (this.props.session.id !== nextProps.session.id) {
@@ -121,7 +124,7 @@ class CallCtrlPage extends Component {
   render() {
     const {
       session,
-      getOnlineProfiles,
+      getPartyProfiles,
       mergeDisabled,
       addDisabled,
       layout,
@@ -148,9 +151,8 @@ class CallCtrlPage extends Component {
         direction={session.direction}
         addDisabled={addDisabled}
         mergeDisabled={mergeDisabled}
-        getOnlineProfiles={getOnlineProfiles}
+        getPartyProfiles={getPartyProfiles}
         layout={layout}
-        conferenceData={this.props.conferenceData}
         backButtonLabel={backButtonLabel}
         currentLocale={this.props.currentLocale}
         formatPhone={this.props.formatPhone}
@@ -216,9 +218,8 @@ CallCtrlPage.propTypes = {
     from: PropTypes.string,
     contactMatch: PropTypes.object,
   }).isRequired,
-  getOnlineProfiles: PropTypes.func.isRequired,
+  getPartyProfiles: PropTypes.func.isRequired,
   layout: PropTypes.string.isRequired,
-  conferenceData: PropTypes.object,
   currentLocale: PropTypes.string.isRequired,
   onMute: PropTypes.func.isRequired,
   onUnmute: PropTypes.func.isRequired,
@@ -266,7 +267,6 @@ CallCtrlPage.defaultProps = {
   phoneTypeRenderer: undefined,
   recipientsContactInfoRenderer: undefined,
   recipientsContactPhoneRenderer: undefined,
-  conferenceData: null,
   mergeDisabled: false,
   addDisabled: false,
   sessionToMergeWith: null,
@@ -320,7 +320,6 @@ function mapToProps(_, {
     flipNumbers: forwardingNumber.flipNumbers,
     calls: callMonitor.calls,
     searchContactList: contactSearch.sortedResult,
-    conferenceData,
     mergeDisabled,
     addDisabled,
     layout: isOnConference ? callCtrlLayout.conferenceCtrl : layout,
@@ -379,7 +378,16 @@ function mapToFunctions(_, {
       routerInteraction.push('/conferenceCall/dialer/');
     },
     gotoNormalCallCtrl: () => routerInteraction.push('/calls/active'),
-    getOnlineProfiles: id => conferenceCall.getOnlinePartyProfiles(id),
+    getPartyProfiles() {
+      const conferenceData = Object.values(conferenceCall.conferences)[0];
+      if (conferenceData) {
+        if (conferenceData.conference.parties.length === 0) {
+          return conferenceData.profiles;
+        }
+        return conferenceCall.getOnlinePartyProfiles(conferenceData.conference.id);
+      }
+      return [];
+    },
   };
 }
 
@@ -396,8 +404,6 @@ CallCtrlContainer.propTypes = {
   children: PropTypes.node,
   showContactDisplayPlaceholder: PropTypes.bool,
   sourceIcons: PropTypes.object,
-  isOnConference: PropTypes.bool,
-  conferenceData: PropTypes.object,
 };
 
 CallCtrlContainer.defaultProps = {
@@ -405,8 +411,6 @@ CallCtrlContainer.defaultProps = {
   showContactDisplayPlaceholder: false,
   children: undefined,
   sourceIcons: undefined,
-  isOnConference: false,
-  conferenceData: null,
 };
 
 export {

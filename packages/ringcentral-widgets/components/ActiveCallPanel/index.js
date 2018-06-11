@@ -28,14 +28,8 @@ class ActiveCallPanel extends React.Component {
     const MAXIMUM_AVATARS = 4;
     // todo: handle width calculation
     if (props.layout === callCtrlLayout.conferenceCtrl) {
-      let profiles;
       // conference is just created and waiting for parties data to return
-      const { conferenceData } = props;
-      if (conferenceData.conference.parties.length === 0) {
-        profiles = conferenceData.profiles;
-      } else {
-        profiles = this.props.getOnlineProfiles(conferenceData.conference.id);
-      }
+      const profiles = this.props.getPartyProfiles();
       const displayedProfiles = (profiles.length >= MAXIMUM_AVATARS
         ? profiles.slice(0, MAXIMUM_AVATARS)
         : profiles)
@@ -192,7 +186,7 @@ class ActiveCallPanel extends React.Component {
 }
 
 ActiveCallPanel.propTypes = {
-  getOnlineProfiles: PropTypes.func.isRequired,
+  getPartyProfiles: PropTypes.func.isRequired,
   phoneNumber: PropTypes.string,
   nameMatches: PropTypes.array.isRequired,
   fallBackName: PropTypes.string.isRequired,
@@ -201,7 +195,6 @@ ActiveCallPanel.propTypes = {
   startTimeOffset: PropTypes.number,
   isOnMute: PropTypes.bool,
   isOnHold: PropTypes.bool,
-  conferenceData: PropTypes.object,
   recordStatus: PropTypes.string.isRequired,
   onMute: PropTypes.func.isRequired,
   onUnmute: PropTypes.func.isRequired,
@@ -241,7 +234,6 @@ ActiveCallPanel.defaultProps = {
   startTimeOffset: 0,
   isOnMute: false,
   isOnHold: false,
-  conferenceData: null,
   phoneNumber: null,
   children: undefined,
   avatarUrl: null,

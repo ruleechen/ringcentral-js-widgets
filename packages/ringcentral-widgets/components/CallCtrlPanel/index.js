@@ -92,9 +92,8 @@ class CallCtrlPanel extends Component {
         mergeDisabled={this.props.mergeDisabled}
         addDisabled={this.props.addDisabled}
         layout={this.props.layout}
-        getOnlineProfiles={this.props.getOnlineProfiles}
+        getPartyProfiles={this.props.getPartyProfiles}
         getAvatarUrl={this.props.getAvatarUrl}
-        conferenceData={this.props.conferenceData}
         backButtonLabel={this.props.backButtonLabel}
         currentLocale={this.props.currentLocale}
         formatPhone={this.props.formatPhone}
@@ -143,7 +142,7 @@ CallCtrlPanel.propTypes = {
   direction: PropTypes.string,
   mergeDisabled: PropTypes.bool,
   layout: PropTypes.string.isRequired,
-  getOnlineProfiles: PropTypes.func.isRequired,
+  getPartyProfiles: PropTypes.func.isRequired,
   callStatus: PropTypes.string,
   sessionId: PropTypes.string,
   phoneNumber: PropTypes.string,
@@ -151,7 +150,6 @@ CallCtrlPanel.propTypes = {
   fallBackName: PropTypes.string.isRequired,
   currentLocale: PropTypes.string.isRequired,
   startTime: PropTypes.number,
-  conferenceData: PropTypes.object,
   isOnMute: PropTypes.bool,
   isOnHold: PropTypes.bool,
   isOnFlip: PropTypes.bool,
@@ -200,7 +198,6 @@ CallCtrlPanel.defaultProps = {
   addDisabled: false,
   getAvatarUrl: null,
   startTime: null,
-  conferenceData: null,
   isOnMute: false,
   isOnHold: false,
   isOnTransfer: false,
