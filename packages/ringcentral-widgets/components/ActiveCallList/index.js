@@ -5,6 +5,10 @@ import classnames from 'classnames';
 import ActiveCallItem from '../ActiveCallItem';
 import styles from './styles.scss';
 
+function isConferenceCall(normalizedCall) {
+  return normalizedCall.to.phoneNumber.length === 0 && normalizedCall.toName === 'Conference';
+}
+
 function ActiveCallList({
   calls,
   conference,
@@ -21,7 +25,7 @@ function ActiveCallList({
   outboundSmsPermission,
   internalSmsPermission,
   isLoggedContact,
-  isConferenceCall,
+  isSessionAConferenceCall,
   mergeToConference,
   onLogCall,
   autoLog,
@@ -55,10 +59,10 @@ function ActiveCallList({
           const currentCall = activeCurrentCalls[0];
           const hasConference = !!conference;
           const isOnConferenceCall = call.webphoneSession
-            ? isConferenceCall(call.webphoneSession.id)
-            : false;
+            ? isSessionAConferenceCall(call.webphoneSession.id)
+            : isConferenceCall(call);// in case it's an other device call
           const isCurrentCallAConf = currentCall
-            ? isConferenceCall(currentCall.webphoneSession.id)
+            ? isSessionAConferenceCall(currentCall.webphoneSession.id)
             : false;
 
           if (!isOnWebRTC) {
@@ -158,7 +162,7 @@ ActiveCallList.propTypes = {
   outboundSmsPermission: PropTypes.bool,
   internalSmsPermission: PropTypes.bool,
   isLoggedContact: PropTypes.func,
-  isConferenceCall: PropTypes.func.isRequired,
+  isSessionAConferenceCall: PropTypes.func.isRequired,
   onLogCall: PropTypes.func,
   loggingMap: PropTypes.object,
   webphoneAnswer: PropTypes.func,

@@ -79,7 +79,7 @@ function mapToFunctions(_, {
       areaCode: regionSettings.areaCode,
       countryCode: regionSettings.countryCode,
     }),
-    isConferenceCall: sessionId => conferenceCall.isConferenceSession(sessionId),
+    isSessionAConferenceCall: sessionId => conferenceCall.isConferenceSession(sessionId),
     webphoneAnswer: (...args) => (webphone && webphone.answer(...args)),
     webphoneToVoicemail: (...args) => (webphone && webphone.toVoiceMail(...args)),
     webphoneReject: (...args) => (webphone && webphone.reject(...args)),
