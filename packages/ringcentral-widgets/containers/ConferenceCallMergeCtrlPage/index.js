@@ -20,14 +20,37 @@ function mapToProps(_, {
 }
 
 function mapToFunctions(_, {
+  phone,
+  phone: {
+    webphone,
+    conferenceCall,
+  },
   ...props
 }) {
   const baseProps = mapToBaseFunctions(_, {
+    phone,
     ...props,
   });
   return {
     ...baseProps,
-    onAdd() { },
+    onMerge(sessionId) {
+      const session = webphone._sessions.get(sessionId);
+      conferenceCall.setMergeParty({ to: session });
+      const sessionToMergeWith = conferenceCall.state.mergingPair.from;
+      const webphoneSessions = sessionToMergeWith
+        ? [sessionToMergeWith, session]
+        : [session];
+      conferenceCall.mergeToConference(webphoneSessions).then(() => {
+        const conferenceData = Object.values(conferenceCall.conferences)[0];
+        if (conferenceData && conferenceData.session.isOnHold().local) {
+          /**
+           * because session termination operation in conferenceCall._mergeToConference,
+           * need to wait for webphone.getActiveSessionIdReducer to update
+           */
+          conferenceData.session.unhold();
+        }
+      });
+    },
   };
 }
 

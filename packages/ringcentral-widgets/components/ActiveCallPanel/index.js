@@ -95,6 +95,7 @@ class ActiveCallPanel extends React.Component {
       onHangup,
       onPark,
       onAdd,
+      onMerge,
       onShowFlipPanel,
       onToggleTransferPanel,
       children,
@@ -106,11 +107,7 @@ class ActiveCallPanel extends React.Component {
       simple,
       mergeDisabled,
       direction,
-      gotoConferenceCallDialer,
-      mergeToConference,
       addDisabled,
-      setMergingFrom,
-      setMergingTo,
     } = this.props;
 
     const timeCounter = startTime ?
@@ -127,8 +124,8 @@ class ActiveCallPanel extends React.Component {
             <i className={classnames(dynamicsFont.arrow, styles.backIcon)} />
             <span className={styles.backLabel}>{backButtonLabel}</span>
           </span>
-      )}
-    />
+        )}
+      />
     ) : <BackHeader className={styles.hidden} />;
 
     return (
@@ -137,34 +134,32 @@ class ActiveCallPanel extends React.Component {
         <Panel className={styles.panel}>
           {timeCounter}
           {
-          isOnConference
-          ? (
-            <ConferenceInfo
-              displayedProfiles={this.state.displayedProfiles}
-              remains={this.state.remains}
-              onClick={() => this.openPartiesModal()}
-            />
-          )
-          : (<CallInfo
-            currentLocale={currentLocale}
-            nameMatches={nameMatches}
-            fallBackName={fallBackName}
-            phoneNumber={phoneNumber}
-            formatPhone={formatPhone}
-            startTime={startTime}
-            areaCode={areaCode}
-            countryCode={countryCode}
-            selectedMatcherIndex={selectedMatcherIndex}
-            onSelectMatcherName={onSelectMatcherName}
-            avatarUrl={avatarUrl}
-            brand={brand}
-            showContactDisplayPlaceholder={showContactDisplayPlaceholder}
-            sourceIcons={sourceIcons}
-          />)
-        }
+            isOnConference
+              ? (
+                <ConferenceInfo
+                  displayedProfiles={this.state.displayedProfiles}
+                  remains={this.state.remains}
+                  onClick={() => this.openPartiesModal()}
+                />
+              )
+              : (<CallInfo
+                currentLocale={currentLocale}
+                nameMatches={nameMatches}
+                fallBackName={fallBackName}
+                phoneNumber={phoneNumber}
+                formatPhone={formatPhone}
+                startTime={startTime}
+                areaCode={areaCode}
+                countryCode={countryCode}
+                selectedMatcherIndex={selectedMatcherIndex}
+                onSelectMatcherName={onSelectMatcherName}
+                avatarUrl={avatarUrl}
+                brand={brand}
+                showContactDisplayPlaceholder={showContactDisplayPlaceholder}
+                sourceIcons={sourceIcons}
+              />)
+          }
           <ActiveCallPad
-            setMergingTo={setMergingTo}
-            setMergingFrom={setMergingFrom}
             direction={direction}
             simple={simple}
             className={styles.callPad}
@@ -182,15 +177,14 @@ class ActiveCallPanel extends React.Component {
             onShowKeyPad={onShowKeyPad}
             onHangup={onHangup}
             onAdd={onAdd}
+            onMerge={onMerge}
             onShowFlipPanel={onShowFlipPanel}
             onToggleTransferPanel={onToggleTransferPanel}
             flipNumbers={flipNumbers}
             onPark={onPark}
             mergeDisabled={mergeDisabled}
             addDisabled={addDisabled}
-            gotoConferenceCallDialer={gotoConferenceCallDialer}
-            mergeToConference={mergeToConference}
-        />
+          />
           {children}
         </Panel>
       </div>
@@ -217,7 +211,8 @@ ActiveCallPanel.propTypes = {
   onUnhold: PropTypes.func.isRequired,
   onRecord: PropTypes.func.isRequired,
   onStopRecord: PropTypes.func.isRequired,
-  onAdd: PropTypes.func.isRequired,
+  onAdd: PropTypes.func,
+  onMerge: PropTypes.func,
   onHangup: PropTypes.func.isRequired,
   onPark: PropTypes.func.isRequired,
   onBackButtonClick: PropTypes.func.isRequired,
@@ -237,14 +232,10 @@ ActiveCallPanel.propTypes = {
   calls: PropTypes.array.isRequired,
   onToggleTransferPanel: PropTypes.func,
   sourceIcons: PropTypes.object,
-  gotoConferenceCallDialer: PropTypes.func,
   direction: PropTypes.string,
   mergeDisabled: PropTypes.bool,
   simple: PropTypes.bool,
-  mergeToConference: PropTypes.func,
   addDisabled: PropTypes.bool,
-  setMergingFrom: PropTypes.func,
-  setMergingTo: PropTypes.func,
 };
 
 ActiveCallPanel.defaultProps = {
@@ -261,16 +252,14 @@ ActiveCallPanel.defaultProps = {
   brand: 'RingCentral',
   showContactDisplayPlaceholder: true,
   flipNumbers: [],
+  onAdd: i => i,
+  onMerge: i => i,
   onShowFlipPanel: () => null,
   onToggleTransferPanel: () => null,
   sourceIcons: undefined,
-  gotoConferenceCallDialer: i => i,
   direction: null,
   mergeDisabled: false,
   simple: null,
-  mergeToConference: i => i,
-  setMergingFrom: i => i,
-  setMergingTo: i => i,
   addDisabled: false,
 };
 

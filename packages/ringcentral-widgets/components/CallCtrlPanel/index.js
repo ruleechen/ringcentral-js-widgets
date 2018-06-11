@@ -89,10 +89,6 @@ class CallCtrlPanel extends Component {
     }
     return (
       <ActiveCallPanel
-        setMergingFrom={this.props.setMergingFrom}
-        setMergingTo={this.props.setMergingTo}
-        mergeToConference={this.props.mergeToConference}
-        gotoConferenceCallDialer={this.props.gotoConferenceCallDialer}
         direction={this.props.direction}
         mergeDisabled={this.props.mergeDisabled}
         addDisabled={this.props.addDisabled}
@@ -122,6 +118,7 @@ class CallCtrlPanel extends Component {
         onHangup={this.props.onHangup}
         onPark={this.props.onPark}
         onAdd={this.props.onAdd}
+        onMerge={this.props.onMerge}
         nameMatches={this.props.nameMatches}
         fallBackName={this.props.fallBackName}
         areaCode={this.props.areaCode}
@@ -171,7 +168,8 @@ CallCtrlPanel.propTypes = {
   onUnhold: PropTypes.func.isRequired,
   onRecord: PropTypes.func.isRequired,
   onStopRecord: PropTypes.func.isRequired,
-  onAdd: PropTypes.func.isRequired,
+  onAdd: PropTypes.func,
+  onMerge: PropTypes.func,
   onPark: PropTypes.func.isRequired,
   onHangup: PropTypes.func.isRequired,
   onFlip: PropTypes.func.isRequired,
@@ -195,12 +193,8 @@ CallCtrlPanel.propTypes = {
   recipientsContactInfoRenderer: PropTypes.func,
   recipientsContactPhoneRenderer: PropTypes.func,
   getAvatarUrl: PropTypes.func,
-  gotoConferenceCallDialer: PropTypes.func,
-  mergeToConference: PropTypes.func,
   addDisabled: PropTypes.bool,
   isMerging: PropTypes.bool,
-  setMergingFrom: PropTypes.func,
-  setMergingTo: PropTypes.func,
 };
 
 CallCtrlPanel.defaultProps = {
@@ -229,10 +223,8 @@ CallCtrlPanel.defaultProps = {
   phoneTypeRenderer: undefined,
   recipientsContactInfoRenderer: undefined,
   recipientsContactPhoneRenderer: undefined,
-  gotoConferenceCallDialer: i => i,
-  mergeToConference: i => i,
-  setMergingFrom: i => i,
-  setMergingTo: i => i,
+  onAdd: i => i,
+  onMerge: i => i,
   isMerging: false,
 };
 
