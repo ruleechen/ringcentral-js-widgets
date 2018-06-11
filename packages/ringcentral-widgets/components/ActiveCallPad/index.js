@@ -17,6 +17,7 @@ import FlipIcon from '../../assets/images/Flip.svg';
 import EndIcon from '../../assets/images/End.svg';
 import CombineIcon from '../../assets/images/Combine.svg';
 import MergeIcon from '../../assets/images/MergeIntoConferenceIcon.svg';
+import callCtrlLayout from '../../lib/callCtrlLayout';
 import styles from './styles.scss';
 import i18n from './i18n';
 
@@ -34,9 +35,10 @@ export default function ActiveCallPad(props) {
   const isRecordButtonActive = props.recordStatus === recordStatus.recording;
   const isRecordDisabled = props.recordStatus === recordStatus.pending;
   const {
-    isOnConference, simple, mergeDisabled, addDisabled
+    layout, mergeDisabled, addDisabled
   } = props;
-  const btnClassName = isOnConference ? styles.conferenceCallButton : styles.callButton;
+  const btnClassName = layout === callCtrlLayout.conferenceCtrl
+    ? styles.conferenceCallButton : styles.callButton;
   const muteButton = props.isOnMute ?
     (
       <ActiveCallButton
@@ -55,7 +57,7 @@ export default function ActiveCallPad(props) {
       />
     );
   let buttons;
-  if (isOnConference) {
+  if (layout === callCtrlLayout.conferenceCtrl) {
     buttons = [
       muteButton,
       <ActiveCallButton
@@ -88,7 +90,7 @@ export default function ActiveCallPad(props) {
         iconY={165}
       />,
     ];
-  } else if (simple) {
+  } else if (layout === callCtrlLayout.mergeCtrl) {
     buttons = [
       muteButton,
       <ActiveCallButton
@@ -171,7 +173,7 @@ export default function ActiveCallPad(props) {
   if (props.direction === callDirections.inbound) {
     conferenceCallButton = null;
   } else {
-    conferenceCallButton = simple ?
+    conferenceCallButton = layout === callCtrlLayout.mergeCtrl ?
       (
         <div className={styles.button}>
           <CircleButton
@@ -233,7 +235,6 @@ ActiveCallPad.propTypes = {
   className: PropTypes.string,
   isOnMute: PropTypes.bool,
   isOnHold: PropTypes.bool,
-  isOnConference: PropTypes.bool,
   recordStatus: PropTypes.string.isRequired,
   onMute: PropTypes.func.isRequired,
   onUnmute: PropTypes.func.isRequired,
@@ -252,17 +253,15 @@ ActiveCallPad.propTypes = {
   direction: PropTypes.string,
   mergeDisabled: PropTypes.bool,
   addDisabled: PropTypes.bool,
-  simple: PropTypes.bool,
+  layout: PropTypes.string.isRequired,
 };
 
 ActiveCallPad.defaultProps = {
   direction: null,
   mergeDisabled: null,
-  simple: null,
   className: null,
   isOnMute: false,
   isOnHold: false,
-  isOnConference: false,
   addDisabled: false,
   onAdd: i => i,
   onMerge: i => i,

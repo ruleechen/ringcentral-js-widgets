@@ -1,5 +1,7 @@
 import { connect } from 'react-redux';
+
 import withPhone from '../../lib/withPhone';
+import callCtrlLayout from '../../lib/callCtrlLayout';
 
 import {
   CallCtrlPage,
@@ -15,7 +17,7 @@ function mapToProps(_, {
   });
   return {
     ...baseProps,
-    simple: true,
+    layout: callCtrlLayout.mergeCtrl,
   };
 }
 

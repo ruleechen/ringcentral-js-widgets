@@ -9,6 +9,7 @@ import BackHeader from '../BackHeader';
 import Panel from '../Panel';
 import DurationCounter from '../DurationCounter';
 import ActiveCallPad from '../ActiveCallPad';
+import callCtrlLayout from '../../lib/callCtrlLayout';
 import dynamicsFont from '../../assets/DynamicsFont/DynamicsFont.scss';
 import styles from './styles.scss';
 
@@ -24,12 +25,12 @@ class ActiveCallPanel extends React.Component {
   }
 
   handleResize(props) {
-    const { isOnConference, conferenceData } = props;
     const MAXIMUM_AVATARS = 4;
     // todo: handle width calculation
-    if (isOnConference) {
+    if (props.layout === callCtrlLayout.conferenceCtrl) {
       let profiles;
       // conference is just created and waiting for parties data to return
+      const { conferenceData } = props;
       if (conferenceData.conference.parties.length === 0) {
         profiles = conferenceData.profiles;
       } else {
@@ -43,7 +44,7 @@ class ActiveCallPanel extends React.Component {
       this.setState(prev => ({
         ...prev,
         displayedProfiles,
-        remains
+        remains,
       }));
     }
   }
@@ -83,7 +84,6 @@ class ActiveCallPanel extends React.Component {
       avatarUrl,
       isOnMute,
       isOnHold,
-      isOnConference,
       recordStatus,
       onMute,
       onUnmute,
@@ -104,7 +104,7 @@ class ActiveCallPanel extends React.Component {
       flipNumbers,
       calls,
       sourceIcons,
-      simple,
+      layout,
       mergeDisabled,
       direction,
       addDisabled,
@@ -116,7 +116,7 @@ class ActiveCallPanel extends React.Component {
           <DurationCounter startTime={startTime} offset={startTimeOffset} />
         </span>
       ) : null;
-    const backHeader = (calls.length > 1 || isOnConference) ? (
+    const backHeader = (calls.length > 1 || layout === callCtrlLayout.conferenceCtrl) ? (
       <BackHeader
         onBackClick={onBackButtonClick}
         backButton={(
@@ -134,7 +134,7 @@ class ActiveCallPanel extends React.Component {
         <Panel className={styles.panel}>
           {timeCounter}
           {
-            isOnConference
+            layout === callCtrlLayout.conferenceCtrl
               ? (
                 <ConferenceInfo
                   displayedProfiles={this.state.displayedProfiles}
@@ -161,12 +161,11 @@ class ActiveCallPanel extends React.Component {
           }
           <ActiveCallPad
             direction={direction}
-            simple={simple}
+            layout={layout}
             className={styles.callPad}
             currentLocale={currentLocale}
             isOnMute={isOnMute}
             isOnHold={isOnHold}
-            isOnConference={isOnConference}
             recordStatus={recordStatus}
             onMute={onMute}
             onUnmute={onUnmute}
@@ -202,7 +201,6 @@ ActiveCallPanel.propTypes = {
   startTimeOffset: PropTypes.number,
   isOnMute: PropTypes.bool,
   isOnHold: PropTypes.bool,
-  isOnConference: PropTypes.bool,
   conferenceData: PropTypes.object,
   recordStatus: PropTypes.string.isRequired,
   onMute: PropTypes.func.isRequired,
@@ -234,7 +232,7 @@ ActiveCallPanel.propTypes = {
   sourceIcons: PropTypes.object,
   direction: PropTypes.string,
   mergeDisabled: PropTypes.bool,
-  simple: PropTypes.bool,
+  layout: PropTypes.string.isRequired,
   addDisabled: PropTypes.bool,
 };
 
@@ -243,7 +241,6 @@ ActiveCallPanel.defaultProps = {
   startTimeOffset: 0,
   isOnMute: false,
   isOnHold: false,
-  isOnConference: false,
   conferenceData: null,
   phoneNumber: null,
   children: undefined,
@@ -259,7 +256,6 @@ ActiveCallPanel.defaultProps = {
   sourceIcons: undefined,
   direction: null,
   mergeDisabled: false,
-  simple: null,
   addDisabled: false,
 };
 

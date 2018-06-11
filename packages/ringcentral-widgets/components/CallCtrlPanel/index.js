@@ -7,7 +7,6 @@ import FlipPanel from '../FlipPanel';
 import TransferPanel from '../TransferPanel';
 import SpinnerOverlay from '../SpinnerOverlay';
 
-
 class CallCtrlPanel extends Component {
   constructor(props) {
     super(props);
@@ -92,11 +91,10 @@ class CallCtrlPanel extends Component {
         direction={this.props.direction}
         mergeDisabled={this.props.mergeDisabled}
         addDisabled={this.props.addDisabled}
-        simple={this.props.simple}
+        layout={this.props.layout}
         getOnlineProfiles={this.props.getOnlineProfiles}
         getAvatarUrl={this.props.getAvatarUrl}
         conferenceData={this.props.conferenceData}
-        isOnConference={this.props.isOnConference}
         backButtonLabel={this.props.backButtonLabel}
         currentLocale={this.props.currentLocale}
         formatPhone={this.props.formatPhone}
@@ -144,7 +142,7 @@ class CallCtrlPanel extends Component {
 CallCtrlPanel.propTypes = {
   direction: PropTypes.string,
   mergeDisabled: PropTypes.bool,
-  simple: PropTypes.bool,
+  layout: PropTypes.string.isRequired,
   getOnlineProfiles: PropTypes.func.isRequired,
   callStatus: PropTypes.string,
   sessionId: PropTypes.string,
@@ -157,7 +155,6 @@ CallCtrlPanel.propTypes = {
   isOnMute: PropTypes.bool,
   isOnHold: PropTypes.bool,
   isOnFlip: PropTypes.bool,
-  isOnConference: PropTypes.bool,
   isOnTransfer: PropTypes.bool,
   flipNumbers: PropTypes.array,
   calls: PropTypes.array.isRequired,
@@ -201,11 +198,9 @@ CallCtrlPanel.defaultProps = {
   direction: null,
   mergeDisabled: false,
   addDisabled: false,
-  simple: null,
   getAvatarUrl: null,
   startTime: null,
   conferenceData: null,
-  isOnConference: false,
   isOnMute: false,
   isOnHold: false,
   isOnTransfer: false,
