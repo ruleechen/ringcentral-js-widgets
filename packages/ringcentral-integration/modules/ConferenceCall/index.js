@@ -177,6 +177,9 @@ export default class ConferenceCall extends RcModule {
       if (this._webphone) {
         if (conferenceData) {
           this._webphone.hangup(conferenceData.session.id);
+          // Help server to do the GC, and we don't care the whether it's successful or not
+          this._client.service.platform()
+            .delete(`/account/~/telephony/sessions/${id}`);
           this.store.dispatch({
             type: this.actionTypes.terminateConferenceSucceeded,
             conference: conferenceData.conference,
