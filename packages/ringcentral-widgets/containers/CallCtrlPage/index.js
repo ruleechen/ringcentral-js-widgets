@@ -411,7 +411,18 @@ function mapToFunctions(_, {
     recipientsContactPhoneRenderer,
     gotoConferenceCallDialer: () => routerInteraction.push('/conferenceCall/dialer/'),
     gotoNormalCallCtrl: () => routerInteraction.push('/calls/active'),
-    mergeToConference: webphoneSessions => conferenceCall.mergeToConference(webphoneSessions),
+    async mergeToConference(webphoneSessions) {
+      await conferenceCall.mergeToConference(webphoneSessions);
+      const conferenceData = Object.values(conferenceCall.conferences)[0];
+      if (conferenceData && conferenceData.session.isOnHold().local
+      ) {
+        /**
+         * because session termination operation in conferenceCall._mergeToConference,
+         * need to wait for webphone.getActiveSessionIdReducer to update
+         */
+        setTimeout(() => conferenceData.session.unhold(), conferenceCall._spanForTermination + 1);
+      }
+    },
     setMergingFrom: from => conferenceCall.setMergeParty({ from }),
     setMergingTo: to => conferenceCall.setMergeParty({ to }),
     getSipInstance: session => webphone._sessions.get(session.id),

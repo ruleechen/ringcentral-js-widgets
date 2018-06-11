@@ -77,6 +77,7 @@ export default class ConferenceCall extends RcModule {
     pulling = true,
     capacity = MAXIMUM_CAPACITY,
     spanForBringIn = DEFAULT_WAIT,
+    spanForTermination = DEFAULT_TERMINATION_SPAN,
     ...options
   }) {
     super({
@@ -109,6 +110,7 @@ export default class ConferenceCall extends RcModule {
     this._timers = {};
     this._pulling = pulling;
     this._spanForBringIn = spanForBringIn;
+    this._spanForTermination = spanForTermination;
     this.capacity = capacity;
   }
 
@@ -620,7 +622,7 @@ export default class ConferenceCall extends RcModule {
             this._webphone.hangup(webphoneSession.id);
           }
         });
-      }, DEFAULT_TERMINATION_SPAN);
+      }, this._spanForTermination);
 
       this.startPollingConferenceStatus(conferenceId);
       return conferenceId;
