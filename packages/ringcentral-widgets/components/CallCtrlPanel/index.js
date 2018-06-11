@@ -88,11 +88,6 @@ class CallCtrlPanel extends Component {
     }
     return (
       <ActiveCallPanel
-        direction={this.props.direction}
-        mergeDisabled={this.props.mergeDisabled}
-        addDisabled={this.props.addDisabled}
-        layout={this.props.layout}
-        getPartyProfiles={this.props.getPartyProfiles}
         getAvatarUrl={this.props.getAvatarUrl}
         backButtonLabel={this.props.backButtonLabel}
         currentLocale={this.props.currentLocale}
@@ -130,6 +125,11 @@ class CallCtrlPanel extends Component {
         flipNumbers={this.props.flipNumbers}
         calls={this.props.calls}
         sourceIcons={this.props.sourceIcons}
+        layout={this.props.layout}
+        direction={this.props.direction}
+        addDisabled={this.props.addDisabled}
+        mergeDisabled={this.props.mergeDisabled}
+        getPartyProfiles={this.props.getPartyProfiles}
       >
         {this.props.children}
         {this.props.isMerging ? <SpinnerOverlay /> : null}
@@ -139,10 +139,6 @@ class CallCtrlPanel extends Component {
 }
 
 CallCtrlPanel.propTypes = {
-  direction: PropTypes.string,
-  mergeDisabled: PropTypes.bool,
-  layout: PropTypes.string.isRequired,
-  getPartyProfiles: PropTypes.func.isRequired,
   callStatus: PropTypes.string,
   sessionId: PropTypes.string,
   phoneNumber: PropTypes.string,
@@ -188,14 +184,15 @@ CallCtrlPanel.propTypes = {
   recipientsContactInfoRenderer: PropTypes.func,
   recipientsContactPhoneRenderer: PropTypes.func,
   getAvatarUrl: PropTypes.func,
-  addDisabled: PropTypes.bool,
+  layout: PropTypes.string.isRequired,
   isMerging: PropTypes.bool,
+  direction: PropTypes.string,
+  addDisabled: PropTypes.bool,
+  mergeDisabled: PropTypes.bool,
+  getPartyProfiles: PropTypes.func,
 };
 
 CallCtrlPanel.defaultProps = {
-  direction: null,
-  mergeDisabled: false,
-  addDisabled: false,
   getAvatarUrl: null,
   startTime: null,
   isOnMute: false,
@@ -218,6 +215,10 @@ CallCtrlPanel.defaultProps = {
   onAdd: i => i,
   onMerge: i => i,
   isMerging: false,
+  direction: null,
+  addDisabled: false,
+  mergeDisabled: false,
+  getPartyProfiles: i => i,
 };
 
 export default CallCtrlPanel;

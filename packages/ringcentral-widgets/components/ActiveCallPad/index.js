@@ -250,19 +250,19 @@ ActiveCallPad.propTypes = {
   onShowFlipPanel: PropTypes.func.isRequired,
   onToggleTransferPanel: PropTypes.func.isRequired,
   flipNumbers: PropTypes.array.isRequired,
-  direction: PropTypes.string,
-  mergeDisabled: PropTypes.bool,
-  addDisabled: PropTypes.bool,
   layout: PropTypes.string.isRequired,
+  direction: PropTypes.string,
+  addDisabled: PropTypes.bool,
+  mergeDisabled: PropTypes.bool,
 };
 
 ActiveCallPad.defaultProps = {
-  direction: null,
-  mergeDisabled: null,
   className: null,
   isOnMute: false,
   isOnHold: false,
+  direction: null,
   addDisabled: false,
+  mergeDisabled: null,
   onAdd: i => i,
   onMerge: i => i,
 };

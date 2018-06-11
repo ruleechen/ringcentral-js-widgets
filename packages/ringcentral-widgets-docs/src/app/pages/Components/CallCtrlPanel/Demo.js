@@ -1,6 +1,7 @@
 import React from 'react';
 // eslint-disable-next-line
 import CallCtrlPanel from 'ringcentral-widgets/components/CallCtrlPanel';
+import callCtrlLayout from 'ringcentral-widgets/lib/callCtrlLayout';
 
 const props = {};
 props.nameMatches = [];
@@ -14,6 +15,7 @@ props.onUnhold = () => null;
 props.onRecord = () => null;
 props.onStopRecord = () => null;
 props.onAdd = () => null;
+props.onMerge = () => null;
 props.onHangup = () => null;
 props.onFlip = () => null;
 props.onPark = () => null;
@@ -28,6 +30,8 @@ props.onSelectMatcherName = () => null;
 props.calls = [{}, {}];
 props.searchContactList = [];
 props.searchContact = () => null;
+props.layout = callCtrlLayout.normalCtrl;
+
 /**
  * A example of `CallCtrlPanel`
  */

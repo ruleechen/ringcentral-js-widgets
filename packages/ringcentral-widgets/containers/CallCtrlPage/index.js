@@ -124,10 +124,11 @@ class CallCtrlPage extends Component {
   render() {
     const {
       session,
-      getPartyProfiles,
-      mergeDisabled,
-      addDisabled,
       layout,
+      isMerging,
+      addDisabled,
+      mergeDisabled,
+      getPartyProfiles,
     } = this.props;
     if (!session.id) {
       return null;
@@ -148,11 +149,6 @@ class CallCtrlPage extends Component {
 
     return (
       <CallCtrlPanel
-        direction={session.direction}
-        addDisabled={addDisabled}
-        mergeDisabled={mergeDisabled}
-        getPartyProfiles={getPartyProfiles}
-        layout={layout}
         backButtonLabel={backButtonLabel}
         currentLocale={this.props.currentLocale}
         formatPhone={this.props.formatPhone}
@@ -196,7 +192,12 @@ class CallCtrlPage extends Component {
         phoneTypeRenderer={this.props.phoneTypeRenderer}
         recipientsContactInfoRenderer={this.props.recipientsContactInfoRenderer}
         recipientsContactPhoneRenderer={this.props.recipientsContactPhoneRenderer}
-        isMerging={this.props.isMerging}
+        layout={layout}
+        isMerging={isMerging}
+        direction={session.direction}
+        addDisabled={addDisabled}
+        mergeDisabled={mergeDisabled}
+        getPartyProfiles={getPartyProfiles}
       >
         {this.props.children}
       </CallCtrlPanel>
@@ -218,8 +219,6 @@ CallCtrlPage.propTypes = {
     from: PropTypes.string,
     contactMatch: PropTypes.object,
   }).isRequired,
-  getPartyProfiles: PropTypes.func.isRequired,
-  layout: PropTypes.string.isRequired,
   currentLocale: PropTypes.string.isRequired,
   onMute: PropTypes.func.isRequired,
   onUnmute: PropTypes.func.isRequired,
@@ -253,11 +252,13 @@ CallCtrlPage.propTypes = {
   phoneTypeRenderer: PropTypes.func,
   recipientsContactInfoRenderer: PropTypes.func,
   recipientsContactPhoneRenderer: PropTypes.func,
-  mergeDisabled: PropTypes.bool,
-  addDisabled: PropTypes.bool,
   sessionToMergeWith: PropTypes.object,
   gotoNormalCallCtrl: PropTypes.func,
+  layout: PropTypes.string.isRequired,
   isMerging: PropTypes.bool,
+  addDisabled: PropTypes.bool,
+  mergeDisabled: PropTypes.bool,
+  getPartyProfiles: PropTypes.func,
 };
 
 CallCtrlPage.defaultProps = {
@@ -267,13 +268,14 @@ CallCtrlPage.defaultProps = {
   phoneTypeRenderer: undefined,
   recipientsContactInfoRenderer: undefined,
   recipientsContactPhoneRenderer: undefined,
-  mergeDisabled: false,
-  addDisabled: false,
   sessionToMergeWith: null,
   gotoNormalCallCtrl: i => i,
   onAdd: i => i,
   onMerge: i => i,
   isMerging: false,
+  addDisabled: false,
+  mergeDisabled: false,
+  getPartyProfiles: i => i,
 };
 
 function mapToProps(_, {
@@ -320,11 +322,11 @@ function mapToProps(_, {
     flipNumbers: forwardingNumber.flipNumbers,
     calls: callMonitor.calls,
     searchContactList: contactSearch.sortedResult,
-    mergeDisabled,
-    addDisabled,
     layout: isOnConference ? callCtrlLayout.conferenceCtrl : layout,
-    sessionToMergeWith: conferenceCall.state.mergingPair.from,
     isMerging: conferenceCall.state.isMerging,
+    addDisabled,
+    mergeDisabled,
+    sessionToMergeWith: conferenceCall.state.mergingPair.from,
   };
 }
 

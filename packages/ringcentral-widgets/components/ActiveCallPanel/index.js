@@ -99,9 +99,9 @@ class ActiveCallPanel extends React.Component {
       calls,
       sourceIcons,
       layout,
-      mergeDisabled,
       direction,
       addDisabled,
+      mergeDisabled,
     } = this.props;
 
     const timeCounter = startTime ?
@@ -154,8 +154,6 @@ class ActiveCallPanel extends React.Component {
               />)
           }
           <ActiveCallPad
-            direction={direction}
-            layout={layout}
             className={styles.callPad}
             currentLocale={currentLocale}
             isOnMute={isOnMute}
@@ -175,8 +173,10 @@ class ActiveCallPanel extends React.Component {
             onToggleTransferPanel={onToggleTransferPanel}
             flipNumbers={flipNumbers}
             onPark={onPark}
-            mergeDisabled={mergeDisabled}
+            layout={layout}
+            direction={direction}
             addDisabled={addDisabled}
+            mergeDisabled={mergeDisabled}
           />
           {children}
         </Panel>
@@ -186,7 +186,6 @@ class ActiveCallPanel extends React.Component {
 }
 
 ActiveCallPanel.propTypes = {
-  getPartyProfiles: PropTypes.func.isRequired,
   phoneNumber: PropTypes.string,
   nameMatches: PropTypes.array.isRequired,
   fallBackName: PropTypes.string.isRequired,
@@ -223,10 +222,11 @@ ActiveCallPanel.propTypes = {
   calls: PropTypes.array.isRequired,
   onToggleTransferPanel: PropTypes.func,
   sourceIcons: PropTypes.object,
-  direction: PropTypes.string,
-  mergeDisabled: PropTypes.bool,
   layout: PropTypes.string.isRequired,
+  direction: PropTypes.string,
   addDisabled: PropTypes.bool,
+  mergeDisabled: PropTypes.bool,
+  getPartyProfiles: PropTypes.func,
 };
 
 ActiveCallPanel.defaultProps = {
@@ -247,8 +247,9 @@ ActiveCallPanel.defaultProps = {
   onToggleTransferPanel: () => null,
   sourceIcons: undefined,
   direction: null,
-  mergeDisabled: false,
   addDisabled: false,
+  mergeDisabled: false,
+  getPartyProfiles: i => i,
 };
 
 export default ActiveCallPanel;
