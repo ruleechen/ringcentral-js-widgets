@@ -160,7 +160,7 @@ export default class BasePhone extends RcModule {
     contacts,
     contactMatcher,
     conferenceCall,
-    ...options,
+    ...options
   }) {
     super({
       ...options,
@@ -168,7 +168,7 @@ export default class BasePhone extends RcModule {
 
     contactSearch.addSearchSource({
       sourceName: 'contacts',
-      searchFn: ({ searchString }) => {
+      searchFn({ searchString }) {
         const items = contacts.allContacts;
         if (!searchString) {
           return items;
@@ -216,7 +216,9 @@ export default class BasePhone extends RcModule {
         (!currentSession || session.id === currentSession.id)
       ) {
         routerInteraction.goBack();
-        return;
+        if (routerInteraction.currentPath === '/conferenceCall/mergeCtrl') {
+          routerInteraction.push('/dialer');
+        }
       }
     };
 
@@ -231,17 +233,18 @@ export default class BasePhone extends RcModule {
         return;
       }
 
+      const isConferenceCallSession = (
+        session.to.indexOf('conf_') === 0 &&
+        session.callStatus === 'webphone-session-connecting' &&
+        conferenceCall.conferenceCallStatus === conferenceCallStatus.requesting
+      );
+
       if (
         routerInteraction.currentPath !== '/calls/active' &&
-        routerInteraction.currentPath !== '/conferenceCall/mergeCtrl' && !(
-          session.callStatus === 'webphone-session-connecting'
-          && session.to.indexOf('conf_') === 0
-          && conferenceCall.conferenceCallStatus === conferenceCallStatus.requesting
-          && routerInteraction.currentPath === '/calls'
-        )
+        routerInteraction.currentPath !== '/conferenceCall/mergeCtrl' &&
+        !(isConferenceCallSession && routerInteraction.currentPath === '/calls')
       ) {
         routerInteraction.push('/calls/active');
-        return;
       }
     };
 
