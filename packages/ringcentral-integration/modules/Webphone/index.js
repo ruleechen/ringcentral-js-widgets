@@ -636,8 +636,8 @@ export default class Webphone extends RcModule {
       ) {
         /**
          * interface SessionData{
-         *  "party-id": String,
-         *  "session-id": String
+         *  "partyId": String,
+         *  "sessionId": String
          * }
          */
         session.data = incomingResponse.headers['P-Rc-Api-Ids'][0].raw.split(';')

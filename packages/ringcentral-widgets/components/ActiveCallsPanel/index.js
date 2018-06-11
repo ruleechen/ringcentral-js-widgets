@@ -35,7 +35,7 @@ export default class ActiveCallsPanel extends Component {
     };
 
     this.confirmMergeCall = () => {
-      this.mergeToConference([this.state.callOfModal]);
+      this.mergeToConference([this.state.callOfModal.webphoneSession]);
       this.hideConfirmMergeModal();
     };
   }
@@ -93,7 +93,7 @@ export default class ActiveCallsPanel extends Component {
       webphoneToVoicemail,
       sourceIcons,
       conference,
-      isConferenceCall,
+      isSessionAConferenceCall,
       callingMode,
       activeCurrentCalls,
       disableMerge,
@@ -102,7 +102,7 @@ export default class ActiveCallsPanel extends Component {
     return (
       <ActiveCallList
         isOnWebRTC={callingMode === callingModes.webphone}
-        isConferenceCall={isConferenceCall}
+        isSessionAConferenceCall={isSessionAConferenceCall}
         conference={conference}
         title={title}
         calls={calls}
@@ -199,7 +199,7 @@ ActiveCallsPanel.propTypes = {
   outboundSmsPermission: PropTypes.bool,
   internalSmsPermission: PropTypes.bool,
   isLoggedContact: PropTypes.func,
-  isConferenceCall: PropTypes.func.isRequired,
+  isSessionAConferenceCall: PropTypes.func.isRequired,
   mergeToConference: PropTypes.func.isRequired,
   onLogCall: PropTypes.func,
   webphoneAnswer: PropTypes.func,
