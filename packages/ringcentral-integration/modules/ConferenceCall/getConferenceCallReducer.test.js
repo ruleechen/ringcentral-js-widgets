@@ -3,6 +3,8 @@ import actionTypes from './actionTypes';
 import getConferenceCallReducer, {
   getConferenceCallStatusReducer,
   getMakeConferenceCallReducer,
+  getMergingStatusReducer,
+  getMergingPairReducer,
 } from './getConferenceCallReducer';
 import getModuleStatusReducer from '../../lib/getModuleStatusReducer';
 import conferenceCallStatus from './conferenceCallStatus';
@@ -20,12 +22,85 @@ describe('ConferenceCall :: getConferenceCallReducer', () => {
     const statusReducer = getModuleStatusReducer(actionTypes);
     const conferenceCallStatusReducer = getConferenceCallStatusReducer(actionTypes);
     const conferencesReducer = getMakeConferenceCallReducer(actionTypes);
+    const mergingPairReducer = getMergingPairReducer(actionTypes);
+    const isMergingReducer = getMergingStatusReducer(actionTypes);
+
     it('should return the combined initialState', () => {
       expect(reducer(undefined, {})).to.deep.equal({
         status: statusReducer(undefined, {}),
         conferences: conferencesReducer(undefined, {}),
         conferenceCallStatus: conferenceCallStatusReducer(undefined, {}),
+        isMerging: isMergingReducer(undefined, {}),
+        mergingPair: mergingPairReducer(undefined, {}),
       });
+    });
+  });
+});
+
+describe('ConferenceCall :: getMergingStatusReducer', () => {
+  const reducer = getMergingStatusReducer(actionTypes);
+  it('should have initial state of false', () => {
+    expect(reducer(undefined, {})).to.equal(false);
+  });
+  it('should have state of false', () => {
+    [
+      'mergeSucceeded',
+      'mergeFailed',
+      'resetSuccess',
+    ].forEach((type) => {
+      expect(reducer(undefined, {
+        type: actionTypes[type]
+      })).to.equal(false);
+    });
+  });
+  it('should have state of true', () => {
+    [
+      'mergeStart',
+    ].forEach((type) => {
+      expect(reducer(undefined, {
+        type: actionTypes[type]
+      })).to.equal(true);
+    });
+  });
+});
+
+describe('ConferenceCall :: getMergingPairReducer', () => {
+  const reducer = getMergingPairReducer(actionTypes);
+  it('should have initial state of empty', () => {
+    // eslint-disable-next-line no-unused-expressions
+    expect(reducer(undefined, {})).to.be.an('object').that.is.empty;
+  });
+  it('should have the from field', () => {
+    const from = {};
+
+    expect(reducer(undefined, {
+      type: actionTypes.updateFromSession,
+      from,
+    })).to.deep.equal({
+      from
+    });
+  });
+
+  it('should have the to field', () => {
+    const to = {};
+
+    expect(reducer(undefined, {
+      type: actionTypes.updateToSession,
+      to,
+    })).to.deep.equal({
+      to
+    });
+  });
+
+  it('should reset to empty when reseting or merging successfully', () => {
+    [
+      'resetSuccess',
+      'mergeSucceeded',
+    ].forEach((type) => {
+    // eslint-disable-next-line no-unused-expressions
+      expect(reducer(undefined, {
+        type: actionTypes[type]
+      })).to.be.an('object').that.is.empty;
     });
   });
 });
