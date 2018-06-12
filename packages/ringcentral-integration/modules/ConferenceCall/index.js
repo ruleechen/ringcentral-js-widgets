@@ -690,7 +690,8 @@ export default class ConferenceCall extends RcModule {
     }
   }
 
-  async _getProfile(session) {
+  async _getProfile(sessionInstance) {
+    const session = this._webphone.sessions.find(session => session.id === sessionInstance.id);
     const { to } = session;
     let toUserName = session.toUserName;
     let avatarUrl;

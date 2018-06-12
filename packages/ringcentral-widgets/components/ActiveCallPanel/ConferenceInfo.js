@@ -23,7 +23,7 @@ export default function ConferenceInfo({
             <div
               key={`${toUserName}_${idx}`}
               className={styles.avatar}
-              style={avatarUrl ? { backgroundImage: avatarUrl } : { backgroundColor: '#fff' }}>
+              style={avatarUrl ? { backgroundImage: `url(${avatarUrl})` } : { backgroundColor: '#fff' }}>
               {avatarUrl ? null : <i className={classnames(dynamicsFont.portrait, styles.icon)} /> }
             </div>
         ))}
