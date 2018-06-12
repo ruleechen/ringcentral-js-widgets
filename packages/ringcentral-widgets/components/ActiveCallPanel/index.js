@@ -30,16 +30,18 @@ class ActiveCallPanel extends React.Component {
     if (props.layout === callCtrlLayout.conferenceCtrl) {
       // conference is just created and waiting for parties data to return
       const profiles = this.props.getPartyProfiles();
-      const displayedProfiles = (profiles.length >= MAXIMUM_AVATARS
-        ? profiles.slice(0, MAXIMUM_AVATARS)
-        : profiles)
-        .map(({ avatarUrl, toUserName, id }) => ({ avatarUrl, toUserName, id }));
-      const remains = profiles.length <= MAXIMUM_AVATARS ? 0 : profiles.length - MAXIMUM_AVATARS;
-      this.setState(prev => ({
-        ...prev,
-        displayedProfiles,
-        remains,
-      }));
+      if (profiles) {
+        const displayedProfiles = (profiles.length >= MAXIMUM_AVATARS
+          ? profiles.slice(0, MAXIMUM_AVATARS)
+          : profiles)
+          .map(({ avatarUrl, toUserName, id }) => ({ avatarUrl, toUserName, id }));
+        const remains = profiles.length <= MAXIMUM_AVATARS ? 0 : profiles.length - MAXIMUM_AVATARS;
+        this.setState(prev => ({
+          ...prev,
+          displayedProfiles,
+          remains,
+        }));
+      }
     }
   }
 

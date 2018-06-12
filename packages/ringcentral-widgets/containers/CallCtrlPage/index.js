@@ -65,12 +65,6 @@ class CallCtrlPage extends Component {
       this.props.onAdd(this.props.session.id);
     this.onMerge = () =>
       this.props.onMerge(this.props.session.id);
-
-    this.gotoNormalCallCtrl = () => this.props.gotoNormalCallCtrl();
-
-    if (this.props.sessionToMergeWith) {
-      this.props.sessionToMergeWith.on('terminated', this.gotoNormalCallCtrl);
-    }
   }
 
   componentDidMount() {
@@ -92,9 +86,6 @@ class CallCtrlPage extends Component {
 
   componentWillUnmount() {
     this._mounted = false;
-    if (this.props.sessionToMergeWith) {
-      this.props.sessionToMergeWith.removeListener('terminated', this.gotoNormalCallCtrl);
-    }
   }
 
   _updateAvatarAndMatchIndex(props) {
@@ -252,13 +243,12 @@ CallCtrlPage.propTypes = {
   phoneTypeRenderer: PropTypes.func,
   recipientsContactInfoRenderer: PropTypes.func,
   recipientsContactPhoneRenderer: PropTypes.func,
-  sessionToMergeWith: PropTypes.object,
-  gotoNormalCallCtrl: PropTypes.func,
   layout: PropTypes.string.isRequired,
   isMerging: PropTypes.bool,
   addDisabled: PropTypes.bool,
   mergeDisabled: PropTypes.bool,
   getPartyProfiles: PropTypes.func,
+  gotoNormalCallCtrl: PropTypes.func,
 };
 
 CallCtrlPage.defaultProps = {
@@ -268,14 +258,13 @@ CallCtrlPage.defaultProps = {
   phoneTypeRenderer: undefined,
   recipientsContactInfoRenderer: undefined,
   recipientsContactPhoneRenderer: undefined,
-  sessionToMergeWith: null,
-  gotoNormalCallCtrl: i => i,
   onAdd: i => i,
   onMerge: i => i,
   isMerging: false,
   addDisabled: false,
   mergeDisabled: false,
   getPartyProfiles: i => i,
+  gotoNormalCallCtrl: i => i,
 };
 
 function mapToProps(_, {
@@ -326,7 +315,6 @@ function mapToProps(_, {
     isMerging: conferenceCall.state.isMerging,
     addDisabled,
     mergeDisabled,
-    sessionToMergeWith: conferenceCall.state.mergingPair.from,
   };
 }
 
@@ -388,7 +376,7 @@ function mapToFunctions(_, {
         }
         return conferenceCall.getOnlinePartyProfiles(conferenceData.conference.id);
       }
-      return [];
+      return null;
     },
   };
 }
