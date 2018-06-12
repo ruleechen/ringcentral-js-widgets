@@ -692,15 +692,15 @@ export default class ConferenceCall extends RcModule {
 
   async _getProfile(sessionInstance) {
     const session = this._webphone.sessions.find(session => session.id === sessionInstance.id);
-    const { to } = session;
-    let toUserName = session.toUserName;
+    const { to, contactMatch } = session;
+    let { toUserName } = session;
     let avatarUrl;
     let rcId;
 
     if (this._contacts && this._contactMatcher && this._contactMatcher.dataMapping) {
       const contactMapping = this._contactMatcher.dataMapping;
-      let contact = session.contactMatch;
-      const nameMatches = (contactMapping && contactMapping[session.to]) || [];
+      let contact = contactMatch;
+      const nameMatches = (contactMapping && contactMapping[to]) || [];
 
       if (!contact) {
         contact = nameMatches && nameMatches[0];
