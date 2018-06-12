@@ -89,7 +89,7 @@ export function getMergingStatusReducer(types) {
   };
 }
 
-export function getMergingPairReduce(types) {
+export function getMergingPairReducer(types) {
   return (state = {}, { type, from, to }) => {
     switch (type) {
       case types.updateFromSession:
@@ -112,6 +112,6 @@ export default function getConferenceCallReducer(types) {
     conferences: getMakeConferenceCallReducer(types),
     conferenceCallStatus: getConferenceCallStatusReducer(types),
     isMerging: getMergingStatusReducer(types),
-    mergingPair: getMergingPairReduce(types),
+    mergingPair: getMergingPairReducer(types),
   });
 }
