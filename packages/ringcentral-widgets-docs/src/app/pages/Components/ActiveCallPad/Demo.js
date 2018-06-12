@@ -1,6 +1,7 @@
 import React from 'react';
 // eslint-disable-next-line
 import ActiveCallPad from 'ringcentral-widgets/components/ActiveCallPad';
+import callCtrlLayout from 'ringcentral-widgets/lib/callCtrlLayout';
 
 const props = {};
 props.onMute = () => null;
@@ -13,11 +14,14 @@ props.onHangup = () => null;
 props.onPark = () => null;
 props.onShowKeyPad = () => null;
 props.onAdd = () => null;
+props.onMerge = () => null;
 props.currentLocale = 'en-US';
 props.flipNumbers = [];
 props.recordStatus = 'recordStatus-idle';
 props.onShowFlipPanel = () => null;
 props.onToggleTransferPanel = () => null;
+props.layout = callCtrlLayout.normalCtrl;
+
 /**
  * A example of `ActiveCallPad`
  */

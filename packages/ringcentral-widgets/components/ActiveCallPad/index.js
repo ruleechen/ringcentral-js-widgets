@@ -17,6 +17,7 @@ import FlipIcon from '../../assets/images/Flip.svg';
 import EndIcon from '../../assets/images/End.svg';
 import CombineIcon from '../../assets/images/Combine.svg';
 import MergeIcon from '../../assets/images/MergeIntoConferenceIcon.svg';
+import callCtrlLayout from '../../lib/callCtrlLayout';
 import styles from './styles.scss';
 import i18n from './i18n';
 
@@ -33,10 +34,9 @@ export default function ActiveCallPad(props) {
     i18n.getString('record', props.currentLocale);
   const isRecordButtonActive = props.recordStatus === recordStatus.recording;
   const isRecordDisabled = props.recordStatus === recordStatus.pending;
-  const {
-    isOnConference, simple, mergeDisabled, addDisabled
-  } = props;
-  const btnClassName = isOnConference ? styles.conferenceCallButton : styles.callButton;
+
+  const btnClassName = props.layout === callCtrlLayout.conferenceCtrl
+    ? styles.conferenceCallButton : styles.callButton;
   const muteButton = props.isOnMute ?
     (
       <ActiveCallButton
@@ -54,154 +54,160 @@ export default function ActiveCallPad(props) {
         icon={UnmuteIcon}
       />
     );
+
   let buttons;
-  if (isOnConference) {
-    buttons = [
-      muteButton,
-      <ActiveCallButton
-        onClick={props.onShowKeyPad}
-        className={btnClassName}
-        icon={KeypadIcon}
-        title={i18n.getString('keypad', props.currentLocale)}
-    />,
-      <ActiveCallButton
-        onClick={onRecordClicked}
-        title={recordTitle}
-        active={isRecordButtonActive}
-        className={btnClassName}
-        icon={RecordIcon}
-        disabled={props.isOnHold || isRecordDisabled}
-    />,
-      <ActiveCallButton
-        onClick={onHoldClicked}
-        className={btnClassName}
-        title={
-        props.isOnHold ?
-        i18n.getString('onHold', props.currentLocale) :
-        i18n.getString('hold', props.currentLocale)
-      }
-        active={props.isOnHold}
-        icon={HoldIcon}
-        iconWidth={120}
-        iconHeight={160}
-        iconX={190}
-        iconY={165}
-    />,
-    ];
-  } else if (simple) {
-    buttons = [
-      muteButton,
-      <ActiveCallButton
-        onClick={props.onShowKeyPad}
-        className={btnClassName}
-        icon={KeypadIcon}
-        title={i18n.getString('keypad', props.currentLocale)}
-    />,
-      <ActiveCallButton
-        onClick={onHoldClicked}
-        className={btnClassName}
-        title={
-        props.isOnHold ?
-        i18n.getString('onHold', props.currentLocale) :
-        i18n.getString('hold', props.currentLocale)
-      }
-        active={props.isOnHold}
-        icon={HoldIcon}
-        iconWidth={120}
-        iconHeight={160}
-        iconX={190}
-        iconY={165}
-    />,
-    ];
-  } else {
-    buttons = [
-      muteButton,
-      <ActiveCallButton
-        onClick={props.onShowKeyPad}
-        className={btnClassName}
-        icon={KeypadIcon}
-        title={i18n.getString('keypad', props.currentLocale)}
-      />,
-      <ActiveCallButton
-        onClick={onHoldClicked}
-        className={btnClassName}
-        title={
-        props.isOnHold ?
-        i18n.getString('onHold', props.currentLocale) :
-        i18n.getString('hold', props.currentLocale)
-      }
-        active={props.isOnHold}
-        icon={HoldIcon}
-        iconWidth={120}
-        iconHeight={160}
-        iconX={190}
-        iconY={165}
-      />,
-      <ActiveCallButton
-        onClick={props.onToggleTransferPanel}
-        title={i18n.getString('transfer', props.currentLocale)}
-        icon={TransferIcon}
-        className={btnClassName}
-        iconWidth={220}
-        iconX={140}
-     />,
-      <ActiveCallButton
-        onClick={onRecordClicked}
-        title={recordTitle}
-        active={isRecordButtonActive}
-        className={btnClassName}
-        icon={RecordIcon}
-        disabled={props.isOnHold || isRecordDisabled}
-      />,
-      <ActiveCallButton
-        onClick={props.onShowFlipPanel}
-        title={i18n.getString('flip', props.currentLocale)}
-        icon={FlipIcon}
-        className={btnClassName}
-        disabled={disabledFlip || props.isOnHold}
-        iconWidth={220}
-        iconHeight={215}
-        iconX={140}
-        iconY={142}
-      />,
-    ];
+  switch (props.layout) {
+    case callCtrlLayout.conferenceCtrl: {
+      buttons = [
+        muteButton,
+        <ActiveCallButton
+          onClick={props.onShowKeyPad}
+          className={btnClassName}
+          icon={KeypadIcon}
+          title={i18n.getString('keypad', props.currentLocale)}
+        />,
+        <ActiveCallButton
+          onClick={onRecordClicked}
+          title={recordTitle}
+          active={isRecordButtonActive}
+          className={btnClassName}
+          icon={RecordIcon}
+          disabled={props.isOnHold || isRecordDisabled}
+        />,
+        <ActiveCallButton
+          onClick={onHoldClicked}
+          className={btnClassName}
+          title={
+            props.isOnHold ?
+              i18n.getString('onHold', props.currentLocale) :
+              i18n.getString('hold', props.currentLocale)
+          }
+          active={props.isOnHold}
+          icon={HoldIcon}
+          iconWidth={120}
+          iconHeight={160}
+          iconX={190}
+          iconY={165}
+        />,
+      ];
+      break;
+    }
+    case callCtrlLayout.mergeCtrl: {
+      buttons = [
+        muteButton,
+        <ActiveCallButton
+          onClick={props.onShowKeyPad}
+          className={btnClassName}
+          icon={KeypadIcon}
+          title={i18n.getString('keypad', props.currentLocale)}
+        />,
+        <ActiveCallButton
+          onClick={onHoldClicked}
+          className={btnClassName}
+          title={
+            props.isOnHold ?
+              i18n.getString('onHold', props.currentLocale) :
+              i18n.getString('hold', props.currentLocale)
+          }
+          active={props.isOnHold}
+          icon={HoldIcon}
+          iconWidth={120}
+          iconHeight={160}
+          iconX={190}
+          iconY={165}
+        />,
+      ];
+      break;
+    }
+    default: {
+      buttons = [
+        muteButton,
+        <ActiveCallButton
+          onClick={props.onShowKeyPad}
+          className={btnClassName}
+          icon={KeypadIcon}
+          title={i18n.getString('keypad', props.currentLocale)}
+        />,
+        <ActiveCallButton
+          onClick={onHoldClicked}
+          className={btnClassName}
+          title={
+            props.isOnHold ?
+              i18n.getString('onHold', props.currentLocale) :
+              i18n.getString('hold', props.currentLocale)
+          }
+          active={props.isOnHold}
+          icon={HoldIcon}
+          iconWidth={120}
+          iconHeight={160}
+          iconX={190}
+          iconY={165}
+        />,
+        <ActiveCallButton
+          onClick={props.onToggleTransferPanel}
+          title={i18n.getString('transfer', props.currentLocale)}
+          icon={TransferIcon}
+          className={btnClassName}
+          iconWidth={220}
+          iconX={140}
+        />,
+        <ActiveCallButton
+          onClick={onRecordClicked}
+          title={recordTitle}
+          active={isRecordButtonActive}
+          className={btnClassName}
+          icon={RecordIcon}
+          disabled={props.isOnHold || isRecordDisabled}
+        />,
+        <ActiveCallButton
+          onClick={props.onShowFlipPanel}
+          title={i18n.getString('flip', props.currentLocale)}
+          icon={FlipIcon}
+          className={btnClassName}
+          disabled={disabledFlip || props.isOnHold}
+          iconWidth={220}
+          iconHeight={215}
+          iconX={140}
+          iconY={142}
+        />,
+      ];
+      break;
+    }
   }
 
   let conferenceCallButton;
   if (props.direction === callDirections.inbound) {
     conferenceCallButton = null;
   } else {
-    conferenceCallButton = simple ?
+    conferenceCallButton = props.layout === callCtrlLayout.mergeCtrl ?
       (
         <div className={styles.button}>
           <CircleButton
-            className={mergeDisabled ? styles.disabled : styles.mergeButton}
-            onClick={mergeDisabled ? i => i : () => {
-              props.setMergingTo();
-              props.mergeToConference();
+            className={props.mergeDisabled ? styles.disabled : styles.mergeButton}
+            onClick={props.mergeDisabled ? i => i : () => {
+              props.onMerge();
             }}
             icon={MergeIcon}
             showBorder={false}
             iconWidth={250}
             iconX={125}
-            disabled={mergeDisabled}
-      />
+            disabled={props.mergeDisabled}
+          />
         </div>
       )
       : (
         <div className={styles.button}>
           <CircleButton
-            className={addDisabled ? styles.disabled : styles.combineButton}
-            onClick={addDisabled ? i => i : () => {
-              props.setMergingFrom();
-              props.gotoConferenceCallDialer();
+            className={props.addDisabled ? styles.disabled : styles.combineButton}
+            onClick={props.addDisabled ? i => i : () => {
+              props.onAdd();
             }}
             icon={CombineIcon}
             showBorder={false}
             iconWidth={250}
-            disabled={addDisabled}
+            disabled={props.addDisabled}
             iconX={125}
-      />
+          />
         </div>
       );
   }
@@ -235,7 +241,6 @@ ActiveCallPad.propTypes = {
   className: PropTypes.string,
   isOnMute: PropTypes.bool,
   isOnHold: PropTypes.bool,
-  isOnConference: PropTypes.bool,
   recordStatus: PropTypes.string.isRequired,
   onMute: PropTypes.func.isRequired,
   onUnmute: PropTypes.func.isRequired,
@@ -246,31 +251,24 @@ ActiveCallPad.propTypes = {
   onHangup: PropTypes.func.isRequired,
   // onPark: PropTypes.func.isRequired,
   onShowKeyPad: PropTypes.func.isRequired,
-  // onAdd: PropTypes.func.isRequired,
+  onAdd: PropTypes.func,
+  onMerge: PropTypes.func,
   onShowFlipPanel: PropTypes.func.isRequired,
   onToggleTransferPanel: PropTypes.func.isRequired,
   flipNumbers: PropTypes.array.isRequired,
-  mergeToConference: PropTypes.func,
-  gotoConferenceCallDialer: PropTypes.func,
+  layout: PropTypes.string.isRequired,
   direction: PropTypes.string,
-  mergeDisabled: PropTypes.bool,
   addDisabled: PropTypes.bool,
-  simple: PropTypes.bool,
-  setMergingFrom: PropTypes.func,
-  setMergingTo: PropTypes.func,
+  mergeDisabled: PropTypes.bool,
 };
 
 ActiveCallPad.defaultProps = {
-  direction: null,
-  mergeDisabled: null,
-  simple: null,
   className: null,
   isOnMute: false,
   isOnHold: false,
-  isOnConference: false,
-  mergeToConference: i => i,
-  gotoConferenceCallDialer: i => i,
+  direction: null,
   addDisabled: false,
-  setMergingFrom: i => i,
-  setMergingTo: i => i,
+  mergeDisabled: null,
+  onAdd: i => i,
+  onMerge: i => i,
 };

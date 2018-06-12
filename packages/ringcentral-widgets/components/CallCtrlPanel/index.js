@@ -7,7 +7,6 @@ import FlipPanel from '../FlipPanel';
 import TransferPanel from '../TransferPanel';
 import SpinnerOverlay from '../SpinnerOverlay';
 
-
 class CallCtrlPanel extends Component {
   constructor(props) {
     super(props);
@@ -89,18 +88,7 @@ class CallCtrlPanel extends Component {
     }
     return (
       <ActiveCallPanel
-        setMergingFrom={this.props.setMergingFrom}
-        setMergingTo={this.props.setMergingTo}
-        mergeToConference={this.props.mergeToConference}
-        gotoConferenceCallDialer={this.props.gotoConferenceCallDialer}
-        direction={this.props.direction}
-        mergeDisabled={this.props.mergeDisabled}
-        addDisabled={this.props.addDisabled}
-        simple={this.props.simple}
-        getOnlineProfiles={this.props.getOnlineProfiles}
         getAvatarUrl={this.props.getAvatarUrl}
-        conferenceData={this.props.conferenceData}
-        isOnConference={this.props.isOnConference}
         backButtonLabel={this.props.backButtonLabel}
         currentLocale={this.props.currentLocale}
         formatPhone={this.props.formatPhone}
@@ -122,6 +110,7 @@ class CallCtrlPanel extends Component {
         onHangup={this.props.onHangup}
         onPark={this.props.onPark}
         onAdd={this.props.onAdd}
+        onMerge={this.props.onMerge}
         nameMatches={this.props.nameMatches}
         fallBackName={this.props.fallBackName}
         areaCode={this.props.areaCode}
@@ -136,6 +125,11 @@ class CallCtrlPanel extends Component {
         flipNumbers={this.props.flipNumbers}
         calls={this.props.calls}
         sourceIcons={this.props.sourceIcons}
+        layout={this.props.layout}
+        direction={this.props.direction}
+        addDisabled={this.props.addDisabled}
+        mergeDisabled={this.props.mergeDisabled}
+        getPartyProfiles={this.props.getPartyProfiles}
       >
         {this.props.children}
         {this.props.isMerging ? <SpinnerOverlay /> : null}
@@ -145,10 +139,6 @@ class CallCtrlPanel extends Component {
 }
 
 CallCtrlPanel.propTypes = {
-  direction: PropTypes.string,
-  mergeDisabled: PropTypes.bool,
-  simple: PropTypes.bool,
-  getOnlineProfiles: PropTypes.func.isRequired,
   callStatus: PropTypes.string,
   sessionId: PropTypes.string,
   phoneNumber: PropTypes.string,
@@ -156,11 +146,9 @@ CallCtrlPanel.propTypes = {
   fallBackName: PropTypes.string.isRequired,
   currentLocale: PropTypes.string.isRequired,
   startTime: PropTypes.number,
-  conferenceData: PropTypes.object,
   isOnMute: PropTypes.bool,
   isOnHold: PropTypes.bool,
   isOnFlip: PropTypes.bool,
-  isOnConference: PropTypes.bool,
   isOnTransfer: PropTypes.bool,
   flipNumbers: PropTypes.array,
   calls: PropTypes.array.isRequired,
@@ -171,7 +159,8 @@ CallCtrlPanel.propTypes = {
   onUnhold: PropTypes.func.isRequired,
   onRecord: PropTypes.func.isRequired,
   onStopRecord: PropTypes.func.isRequired,
-  onAdd: PropTypes.func.isRequired,
+  onAdd: PropTypes.func,
+  onMerge: PropTypes.func,
   onPark: PropTypes.func.isRequired,
   onHangup: PropTypes.func.isRequired,
   onFlip: PropTypes.func.isRequired,
@@ -195,23 +184,17 @@ CallCtrlPanel.propTypes = {
   recipientsContactInfoRenderer: PropTypes.func,
   recipientsContactPhoneRenderer: PropTypes.func,
   getAvatarUrl: PropTypes.func,
-  gotoConferenceCallDialer: PropTypes.func,
-  mergeToConference: PropTypes.func,
-  addDisabled: PropTypes.bool,
+  layout: PropTypes.string.isRequired,
   isMerging: PropTypes.bool,
-  setMergingFrom: PropTypes.func,
-  setMergingTo: PropTypes.func,
+  direction: PropTypes.string,
+  addDisabled: PropTypes.bool,
+  mergeDisabled: PropTypes.bool,
+  getPartyProfiles: PropTypes.func,
 };
 
 CallCtrlPanel.defaultProps = {
-  direction: null,
-  mergeDisabled: false,
-  addDisabled: false,
-  simple: null,
   getAvatarUrl: null,
   startTime: null,
-  conferenceData: null,
-  isOnConference: false,
   isOnMute: false,
   isOnHold: false,
   isOnTransfer: false,
@@ -229,11 +212,13 @@ CallCtrlPanel.defaultProps = {
   phoneTypeRenderer: undefined,
   recipientsContactInfoRenderer: undefined,
   recipientsContactPhoneRenderer: undefined,
-  gotoConferenceCallDialer: i => i,
-  mergeToConference: i => i,
-  setMergingFrom: i => i,
-  setMergingTo: i => i,
+  onAdd: i => i,
+  onMerge: i => i,
   isMerging: false,
+  direction: null,
+  addDisabled: false,
+  mergeDisabled: false,
+  getPartyProfiles: i => i,
 };
 
 export default CallCtrlPanel;

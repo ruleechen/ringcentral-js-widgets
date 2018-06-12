@@ -4,8 +4,9 @@ import PropTypes from 'prop-types';
 import formatNumber from 'ringcentral-integration/lib/formatNumber';
 import callDirections from 'ringcentral-integration/enums/callDirections';
 
-import CallCtrlPanel from '../../components/CallCtrlPanel';
 import withPhone from '../../lib/withPhone';
+import callCtrlLayout from '../../lib/callCtrlLayout';
+import CallCtrlPanel from '../../components/CallCtrlPanel';
 
 import i18n from './i18n';
 
@@ -17,28 +18,26 @@ class CallCtrlPage extends Component {
       avatarUrl: null,
     };
 
-    this.onSelectMatcherName = this.props.isOnConference
-      ? (option) => {
-        const nameMatches = this.props.nameMatches || [];
-        let selectedMatcherIndex = nameMatches.findIndex(
-          match => match.id === option.id
-        );
-        if (selectedMatcherIndex < 0) {
-          selectedMatcherIndex = 0;
-        }
-        this.setState({
-          selectedMatcherIndex,
-          avatarUrl: null,
-        });
-        const contact = nameMatches[selectedMatcherIndex];
-        if (contact) {
-          this.props.updateSessionMatchedContact(this.props.session.id, contact);
-          this.props.getAvatarUrl(contact).then((avatarUrl) => {
-            this.setState({ avatarUrl });
-          });
-        }
+    this.onSelectMatcherName = (option) => {
+      const nameMatches = this.props.nameMatches || [];
+      let selectedMatcherIndex = nameMatches.findIndex(
+        match => match.id === option.id
+      );
+      if (selectedMatcherIndex < 0) {
+        selectedMatcherIndex = 0;
       }
-      : () => { };
+      this.setState({
+        selectedMatcherIndex,
+        avatarUrl: null,
+      });
+      const contact = nameMatches[selectedMatcherIndex];
+      if (contact) {
+        this.props.updateSessionMatchedContact(this.props.session.id, contact);
+        this.props.getAvatarUrl(contact).then((avatarUrl) => {
+          this.setState({ avatarUrl });
+        });
+      }
+    };
 
     this.onMute = () =>
       this.props.onMute(this.props.session.id);
@@ -62,11 +61,10 @@ class CallCtrlPage extends Component {
       this.props.onTransfer(value, this.props.session.id);
     this.onPark = () =>
       this.props.onPark(this.props.session.id);
-    this.gotoNormalCallCtrl = () => this.props.gotoNormalCallCtrl();
-
-    if (this.props.sessionToMergeWith) {
-      this.props.sessionToMergeWith.on('terminated', this.gotoNormalCallCtrl);
-    }
+    this.onAdd = () =>
+      this.props.onAdd(this.props.session.id);
+    this.onMerge = () =>
+      this.props.onMerge(this.props.session.id);
   }
 
   componentDidMount() {
@@ -75,7 +73,10 @@ class CallCtrlPage extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.simple && nextProps.session.direction === callDirections.inbound) {
+    if (
+      nextProps.layout === callCtrlLayout.mergeCtrl &&
+      nextProps.session.direction === callDirections.inbound
+    ) {
       nextProps.gotoNormalCallCtrl();
     }
     if (this.props.session.id !== nextProps.session.id) {
@@ -85,9 +86,6 @@ class CallCtrlPage extends Component {
 
   componentWillUnmount() {
     this._mounted = false;
-    if (this.props.sessionToMergeWith) {
-      this.props.sessionToMergeWith.removeListener('terminated', this.gotoNormalCallCtrl);
-    }
   }
 
   _updateAvatarAndMatchIndex(props) {
@@ -117,17 +115,11 @@ class CallCtrlPage extends Component {
   render() {
     const {
       session,
-      gotoConferenceCallDialer,
-      sessionToMergeWith,
-      mergeToConference,
-      setMergingFrom,
-      setMergingTo,
-      getSipInstance,
-      isOnConference,
-      getOnlineProfiles,
-      simple,
+      layout,
+      isMerging,
+      addDisabled,
       mergeDisabled,
-      addDisabled
+      getPartyProfiles,
     } = this.props;
     if (!session.id) {
       return null;
@@ -142,26 +134,12 @@ class CallCtrlPage extends Component {
       fallbackUserName = i18n.getString('unknown', this.props.currentLocale);
     }
 
-    const mergeList = sessionToMergeWith
-      ? [sessionToMergeWith, session]
-      : [session];
     const backButtonLabel = this.props.backButtonLabel
       ? this.props.backButtonLabel
       : i18n.getString('activeCalls', this.props.currentLocale);
 
     return (
       <CallCtrlPanel
-        setMergingFrom={isOnConference ? i => i : () => setMergingFrom(getSipInstance(session))}
-        setMergingTo={() => setMergingTo(getSipInstance(session))}
-        mergeToConference={() => mergeToConference(mergeList)}
-        gotoConferenceCallDialer={() => gotoConferenceCallDialer()}
-        direction={session.direction}
-        addDisabled={addDisabled}
-        mergeDisabled={mergeDisabled}
-        simple={!!simple}
-        getOnlineProfiles={getOnlineProfiles}
-        isOnConference={isOnConference}
-        conferenceData={this.props.conferenceData}
         backButtonLabel={backButtonLabel}
         currentLocale={this.props.currentLocale}
         formatPhone={this.props.formatPhone}
@@ -183,7 +161,8 @@ class CallCtrlPage extends Component {
         onStopRecord={this.onStopRecord}
         onKeyPadChange={this.onKeyPadChange}
         onHangup={this.onHangup}
-        onAdd={this.props.onAdd}
+        onAdd={this.onAdd}
+        onMerge={this.onMerge}
         onFlip={this.onFlip}
         onTransfer={this.onTransfer}
         onPark={this.onPark}
@@ -204,7 +183,12 @@ class CallCtrlPage extends Component {
         phoneTypeRenderer={this.props.phoneTypeRenderer}
         recipientsContactInfoRenderer={this.props.recipientsContactInfoRenderer}
         recipientsContactPhoneRenderer={this.props.recipientsContactPhoneRenderer}
-        isMerging={this.props.isMerging}
+        layout={layout}
+        isMerging={isMerging}
+        direction={session.direction}
+        addDisabled={addDisabled}
+        mergeDisabled={mergeDisabled}
+        getPartyProfiles={getPartyProfiles}
       >
         {this.props.children}
       </CallCtrlPanel>
@@ -226,9 +210,6 @@ CallCtrlPage.propTypes = {
     from: PropTypes.string,
     contactMatch: PropTypes.object,
   }).isRequired,
-  getOnlineProfiles: PropTypes.func.isRequired,
-  isOnConference: PropTypes.bool.isRequired,
-  conferenceData: PropTypes.object,
   currentLocale: PropTypes.string.isRequired,
   onMute: PropTypes.func.isRequired,
   onUnmute: PropTypes.func.isRequired,
@@ -239,7 +220,8 @@ CallCtrlPage.propTypes = {
   onHangup: PropTypes.func.isRequired,
   sendDTMF: PropTypes.func.isRequired,
   formatPhone: PropTypes.func.isRequired,
-  onAdd: PropTypes.func.isRequired,
+  onAdd: PropTypes.func,
+  onMerge: PropTypes.func,
   onFlip: PropTypes.func.isRequired,
   onPark: PropTypes.func.isRequired,
   onTransfer: PropTypes.func.isRequired,
@@ -261,18 +243,12 @@ CallCtrlPage.propTypes = {
   phoneTypeRenderer: PropTypes.func,
   recipientsContactInfoRenderer: PropTypes.func,
   recipientsContactPhoneRenderer: PropTypes.func,
-  simple: PropTypes.bool,
-  mergeDisabled: PropTypes.bool,
-  addDisabled: PropTypes.bool,
-  gotoConferenceCallDialer: PropTypes.func,
-  currentCall: PropTypes.object,
-  sessionToMergeWith: PropTypes.object,
-  mergeToConference: PropTypes.func,
-  gotoNormalCallCtrl: PropTypes.func,
+  layout: PropTypes.string.isRequired,
   isMerging: PropTypes.bool,
-  setMergingFrom: PropTypes.func.isRequired,
-  setMergingTo: PropTypes.func.isRequired,
-  getSipInstance: PropTypes.func.isRequired,
+  addDisabled: PropTypes.bool,
+  mergeDisabled: PropTypes.bool,
+  getPartyProfiles: PropTypes.func,
+  gotoNormalCallCtrl: PropTypes.func,
 };
 
 CallCtrlPage.defaultProps = {
@@ -282,16 +258,13 @@ CallCtrlPage.defaultProps = {
   phoneTypeRenderer: undefined,
   recipientsContactInfoRenderer: undefined,
   recipientsContactPhoneRenderer: undefined,
-  conferenceData: null,
-  simple: null,
-  mergeDisabled: false,
-  addDisabled: false,
-  gotoConferenceCallDialer: i => i,
-  mergeToConference: i => i,
-  currentCall: null,
-  sessionToMergeWith: null,
-  gotoNormalCallCtrl: i => i,
+  onAdd: i => i,
+  onMerge: i => i,
   isMerging: false,
+  addDisabled: false,
+  mergeDisabled: false,
+  getPartyProfiles: i => i,
+  gotoNormalCallCtrl: i => i,
 };
 
 function mapToProps(_, {
@@ -305,9 +278,8 @@ function mapToProps(_, {
     callMonitor,
     contactSearch,
     conferenceCall,
-    routerInteraction,
   },
-  simple,
+  layout = callCtrlLayout.normalCtrl,
 }) {
   const currentSession = webphone.activeSession || {};
   const contactMapping = contactMatcher && contactMatcher.dataMapping;
@@ -315,53 +287,34 @@ function mapToProps(_, {
   const toMatches = (contactMapping && contactMapping[currentSession.to]) || [];
   const nameMatches =
     currentSession.direction === callDirections.outbound ? toMatches : fromMatches;
+
   const isOnConference = conferenceCall.isConferenceSession(currentSession.id);
   const conferenceData = Object.values(conferenceCall.conferences)[0];
-
-  const currentCall = callMonitor.calls.find(call => (
-    call.webphoneSession ? call.webphoneSession.id === currentSession.id : false
-  ));
 
   let mergeDisabled = false;
   if (conferenceData) {
     mergeDisabled = conferenceCall.isOverload(conferenceData.conference.id);
   }
-  // else if (!callMonitor.activeOnHoldCalls[0] || !currentCall) {
-  //   mergeDisabled = true;
-  //   // if (!callMonitor.activeOnHoldCalls[0]) {
-  //   //   routerInteraction.push('/calls/active');
-  //   // }
-  // } else {
-  //   mergeDisabled = false;
-  // }
 
   let addDisabled = false;
   if (conferenceData) {
     addDisabled = conferenceCall.isOverload(conferenceData.conference.id);
   }
-  // else if (!currentCall) {
-  //   addDisabled = true;
-  // }
 
   return {
     brand: brand.fullName,
     nameMatches,
     currentLocale: locale.currentLocale,
-    currentCall,
     session: currentSession,
     areaCode: regionSettings.areaCode,
     countryCode: regionSettings.countryCode,
     flipNumbers: forwardingNumber.flipNumbers,
     calls: callMonitor.calls,
     searchContactList: contactSearch.sortedResult,
-    isOnConference,
-    conferenceData,
-    mergeDisabled,
+    layout: isOnConference ? callCtrlLayout.conferenceCtrl : layout,
+    isMerging: conferenceCall.state.isMerging,
     addDisabled,
-    simple,
-    sessionToMergeWith: conferenceCall.state.mergingPair.from,
-    routerInteraction,
-    isMerging: conferenceCall.state.isMerging
+    mergeDisabled,
   };
 }
 
@@ -375,7 +328,6 @@ function mapToFunctions(_, {
   },
   getAvatarUrl,
   onBackButtonClick,
-  onAdd,
   phoneTypeRenderer,
   recipientsContactInfoRenderer,
   recipientsContactPhoneRenderer,
@@ -386,7 +338,6 @@ function mapToFunctions(_, {
       areaCode: regionSettings.areaCode,
       countryCode: regionSettings.countryCode,
     }),
-    getOnlineProfiles: id => conferenceCall.getOnlinePartyProfiles(id),
     onHangup: sessionId => webphone.hangup(sessionId),
     onMute: sessionId => webphone.mute(sessionId),
     onUnmute: sessionId => webphone.unmute(sessionId),
@@ -399,7 +350,6 @@ function mapToFunctions(_, {
       webphone.updateSessionMatchedContact(sessionId, contact),
     getAvatarUrl,
     onBackButtonClick,
-    onAdd,
     onFlip: (flipNumber, sessionId) => webphone.flip(flipNumber, sessionId),
     onTransfer: (transferNumber, sessionId) => webphone.transfer(transferNumber, sessionId),
     onPark: sessionId => webphone.park(sessionId),
@@ -409,23 +359,25 @@ function mapToFunctions(_, {
     phoneTypeRenderer,
     recipientsContactInfoRenderer,
     recipientsContactPhoneRenderer,
-    gotoConferenceCallDialer: () => routerInteraction.push('/conferenceCall/dialer/'),
-    gotoNormalCallCtrl: () => routerInteraction.push('/calls/active'),
-    async mergeToConference(webphoneSessions) {
-      await conferenceCall.mergeToConference(webphoneSessions);
-      const conferenceData = Object.values(conferenceCall.conferences)[0];
-      if (conferenceData && conferenceData.session.isOnHold().local
-      ) {
-        /**
-         * because session termination operation in conferenceCall._mergeToConference,
-         * need to wait for webphone.getActiveSessionIdReducer to update
-         */
-        conferenceData.session.unhold();
+    onAdd(sessionId) {
+      const isConferenceCallSession = conferenceCall.isConferenceSession(sessionId);
+      if (!isConferenceCallSession) {
+        const session = webphone._sessions.get(sessionId);
+        conferenceCall.setMergeParty({ from: session });
       }
+      routerInteraction.push('/conferenceCall/dialer/');
     },
-    setMergingFrom: from => conferenceCall.setMergeParty({ from }),
-    setMergingTo: to => conferenceCall.setMergeParty({ to }),
-    getSipInstance: session => webphone._sessions.get(session.id),
+    gotoNormalCallCtrl: () => routerInteraction.push('/calls/active'),
+    getPartyProfiles() {
+      const conferenceData = Object.values(conferenceCall.conferences)[0];
+      if (conferenceData) {
+        if (conferenceData.conference.parties.length === 0) {
+          return conferenceData.profiles;
+        }
+        return conferenceCall.getOnlinePartyProfiles(conferenceData.conference.id);
+      }
+      return null;
+    },
   };
 }
 
@@ -442,8 +394,6 @@ CallCtrlContainer.propTypes = {
   children: PropTypes.node,
   showContactDisplayPlaceholder: PropTypes.bool,
   sourceIcons: PropTypes.object,
-  isOnConference: PropTypes.bool,
-  conferenceData: PropTypes.object,
 };
 
 CallCtrlContainer.defaultProps = {
@@ -451,8 +401,6 @@ CallCtrlContainer.defaultProps = {
   showContactDisplayPlaceholder: false,
   children: undefined,
   sourceIcons: undefined,
-  isOnConference: false,
-  conferenceData: null,
 };
 
 export {

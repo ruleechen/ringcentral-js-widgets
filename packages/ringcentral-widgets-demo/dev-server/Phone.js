@@ -1,6 +1,5 @@
 import SDK from 'ringcentral';
 import RingCentralClient from 'ringcentral-client';
-import { combineReducers } from 'redux';
 
 import RcModule from 'ringcentral-integration/lib/RcModule';
 
@@ -204,8 +203,16 @@ export default class BasePhone extends RcModule {
       readyCheckFn: () => contacts.ready,
     });
 
-
     webphone._onCallEndFunc = (session, currentSession) => {
+      if (
+        routerInteraction.currentPath === '/conferenceCall/mergeCtrl' &&
+        conferenceCall.state.mergingPair.from &&
+        conferenceCall.state.mergingPair.from.id === session.id
+      ) {
+        routerInteraction.push('/calls/active');
+        return;
+      }
+
       if (currentSession && routerInteraction.currentPath === '/conferenceCall/mergeCtrl') {
         routerInteraction.push('/calls/active');
         return;

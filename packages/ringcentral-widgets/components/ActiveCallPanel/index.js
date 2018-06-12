@@ -9,6 +9,7 @@ import BackHeader from '../BackHeader';
 import Panel from '../Panel';
 import DurationCounter from '../DurationCounter';
 import ActiveCallPad from '../ActiveCallPad';
+import callCtrlLayout from '../../lib/callCtrlLayout';
 import dynamicsFont from '../../assets/DynamicsFont/DynamicsFont.scss';
 import styles from './styles.scss';
 
@@ -24,27 +25,23 @@ class ActiveCallPanel extends React.Component {
   }
 
   handleResize(props) {
-    const { isOnConference, conferenceData } = props;
     const MAXIMUM_AVATARS = 4;
     // todo: handle width calculation
-    if (isOnConference) {
-      let profiles;
+    if (props.layout === callCtrlLayout.conferenceCtrl) {
       // conference is just created and waiting for parties data to return
-      if (conferenceData.conference.parties.length === 0) {
-        profiles = conferenceData.profiles;
-      } else {
-        profiles = this.props.getOnlineProfiles(conferenceData.conference.id);
+      const profiles = this.props.getPartyProfiles();
+      if (profiles) {
+        const displayedProfiles = (profiles.length >= MAXIMUM_AVATARS
+          ? profiles.slice(0, MAXIMUM_AVATARS)
+          : profiles)
+          .map(({ avatarUrl, toUserName, id }) => ({ avatarUrl, toUserName, id }));
+        const remains = profiles.length <= MAXIMUM_AVATARS ? 0 : profiles.length - MAXIMUM_AVATARS;
+        this.setState(prev => ({
+          ...prev,
+          displayedProfiles,
+          remains,
+        }));
       }
-      const displayedProfiles = (profiles.length >= MAXIMUM_AVATARS
-        ? profiles.slice(0, MAXIMUM_AVATARS)
-        : profiles)
-        .map(({ avatarUrl, toUserName, id }) => ({ avatarUrl, toUserName, id }));
-      const remains = profiles.length <= MAXIMUM_AVATARS ? 0 : profiles.length - MAXIMUM_AVATARS;
-      this.setState(prev => ({
-        ...prev,
-        displayedProfiles,
-        remains
-      }));
     }
   }
 
@@ -83,7 +80,6 @@ class ActiveCallPanel extends React.Component {
       avatarUrl,
       isOnMute,
       isOnHold,
-      isOnConference,
       recordStatus,
       onMute,
       onUnmute,
@@ -95,6 +91,7 @@ class ActiveCallPanel extends React.Component {
       onHangup,
       onPark,
       onAdd,
+      onMerge,
       onShowFlipPanel,
       onToggleTransferPanel,
       children,
@@ -103,14 +100,10 @@ class ActiveCallPanel extends React.Component {
       flipNumbers,
       calls,
       sourceIcons,
-      simple,
-      mergeDisabled,
+      layout,
       direction,
-      gotoConferenceCallDialer,
-      mergeToConference,
       addDisabled,
-      setMergingFrom,
-      setMergingTo,
+      mergeDisabled,
     } = this.props;
 
     const timeCounter = startTime ?
@@ -119,7 +112,7 @@ class ActiveCallPanel extends React.Component {
           <DurationCounter startTime={startTime} offset={startTimeOffset} />
         </span>
       ) : null;
-    const backHeader = (calls.length > 1 || isOnConference) ? (
+    const backHeader = (calls.length > 1 || layout === callCtrlLayout.conferenceCtrl) ? (
       <BackHeader
         onBackClick={onBackButtonClick}
         backButton={(
@@ -127,8 +120,8 @@ class ActiveCallPanel extends React.Component {
             <i className={classnames(dynamicsFont.arrow, styles.backIcon)} />
             <span className={styles.backLabel}>{backButtonLabel}</span>
           </span>
-      )}
-    />
+        )}
+      />
     ) : <BackHeader className={styles.hidden} />;
 
     return (
@@ -137,41 +130,36 @@ class ActiveCallPanel extends React.Component {
         <Panel className={styles.panel}>
           {timeCounter}
           {
-          isOnConference
-          ? (
-            <ConferenceInfo
-              displayedProfiles={this.state.displayedProfiles}
-              remains={this.state.remains}
-              onClick={() => this.openPartiesModal()}
-            />
-          )
-          : (<CallInfo
-            currentLocale={currentLocale}
-            nameMatches={nameMatches}
-            fallBackName={fallBackName}
-            phoneNumber={phoneNumber}
-            formatPhone={formatPhone}
-            startTime={startTime}
-            areaCode={areaCode}
-            countryCode={countryCode}
-            selectedMatcherIndex={selectedMatcherIndex}
-            onSelectMatcherName={onSelectMatcherName}
-            avatarUrl={avatarUrl}
-            brand={brand}
-            showContactDisplayPlaceholder={showContactDisplayPlaceholder}
-            sourceIcons={sourceIcons}
-          />)
-        }
+            layout === callCtrlLayout.conferenceCtrl
+              ? (
+                <ConferenceInfo
+                  displayedProfiles={this.state.displayedProfiles}
+                  remains={this.state.remains}
+                  onClick={() => this.openPartiesModal()}
+                />
+              )
+              : (<CallInfo
+                currentLocale={currentLocale}
+                nameMatches={nameMatches}
+                fallBackName={fallBackName}
+                phoneNumber={phoneNumber}
+                formatPhone={formatPhone}
+                startTime={startTime}
+                areaCode={areaCode}
+                countryCode={countryCode}
+                selectedMatcherIndex={selectedMatcherIndex}
+                onSelectMatcherName={onSelectMatcherName}
+                avatarUrl={avatarUrl}
+                brand={brand}
+                showContactDisplayPlaceholder={showContactDisplayPlaceholder}
+                sourceIcons={sourceIcons}
+              />)
+          }
           <ActiveCallPad
-            setMergingTo={setMergingTo}
-            setMergingFrom={setMergingFrom}
-            direction={direction}
-            simple={simple}
             className={styles.callPad}
             currentLocale={currentLocale}
             isOnMute={isOnMute}
             isOnHold={isOnHold}
-            isOnConference={isOnConference}
             recordStatus={recordStatus}
             onMute={onMute}
             onUnmute={onUnmute}
@@ -182,15 +170,16 @@ class ActiveCallPanel extends React.Component {
             onShowKeyPad={onShowKeyPad}
             onHangup={onHangup}
             onAdd={onAdd}
+            onMerge={onMerge}
             onShowFlipPanel={onShowFlipPanel}
             onToggleTransferPanel={onToggleTransferPanel}
             flipNumbers={flipNumbers}
             onPark={onPark}
-            mergeDisabled={mergeDisabled}
+            layout={layout}
+            direction={direction}
             addDisabled={addDisabled}
-            gotoConferenceCallDialer={gotoConferenceCallDialer}
-            mergeToConference={mergeToConference}
-        />
+            mergeDisabled={mergeDisabled}
+          />
           {children}
         </Panel>
       </div>
@@ -199,7 +188,6 @@ class ActiveCallPanel extends React.Component {
 }
 
 ActiveCallPanel.propTypes = {
-  getOnlineProfiles: PropTypes.func.isRequired,
   phoneNumber: PropTypes.string,
   nameMatches: PropTypes.array.isRequired,
   fallBackName: PropTypes.string.isRequired,
@@ -208,8 +196,6 @@ ActiveCallPanel.propTypes = {
   startTimeOffset: PropTypes.number,
   isOnMute: PropTypes.bool,
   isOnHold: PropTypes.bool,
-  isOnConference: PropTypes.bool,
-  conferenceData: PropTypes.object,
   recordStatus: PropTypes.string.isRequired,
   onMute: PropTypes.func.isRequired,
   onUnmute: PropTypes.func.isRequired,
@@ -217,7 +203,8 @@ ActiveCallPanel.propTypes = {
   onUnhold: PropTypes.func.isRequired,
   onRecord: PropTypes.func.isRequired,
   onStopRecord: PropTypes.func.isRequired,
-  onAdd: PropTypes.func.isRequired,
+  onAdd: PropTypes.func,
+  onMerge: PropTypes.func,
   onHangup: PropTypes.func.isRequired,
   onPark: PropTypes.func.isRequired,
   onBackButtonClick: PropTypes.func.isRequired,
@@ -237,14 +224,11 @@ ActiveCallPanel.propTypes = {
   calls: PropTypes.array.isRequired,
   onToggleTransferPanel: PropTypes.func,
   sourceIcons: PropTypes.object,
-  gotoConferenceCallDialer: PropTypes.func,
+  layout: PropTypes.string.isRequired,
   direction: PropTypes.string,
-  mergeDisabled: PropTypes.bool,
-  simple: PropTypes.bool,
-  mergeToConference: PropTypes.func,
   addDisabled: PropTypes.bool,
-  setMergingFrom: PropTypes.func,
-  setMergingTo: PropTypes.func,
+  mergeDisabled: PropTypes.bool,
+  getPartyProfiles: PropTypes.func,
 };
 
 ActiveCallPanel.defaultProps = {
@@ -252,8 +236,6 @@ ActiveCallPanel.defaultProps = {
   startTimeOffset: 0,
   isOnMute: false,
   isOnHold: false,
-  isOnConference: false,
-  conferenceData: null,
   phoneNumber: null,
   children: undefined,
   avatarUrl: null,
@@ -261,17 +243,15 @@ ActiveCallPanel.defaultProps = {
   brand: 'RingCentral',
   showContactDisplayPlaceholder: true,
   flipNumbers: [],
+  onAdd: i => i,
+  onMerge: i => i,
   onShowFlipPanel: () => null,
   onToggleTransferPanel: () => null,
   sourceIcons: undefined,
-  gotoConferenceCallDialer: i => i,
   direction: null,
-  mergeDisabled: false,
-  simple: null,
-  mergeToConference: i => i,
-  setMergingFrom: i => i,
-  setMergingTo: i => i,
   addDisabled: false,
+  mergeDisabled: false,
+  getPartyProfiles: i => i,
 };
 
 export default ActiveCallPanel;
