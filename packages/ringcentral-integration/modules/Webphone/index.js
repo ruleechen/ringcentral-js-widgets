@@ -1189,7 +1189,10 @@ export default class Webphone extends RcModule {
       session: normalizedSession,
       sessions: this.sessions,
     });
-    if (this._contactMatcher) {
+    if (
+      this._contactMatcher &&
+      (!this._tabManager || this._tabManager.active)
+    ) {
       this._contactMatcher.triggerMatch();
     }
     if (typeof this._onCallStartFunc === 'function') {
@@ -1218,7 +1221,10 @@ export default class Webphone extends RcModule {
       session: normalizedSession,
       sessions: this.sessions,
     });
-    if (this._contactMatcher) {
+    if (
+      this._contactMatcher &&
+      (!this._tabManager || this._tabManager.active)
+    ) {
       this._contactMatcher.triggerMatch();
     }
     if (this.activeSession && !isOnHold(this.activeSession)) {

@@ -77,7 +77,8 @@ function matchWephoneSessionWithAcitveCall(sessions, callItem) {
     { dep: 'Webphone', optional: true },
     { dep: 'Call', optional: true },
     { dep: 'ActivityMatcher', optional: true },
-    { dep: 'CallMonitorOptions', optional: true }
+    { dep: 'CallMonitorOptions', optional: true },
+    { dep: 'TabManager', optional: true },
   ]
 })
 export default class CallMonitor extends RcModule {
@@ -102,6 +103,7 @@ export default class CallMonitor extends RcModule {
     detailedPresence,
     activityMatcher,
     contactMatcher,
+    tabManager,
     webphone,
     onRinging,
     onNewCall,
@@ -119,6 +121,7 @@ export default class CallMonitor extends RcModule {
     this._detailedPresence = this:: ensureExist(detailedPresence, 'detailedPresence');
     this._contactMatcher = contactMatcher;
     this._activityMatcher = activityMatcher;
+    this._tabManager = tabManager;
     this._webphone = webphone;
     this._onRinging = onRinging;
     this._onNewCall = onNewCall;
@@ -353,6 +356,7 @@ export default class CallMonitor extends RcModule {
       this._detailedPresence.ready &&
       (!this._contactMatcher || this._contactMatcher.ready) &&
       (!this._activityMatcher || this._activityMatcher.ready) &&
+      (!this._tabManager || this._tabManager.ready) &&
       this._storage.ready &&
       this.pending
     ) {
@@ -369,6 +373,7 @@ export default class CallMonitor extends RcModule {
         !this._detailedPresence.ready ||
         (this._contactMatcher && !this._contactMatcher.ready) ||
         (this._activityMatcher && !this._activityMatcher.ready) ||
+        (this._tabManager && !this._tabManager.ready) ||
         !this._storage.ready
       ) &&
       this.ready
@@ -386,14 +391,20 @@ export default class CallMonitor extends RcModule {
       this.ready
     ) {
       const uniqueNumbers = this._selectors.uniqueNumbers();
-      if (this._lastProcessedNumbers !== uniqueNumbers) {
+      if (
+        this._lastProcessedNumbers !== uniqueNumbers &&
+        (!this._tabManager || this._tabManager.active)
+      ) {
         this._lastProcessedNumbers = uniqueNumbers;
         if (this._contactMatcher && this._contactMatcher.ready) {
           this._contactMatcher.triggerMatch();
         }
       }
       const sessionIds = this._selectors.sessionIds();
-      if (this._lastProcessedIds !== sessionIds) {
+      if (
+        this._lastProcessedIds !== sessionIds &&
+        (!this._tabManager || this._tabManager.active)
+      ) {
         this._lastProcessedIds = sessionIds;
         if (this._activityMatcher && this._activityMatcher.ready) {
           this._activityMatcher.triggerMatch();
