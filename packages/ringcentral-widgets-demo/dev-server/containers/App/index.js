@@ -249,7 +249,7 @@ export default function App({
                 )}
               />
               <Route
-                path="/conferenceCall/dialer/"
+                path="/conferenceCall/dialer/:fromNumber"
                 component={routerProps => (
                   <ConferenceCallDialerPage
                     params={routerProps.params}

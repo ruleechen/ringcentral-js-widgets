@@ -1,3 +1,4 @@
+import { find } from 'ramda';
 import { connect } from 'react-redux';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
@@ -365,7 +366,10 @@ function mapToFunctions(_, {
         const session = webphone._sessions.get(sessionId);
         conferenceCall.setMergeParty({ from: session });
       }
-      routerInteraction.push('/conferenceCall/dialer/');
+      const sessionData = find(x => x.id === sessionId, webphone.sessions);
+      if (sessionData) {
+        routerInteraction.push(`/conferenceCall/dialer/${sessionData.from}`);
+      }
     },
     gotoNormalCallCtrl: () => routerInteraction.push('/calls/active'),
     getPartyProfiles() {
