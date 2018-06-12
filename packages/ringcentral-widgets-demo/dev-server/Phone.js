@@ -223,7 +223,10 @@ export default class BasePhone extends RcModule {
         (!currentSession || session.id === currentSession.id)
       ) {
         routerInteraction.goBack();
-        if (routerInteraction.currentPath === '/conferenceCall/mergeCtrl') {
+        if (
+          routerInteraction.currentPath === '/conferenceCall/mergeCtrl' ||
+          routerInteraction.currentPath.indexOf('/conferenceCall/dialer/') === 0
+        ) {
           routerInteraction.push('/dialer');
         }
       }
