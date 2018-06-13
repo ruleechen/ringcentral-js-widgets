@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import formatNumber from 'ringcentral-integration/lib/formatNumber';
+import sleep from 'ringcentral-integration/lib/sleep';
 import withPhone from '../../lib/withPhone';
-
 import ActiveCallsPanel from '../../components/ActiveCallsPanel';
 
 function mapToProps(_, {
@@ -148,7 +148,14 @@ function mapToFunctions(_, {
      * else make one and merge into it;
      * @param {[string]} sessionIds
      */
-    mergeToConference: (...args) => conferenceCall.mergeToConference(...args),
+    async mergeToConference(...args) {
+      await conferenceCall.mergeToConference(...args);
+      const conferenceData = Object.values(conferenceCall.conferences)[0];
+      if (conferenceData && conferenceData.session.id === webphone.activeSessionId) {
+        await sleep(200);
+        webphone.resume(conferenceData.session.id);
+      }
+    },
     isSessionAConferenceCall: sessionId => conferenceCall.isConferenceSession(sessionId),
   };
 }
