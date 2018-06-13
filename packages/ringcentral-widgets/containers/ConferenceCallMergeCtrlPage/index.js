@@ -1,4 +1,5 @@
 import { connect } from 'react-redux';
+import sleep from 'ringcentral-integration/lib/sleep';
 
 import withPhone from '../../lib/withPhone';
 import callCtrlLayout from '../../lib/callCtrlLayout';
@@ -26,6 +27,7 @@ function mapToFunctions(_, {
   phone: {
     webphone,
     conferenceCall,
+    routerInteraction,
   },
   ...props
 }) {
@@ -50,6 +52,12 @@ function mapToFunctions(_, {
          * need to wait for webphone.getActiveSessionIdReducer to update
          */
         conferenceData.session.unhold();
+        return;
+      }
+      if (!conferenceData) {
+        await sleep(200);
+        await webphone.resume(session.id);
+        routerInteraction.push('/conferenceCall/mergeCtrl');
       }
     },
   };
