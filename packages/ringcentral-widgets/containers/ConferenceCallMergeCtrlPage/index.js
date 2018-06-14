@@ -11,14 +11,26 @@ import {
 } from '../CallCtrlPage';
 
 function mapToProps(_, {
+  phone,
+  phone: {
+    webphone,
+    conferenceCall,
+  },
   ...props
 }) {
   const baseProps = mapToBaseProps(_, {
+    phone,
     ...props,
   });
+
+  const currentSession = webphone.activeSession || {};
+  const isOnConference = conferenceCall.isConferenceSession(currentSession.id)
+    || (conferenceCall.state.isMerging && (currentSession.to.indexOf('conf_') === 0));
+  const layout = isOnConference ? callCtrlLayout.conferenceCtrl : callCtrlLayout.mergeCtrl;
+
   return {
     ...baseProps,
-    layout: callCtrlLayout.mergeCtrl,
+    layout,
   };
 }
 

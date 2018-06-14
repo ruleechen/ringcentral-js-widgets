@@ -303,11 +303,13 @@ function mapToProps(_, {
   if (conferenceData) {
     addDisabled = conferenceCall.isOverload(conferenceData.conference.id);
   }
-  const isMerging = (Object
-    .values(conferenceCall.state.mergingPair)
-    .map(session => session.id)
-    .find(id => id === currentSession.id)
-    || (conferenceData && conferenceData.session.id === currentSession.id))
+  const isMerging = (
+    Object
+      .values(conferenceCall.state.mergingPair)
+      .map(session => session.id)
+      .find(id => id === currentSession.id)
+    || (isOnConference)
+  )
     && conferenceCall.state.isMerging;
 
   layout = isOnConference ? callCtrlLayout.conferenceCtrl : layout;
