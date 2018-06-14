@@ -64,7 +64,7 @@ function mapToFunctions(_, {
          * because session termination operation in conferenceCall._mergeToConference,
          * need to wait for webphone.getActiveSessionIdReducer to update
          */
-        conferenceData.session.unhold();
+        webphone.resume(conferenceData.session.id);
         return;
       }
       if (!conferenceData) {
