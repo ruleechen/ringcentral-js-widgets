@@ -299,7 +299,7 @@ function mapToProps(_, {
     mergeDisabled = conferenceCall.isOverload(conferenceData.conference.id)
     // in case webphone.activeSession has not been updated yet
     || !Object.keys(currentSession).length
-    || !Object.keys(currentSession.data).length;
+    || !(currentSession.data && Object.keys(currentSession.data).length);
   }
 
   let addDisabled = false;
