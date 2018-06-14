@@ -15,7 +15,6 @@ import callingModes from '../CallingSettings/callingModes';
 
 const DEFAULT_TTL = 5000;// timer to update the conference information
 const DEFAULT_WAIT = 800;// timer to bring-in after conference creation
-const DEFAULT_TERMINATION_SPAN = 100;// timer to initiatively terminate the session after bring-in
 const MAXIMUM_CAPACITY = 10;
 
 
@@ -78,7 +77,6 @@ export default class ConferenceCall extends RcModule {
     pulling = true,
     capacity = MAXIMUM_CAPACITY,
     spanForBringIn = DEFAULT_WAIT,
-    spanForTermination = DEFAULT_TERMINATION_SPAN,
     ...options
   }) {
     super({
@@ -111,7 +109,6 @@ export default class ConferenceCall extends RcModule {
     this._timers = {};
     this._pulling = pulling;
     this._spanForBringIn = spanForBringIn;
-    this._spanForTermination = spanForTermination;
     this.capacity = capacity;
   }
 
