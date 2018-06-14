@@ -613,17 +613,6 @@ export default class ConferenceCall extends RcModule {
         )
       );
 
-      /**
-       * HACK: terminate the session initiatively to avoid:
-       * 1. remaining session when duplicated session exsisting in a conference.
-       */
-      await sleep(this._spanForTermination);
-      webphoneSessions.forEach((webphoneSession) => {
-        if (webphoneSession && webphoneSession.id) {
-          this._webphone.hangup(webphoneSession.id);
-        }
-      });
-
       this.startPollingConferenceStatus(conferenceId);
       return conferenceId;
     }
