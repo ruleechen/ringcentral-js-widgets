@@ -25,7 +25,8 @@ function mapToProps(_, {
 
   const currentSession = webphone.activeSession || {};
   const isOnConference = conferenceCall.isConferenceSession(currentSession.id)
-    || (conferenceCall.state.isMerging && (currentSession.to.indexOf('conf_') === 0));
+    || (conferenceCall.state.isMerging && (currentSession.to
+      && currentSession.to.indexOf('conf_') === 0));
   const layout = isOnConference ? callCtrlLayout.conferenceCtrl : callCtrlLayout.mergeCtrl;
 
   return {

@@ -288,20 +288,24 @@ function mapToProps(_, {
   const toMatches = (contactMapping && contactMapping[currentSession.to]) || [];
   const nameMatches =
     currentSession.direction === callDirections.outbound ? toMatches : fromMatches;
-
   const isOnConference = conferenceCall.isConferenceSession(currentSession.id)
-    || (conferenceCall.state.isMerging && (currentSession.to.indexOf('conf_') === 0));
+    || (conferenceCall.state.isMerging && (currentSession.to
+      && currentSession.to.indexOf('conf_') === 0));
 
   const conferenceData = Object.values(conferenceCall.conferences)[0];
 
   let mergeDisabled = false;
   if (conferenceData) {
-    mergeDisabled = conferenceCall.isOverload(conferenceData.conference.id);
+    mergeDisabled = conferenceCall.isOverload(conferenceData.conference.id)
+    // in case webphone.activeSession has not been updated yet
+    || !Object.keys(currentSession).length
+    || !Object.keys(currentSession.data).length;
   }
 
   let addDisabled = false;
   if (conferenceData) {
-    addDisabled = conferenceCall.isOverload(conferenceData.conference.id);
+    addDisabled = !Object.keys(currentSession).length
+    || conferenceCall.isOverload(conferenceData.conference.id);
   }
   const isMerging = (
     Object
