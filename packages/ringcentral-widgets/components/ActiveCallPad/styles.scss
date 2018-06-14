@@ -52,7 +52,8 @@ $conferenceCallBtnPaddingLeft: ($conferenceCallBtnWidth - $callBtnWidth)/2;
   padding: $conferenceCallBtnPaddingLeft;
 }
 
-.disabled {
+.disabled,
+.disabled * {
   circle {
     fill: #c7c7c7;
   }

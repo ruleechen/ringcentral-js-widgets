@@ -117,7 +117,8 @@ $tmpWidth: calc(100% - 53px - 7px - 98px - 20px);
     fill: #ff8800;
   }
 }
-.disabled {
+.disabled,
+.disabled * {
   circle {
     fill: #c7c7c7;
   }
