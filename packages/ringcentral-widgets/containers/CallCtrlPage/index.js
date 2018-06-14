@@ -289,7 +289,9 @@ function mapToProps(_, {
   const nameMatches =
     currentSession.direction === callDirections.outbound ? toMatches : fromMatches;
 
-  const isOnConference = conferenceCall.isConferenceSession(currentSession.id);
+  const isOnConference = conferenceCall.isConferenceSession(currentSession.id)
+    || (conferenceCall.state.isMerging && (currentSession.to.indexOf('conf_') === 0));
+
   const conferenceData = Object.values(conferenceCall.conferences)[0];
 
   let mergeDisabled = false;
@@ -301,6 +303,14 @@ function mapToProps(_, {
   if (conferenceData) {
     addDisabled = conferenceCall.isOverload(conferenceData.conference.id);
   }
+  const isMerging = (Object
+    .values(conferenceCall.state.mergingPair)
+    .map(session => session.id)
+    .find(id => id === currentSession.id)
+    || (conferenceData && conferenceData.session.id === currentSession.id))
+    && conferenceCall.state.isMerging;
+
+  layout = isOnConference ? callCtrlLayout.conferenceCtrl : layout;
 
   return {
     brand: brand.fullName,
@@ -312,8 +322,8 @@ function mapToProps(_, {
     flipNumbers: forwardingNumber.flipNumbers,
     calls: callMonitor.calls,
     searchContactList: contactSearch.sortedResult,
-    layout: isOnConference ? callCtrlLayout.conferenceCtrl : layout,
-    isMerging: conferenceCall.state.isMerging,
+    layout,
+    isMerging,
     addDisabled,
     mergeDisabled,
   };
