@@ -444,7 +444,7 @@ export default class ActiveCallItem extends Component {
 
     return (
       <div className={styles.root} onClick={this.toggleExtended}>
-        <div className={styles.callInfo}>
+        <div className={styles.wrapper}>
           <CallIcon
             direction={direction}
             ringing={ringing}
@@ -455,33 +455,35 @@ export default class ActiveCallItem extends Component {
             missedTitle={i18n.getString('missedCall', currentLocale)}
             isOnConferenceCall={isOnConferenceCall}
           />
-          <ContactDisplay
-            isOnConferenceCall={isOnConferenceCall}
-            contactName={contactName}
-            className={
+          <div className={styles.infoWrapper}>
+            <ContactDisplay
+              isOnConferenceCall={isOnConferenceCall}
+              contactName={contactName}
+              className={
               isOnConferenceCall
                 ? classnames(styles.conferenceContactDisplay)
                 : classnames(styles.contactDisplay, contactDisplayStyle)
 
             }
-            contactMatches={contactMatches}
-            selected={this.state.selected}
-            onSelectContact={this.onSelectContact}
-            disabled={disableLinks}
-            isLogging={isLogging || this.state.isLogging}
-            fallBackName={fallbackContactName}
-            enableContactFallback={enableContactFallback}
-            areaCode={areaCode}
-            countryCode={countryCode}
-            phoneNumber={phoneNumber}
-            currentLocale={currentLocale}
-            brand={brand}
-            showPlaceholder={showContactDisplayPlaceholder}
-            showType={false}
-            sourceIcons={sourceIcons}
-            stopPropagation
+              contactMatches={contactMatches}
+              selected={this.state.selected}
+              onSelectContact={this.onSelectContact}
+              disabled={disableLinks}
+              isLogging={isLogging || this.state.isLogging}
+              fallBackName={fallbackContactName}
+              enableContactFallback={enableContactFallback}
+              areaCode={areaCode}
+              countryCode={countryCode}
+              phoneNumber={phoneNumber}
+              currentLocale={currentLocale}
+              brand={brand}
+              showPlaceholder={showContactDisplayPlaceholder}
+              showType={false}
+              sourceIcons={sourceIcons}
+              stopPropagation
           />
-          {isOnConferenceCall ? null : callDetail}
+            {isOnConferenceCall ? null : callDetail}
+          </div>
           <WebphoneButtons
             session={webphoneSession}
             webphoneAnswer={webphoneAnswer}
