@@ -244,6 +244,7 @@ export default class BasePhone extends RcModule {
       }
 
       const isConferenceCallSession = (
+        session.to &&
         session.to.indexOf('conf_') === 0 &&
         session.callStatus === 'webphone-session-connecting' &&
         conferenceCall.conferenceCallStatus === conferenceCallStatus.requesting
