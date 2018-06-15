@@ -604,11 +604,10 @@ export default class ConferenceCall extends RcModule {
     if (conferenceState) {
       const conferenceId = conferenceState.conference.id;
       this.stopPollingConferenceStatus(conferenceId);
-      await Promise.all(
-        webphoneSessions.map(
-          webphoneSession => this.bringInToConference(conferenceId, webphoneSession, true)
-        )
-      );
+      // for the sake of participants ordering, we can't concurrently bring in the participants
+      for (const webphoneSession of webphoneSessions) {
+        await this.bringInToConference(conferenceId, webphoneSession, true);
+      }
 
       this.startPollingConferenceStatus(conferenceId);
       return conferenceId;
