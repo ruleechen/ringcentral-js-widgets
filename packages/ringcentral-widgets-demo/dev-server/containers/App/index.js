@@ -59,7 +59,10 @@ export default function App({
                 <CallBadgeContainer
                   defaultOffsetX={0}
                   defaultOffsetY={45}
-                  hidden={routerProps.location.pathname === '/calls/active'}
+                  hidden={(
+                    routerProps.location.pathname === '/calls/active' ||
+                    routerProps.location.pathname === '/conferenceCall/mergeCtrl'
+                  )}
                   goToCallCtrl={() => {
                     phone.routerInteraction.push('/calls/active');
                   }}
