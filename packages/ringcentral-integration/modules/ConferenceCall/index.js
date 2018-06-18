@@ -518,13 +518,20 @@ export default class ConferenceCall extends RcModule {
   }
 
   setCapatity(capacity = MAXIMUM_CAPACITY) {
+    if (typeof capacity !== 'number') {
+      throw new Error('The capcity must be a number');
+    }
     this.capacity = capacity;
+    return capacity;
   }
 
   setTimeout(timeout = DEFAULT_TIMEOUT) {
+    if (typeof timeout !== 'number') {
+      throw new Error('The timeout must be a number');
+    }
     this._timout = timeout;
+    return timeout;
   }
-
   _init() {
     this.store.dispatch({
       type: this.actionTypes.initSuccess
