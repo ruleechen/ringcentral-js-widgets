@@ -607,8 +607,13 @@ export default class ConferenceCall extends RcModule {
     }
     const { id } = await this.makeConference(true);
 
-    await new Promise((resolve) => {
-      this.conferences[id].session.on('accepted', () => resolve());
+    await new Promise((resolve, reject) => {
+      const session = this.conferences[id].session;
+      session.on('accepted', () => resolve());
+      session.on('cancel', () => reject(new Error('conferecing cancel')));
+      session.on('failed', () => reject(new Error('conferecing failed')));
+      session.on('rejected', () => reject(new Error('conferecing rejected')));
+      session.on('terminated', () => reject(new Error('conferecing terminated')));
     });
     await this._mergeToConference(webphoneSessions);
     return id;
