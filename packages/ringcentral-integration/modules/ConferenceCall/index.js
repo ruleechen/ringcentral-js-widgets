@@ -10,11 +10,10 @@ import permissionsMessages from '../RolesAndPermissions/permissionsMessages';
 import conferenceErrors from './conferenceCallErrors';
 // import webphoneErrors from '../Webphone/webphoneErrors';
 import ensureExist from '../../lib/ensureExist';
-import sleep from '../../lib/sleep';
+// import sleep from '../../lib/sleep';
 import callingModes from '../CallingSettings/callingModes';
 
 const DEFAULT_TTL = 5000;// timer to update the conference information
-const DEFAULT_WAIT = 800;// timer to bring-in after conference creation
 const MAXIMUM_CAPACITY = 10;
 
 
@@ -76,7 +75,6 @@ export default class ConferenceCall extends RcModule {
     webphone,
     pulling = true,
     capacity = MAXIMUM_CAPACITY,
-    spanForBringIn = DEFAULT_WAIT,
     ...options
   }) {
     super({
@@ -108,7 +106,6 @@ export default class ConferenceCall extends RcModule {
     this._ttl = DEFAULT_TTL;
     this._timers = {};
     this._pulling = pulling;
-    this._spanForBringIn = spanForBringIn;
     this.capacity = capacity;
   }
 
@@ -521,10 +518,6 @@ export default class ConferenceCall extends RcModule {
     this.capacity = capacity;
   }
 
-  setSpanForBringIn(span = DEFAULT_WAIT) {
-    this._spanForBringIn = span;
-  }
-
   _init() {
     this.store.dispatch({
       type: this.actionTypes.initSuccess
@@ -613,14 +606,11 @@ export default class ConferenceCall extends RcModule {
       return conferenceId;
     }
     const { id } = await this.makeConference(true);
-    /**
-     * HACK: 800ms came from exprience, if we try to bring other calls into the conference
-     * immediately, the api will throw 403 error which says: can't find the host of the
-     * conference.
-     */
-    await new Promise(resolve => setTimeout(resolve, this._spanForBringIn));
-    await this._mergeToConference(webphoneSessions);
 
+    await new Promise((resolve) => {
+      this.conferences[id].session.on('accepted', () => resolve());
+    });
+    await this._mergeToConference(webphoneSessions);
     return id;
   }
 
