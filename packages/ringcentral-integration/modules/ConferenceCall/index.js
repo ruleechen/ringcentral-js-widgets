@@ -13,6 +13,7 @@ import ensureExist from '../../lib/ensureExist';
 // import sleep from '../../lib/sleep';
 import callingModes from '../CallingSettings/callingModes';
 
+const DEFAULT_TIMEOUT = 30000;// time out for conferencing session being accepted.
 const DEFAULT_TTL = 5000;// timer to update the conference information
 const MAXIMUM_CAPACITY = 10;
 
@@ -75,6 +76,7 @@ export default class ConferenceCall extends RcModule {
     webphone,
     pulling = true,
     capacity = MAXIMUM_CAPACITY,
+    timeout = DEFAULT_TIMEOUT,
     ...options
   }) {
     super({
@@ -104,6 +106,7 @@ export default class ConferenceCall extends RcModule {
     // we need the constructed actions
     this._reducer = getConferenceCallReducer(this.actionTypes);
     this._ttl = DEFAULT_TTL;
+    this._timout = timeout;
     this._timers = {};
     this._pulling = pulling;
     this.capacity = capacity;
@@ -518,6 +521,10 @@ export default class ConferenceCall extends RcModule {
     this.capacity = capacity;
   }
 
+  setTimeout(timeout = DEFAULT_TIMEOUT) {
+    this._timout = timeout;
+  }
+
   _init() {
     this.store.dispatch({
       type: this.actionTypes.initSuccess
@@ -607,14 +614,20 @@ export default class ConferenceCall extends RcModule {
     }
     const { id } = await this.makeConference(true);
 
-    await new Promise((resolve, reject) => {
-      const session = this.conferences[id].session;
-      session.on('accepted', () => resolve());
-      session.on('cancel', () => reject(new Error('conferecing cancel')));
-      session.on('failed', () => reject(new Error('conferecing failed')));
-      session.on('rejected', () => reject(new Error('conferecing rejected')));
-      session.on('terminated', () => reject(new Error('conferecing terminated')));
-    });
+    await Promise.race([
+      new Promise((resolve, reject) => {
+        const session = this.conferences[id].session;
+        session.on('accepted', () => resolve());
+        session.on('cancel', () => reject(new Error('conferecing cancel')));
+        session.on('failed', () => reject(new Error('conferecing failed')));
+        session.on('rejected', () => reject(new Error('conferecing rejected')));
+        session.on('terminated', () => reject(new Error('conferecing terminated')));
+      }),
+      new Promise((resolve, reject) => {
+        setTimeout(() => reject(new Error('conferecing timeout')), this._timout);
+      })
+    ]);
+
     await this._mergeToConference(webphoneSessions);
     return id;
   }
