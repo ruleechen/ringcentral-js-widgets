@@ -144,7 +144,7 @@ export default class CallMonitor extends RcModule {
       () => this._webphone && this._webphone.sessions,
       (callsFromPresence, countryCode, sessions) => {
         let sessionsCache = sessions || [];
-        return callsFromPresence.map((callItem) => {
+        const calls = callsFromPresence.map((callItem) => {
           // use account countryCode to normalize number due to API issues [RCINT-3419]
           const fromNumber = normalizeNumber({
             phoneNumber: callItem.from && callItem.from.phoneNumber,
