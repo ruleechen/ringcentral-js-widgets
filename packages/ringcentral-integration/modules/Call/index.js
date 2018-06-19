@@ -30,14 +30,8 @@ import ringoutErrors from '../Ringout/ringoutErrors';
     'RegionSettings',
     'CallingSettings',
     'RolesAndPermissions',
-    {
-      dep: 'Webphone',
-      optional: true
-    },
-    {
-      dep: 'CallOptions',
-      optional: true
-    }
+    { dep: 'Webphone', optional: true },
+    { dep: 'CallOptions', optional: true }
   ]
 })
 export default class Call extends RcModule {
@@ -129,7 +123,8 @@ export default class Call extends RcModule {
   }
   _shouldReset() {
     return (
-      (!this._numberValidate.ready ||
+      (
+        !this._numberValidate.ready ||
         !this._callingSettings.ready ||
         !this._regionSettings.ready ||
         (!!this._webphone && !this._webphone.ready) ||
@@ -178,17 +173,11 @@ export default class Call extends RcModule {
   }
 
   // save the click to dial entity, only when call took place
-  onToNumberMatch({
-    entityId,
-    startTime
-  }) {
+  onToNumberMatch({ entityId, startTime }) {
     if (this.isIdle) {
       this.store.dispatch({
         type: this.actionTypes.toNumberMatched,
-        data: {
-          entityId,
-          startTime
-        },
+        data: { entityId, startTime },
       });
     }
   }
@@ -204,7 +193,9 @@ export default class Call extends RcModule {
     phoneNumber,
     recipient,
     fromNumber,
-  }, isConference = false) {
+    isConference = false
+  }) {
+    let session = null;
     if (this.isIdle) {
       const toNumber = recipient && (recipient.phoneNumber || recipient.extension) || phoneNumber;
       if (!toNumber || `${toNumber}`.trim().length === 0) {
@@ -229,16 +220,16 @@ export default class Call extends RcModule {
           });
 
           if (validatedNumbers) {
-            const session = await this._makeCall(validatedNumbers);
+            session = await this._makeCall(validatedNumbers);
             this.store.dispatch({
               type: this.actionTypes.connectSuccess,
               callSettingMode: this._callSettingMode // for Track
             });
-            return session;
+          } else {
+            this.store.dispatch({
+              type: this.actionTypes.connectError
+            });
           }
-          this.store.dispatch({
-            type: this.actionTypes.connectError
-          });
         } catch (error) {
           if (!error.message && error.type && callErrors[error.type]) {
             // validate format error
@@ -271,6 +262,7 @@ export default class Call extends RcModule {
         }
       }
     }
+    return session;
   }
 
   @proxify
@@ -336,6 +328,7 @@ export default class Call extends RcModule {
         toNumber,
       };
     }
+
     const parsedToNumber = parsedNumbers[0];
     if (
       parsedToNumber.international &&

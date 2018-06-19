@@ -115,8 +115,8 @@ export default class CallMonitor extends RcModule {
       actionTypes,
     });
     this._call = call;
-    this._accountInfo = this:: ensureExist(accountInfo, 'accountInfo');
-    this._detailedPresence = this:: ensureExist(detailedPresence, 'detailedPresence');
+    this._accountInfo = this::ensureExist(accountInfo, 'accountInfo');
+    this._detailedPresence = this::ensureExist(detailedPresence, 'detailedPresence');
     this._contactMatcher = contactMatcher;
     this._activityMatcher = activityMatcher;
     this._tabManager = tabManager;
@@ -125,7 +125,7 @@ export default class CallMonitor extends RcModule {
     this._onNewCall = onNewCall;
     this._onCallUpdated = onCallUpdated;
     this._onCallEnded = onCallEnded;
-    this._storage = this:: ensureExist(storage, 'storage');
+    this._storage = this::ensureExist(storage, 'storage');
     this._callMatchedKey = 'callMatched';
 
     this._reducer = getCallMonitorReducer(this.actionTypes);

@@ -39,22 +39,13 @@ const MAX_RETRIES_DELAY = 2 * 60 * 1000;
     'Auth',
     'Alert',
     'Client',
-    {
-      dep: 'ContactMatcher',
-      optional: true
-    },
+    { dep: 'ContactMatcher', optional: true },
     'ExtensionDevice',
     'NumberValidate',
     'RolesAndPermissions',
     'AudioSettings',
-    {
-      dep: 'TabManager',
-      optional: true
-    },
-    {
-      dep: 'WebphoneOptions',
-      optional: true
-    }
+    { dep: 'TabManager', optional: true },
+    { dep: 'WebphoneOptions', optional: true }
   ]
 })
 export default class Webphone extends RcModule {
@@ -293,7 +284,8 @@ export default class Webphone extends RcModule {
 
   _shouldReset() {
     return (
-      (!this._auth.loggedIn ||
+      (
+        !this._auth.loggedIn ||
         !this._rolesAndPermissions.ready ||
         !this._numberValidate.ready ||
         !this._extensionDevice.ready ||
@@ -308,9 +300,7 @@ export default class Webphone extends RcModule {
   async _sipProvision() {
     const response = await this._client.service.platform()
       .post('/client-info/sip-provision', {
-        sipInfo: [{
-          transport: 'WSS'
-        }]
+        sipInfo: [{ transport: 'WSS' }]
       });
     return response.json();
   }
@@ -397,40 +387,34 @@ export default class Webphone extends RcModule {
       switch (statusCode) {
         // Webphone account overlimit
         case 503:
-        case 603:
-        {
+        case 603: {
           errorCode = webphoneErrors.webphoneCountOverLimit;
           needToReconnect = true;
           break;
         }
-        case 403:
-        {
+        case 403: {
           errorCode = webphoneErrors.webphoneForbidden;
           needToReconnect = true;
           break;
         }
         // Request Timeout
-        case 408:
-        {
+        case 408: {
           errorCode = webphoneErrors.requestTimeout;
           needToReconnect = true;
           break;
         }
         // Internal server error
-        case 500:
-        {
+        case 500: {
           errorCode = webphoneErrors.internalServerError;
           break;
         }
         // Timeout
-        case 504:
-        {
+        case 504: {
           errorCode = webphoneErrors.serverTimeout;
           needToReconnect = true;
           break;
         }
-        default:
-        {
+        default: {
           errorCode = webphoneErrors.unknownError;
           break;
         }
@@ -778,7 +762,8 @@ export default class Webphone extends RcModule {
       return false;
     }
     try {
-      const validatedResult = await this._numberValidate.validateNumbers([forwardNumber]);
+      const validatedResult
+        = await this._numberValidate.validateNumbers([forwardNumber]);
       if (!validatedResult.result) {
         validatedResult.errors.forEach((error) => {
           this._alert.warning({
@@ -966,7 +951,8 @@ export default class Webphone extends RcModule {
     try {
       session.isOnTransfer = true;
       this._updateSessions();
-      const validatedResult = await this._numberValidate.validateNumbers([transferNumber]);
+      const validatedResult
+        = await this._numberValidate.validateNumbers([transferNumber]);
       if (!validatedResult.result) {
         validatedResult.errors.forEach((error) => {
           this._alert.warning({

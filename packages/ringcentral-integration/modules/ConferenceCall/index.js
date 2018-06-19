@@ -231,9 +231,9 @@ export default class ConferenceCall extends RcModule {
     const conferenceState = this.state.conferences[id];
     if (
       !conferenceState
-        || !webphoneSession
-        || webphoneSession.direction !== callDirections.outbound
-        || this.isOverload(id)
+      || !webphoneSession
+      || webphoneSession.direction !== callDirections.outbound
+      || this.isOverload(id)
     ) {
       if (!propagete) {
         this._alert.warning({
@@ -661,8 +661,9 @@ export default class ConferenceCall extends RcModule {
       const phoneNumber = conference.voiceCallToken;
       // whether to mutate the session to mark the conference?
       const session = await this._call.call({
-        phoneNumber
-      }, true);
+        phoneNumber,
+        isConference: true,
+      });
 
       if (typeof session === 'object' &&
         Object.prototype.toString.call(session.on).toLowerCase() === '[object function]') {

@@ -1,4 +1,4 @@
-import {Module} from '../../lib/di';
+import { Module } from '../../lib/di';
 import DataFetcher from '../../lib/DataFetcher';
 import permissionsMessages from './permissionsMessages';
 import loginStatus from '../Auth/loginStatus';
@@ -21,10 +21,7 @@ function extractData(permissions) {
 @Module({
   deps: [
     'Client', 'Alert', 'ExtensionInfo',
-    {
-      dep: 'RolesAndPermissionsOptions',
-      optional: true
-    }
+    { dep: 'RolesAndPermissionsOptions', optional: true }
   ]
 })
 export default class RolesAndPermissions extends DataFetcher {
@@ -153,7 +150,8 @@ export default class RolesAndPermissions extends DataFetcher {
   }
 
   get tierEnabled() {
-    if (!this._extensionInfo.serviceFeatures ||
+    if (
+      !this._extensionInfo.serviceFeatures ||
       !this._extensionInfo.serviceFeatures[this._flag]
     ) {
       return null;

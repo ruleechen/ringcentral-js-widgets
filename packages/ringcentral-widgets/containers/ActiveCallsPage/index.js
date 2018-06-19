@@ -14,7 +14,7 @@ function mapToProps(_, {
     regionSettings,
     rolesAndPermissions,
     conferenceCall,
-    callingSettings: { callingMode }
+    callingSettings,
   },
   showContactDisplayPlaceholder = false,
 }) {
@@ -43,11 +43,11 @@ function mapToProps(_, {
       rolesAndPermissions.permissions &&
       rolesAndPermissions.permissions.InternalSMS
     ),
+    showSpinner: conferenceCall.isMerging,
     brand: brand.fullName,
     showContactDisplayPlaceholder,
     autoLog: !!(callLogger && callLogger.autoLog),
-    isWebRTC: (callingMode === callingModes.webphone),
-    showSpinner: conferenceCall.isMerging,
+    isWebRTC: (callingSettings.callingMode === callingModes.webphone),
     hasConferenceCall: !!conference,
     disableMerge,
   };
