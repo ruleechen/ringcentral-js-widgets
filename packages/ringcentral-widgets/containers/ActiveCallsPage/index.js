@@ -1,6 +1,7 @@
 import { connect } from 'react-redux';
 import formatNumber from 'ringcentral-integration/lib/formatNumber';
 import sleep from 'ringcentral-integration/lib/sleep';
+import callingModes from 'ringcentral-integration/modules/CallingSettings/callingModes';
 import withPhone from '../../lib/withPhone';
 import ActiveCallsPanel from '../../components/ActiveCallsPanel';
 
@@ -27,10 +28,7 @@ function mapToProps(_, {
     disableMerge = false;
   }
   return {
-    // only one conference can exist for now
-    conference,
     currentLocale: locale.currentLocale,
-    callingMode,
     activeRingCalls: callMonitor.activeRingCalls,
     activeOnHoldCalls: callMonitor.activeOnHoldCalls,
     activeCurrentCalls: callMonitor.activeCurrentCalls,
@@ -48,8 +46,10 @@ function mapToProps(_, {
     brand: brand.fullName,
     showContactDisplayPlaceholder,
     autoLog: !!(callLogger && callLogger.autoLog),
+    isWebRTC: (callingMode === callingModes.webphone),
+    showSpinner: conferenceCall.isMerging,
+    hasConferenceCall: !!conference,
     disableMerge,
-    isMerging: conferenceCall.isMerging,
   };
 }
 

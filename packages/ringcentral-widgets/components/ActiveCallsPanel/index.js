@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import callingModes from 'ringcentral-integration/modules/CallingSettings/callingModes';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import SpinnerOverlay from '../SpinnerOverlay';
@@ -14,10 +13,6 @@ export default class ActiveCallsPanel extends Component {
     this.state = {
       isModalOpen: false,
       callOfModal: null,
-    };
-
-    this.mergeToConference = async (...args) => {
-      await this.props.mergeToConference(...args);
     };
 
     this.showConfirmMergeModal = (call) => {
@@ -35,7 +30,7 @@ export default class ActiveCallsPanel extends Component {
     };
 
     this.confirmMergeCall = () => {
-      this.mergeToConference([this.state.callOfModal.webphoneSession]);
+      this.props.mergeToConference([this.state.callOfModal.webphoneSession]);
       this.hideConfirmMergeModal();
     };
   }
@@ -92,18 +87,16 @@ export default class ActiveCallsPanel extends Component {
       enableContactFallback,
       webphoneToVoicemail,
       sourceIcons,
-      conference,
-      isSessionAConferenceCall,
-      callingMode,
       activeCurrentCalls,
+      isWebRTC,
+      hasConferenceCall,
       disableMerge,
+      mergeToConference,
+      isSessionAConferenceCall,
     } = this.props;
 
     return (
       <ActiveCallList
-        isOnWebRTC={callingMode === callingModes.webphone}
-        isSessionAConferenceCall={isSessionAConferenceCall}
-        conference={conference}
         title={title}
         calls={calls}
         currentLocale={currentLocale}
@@ -115,7 +108,6 @@ export default class ActiveCallsPanel extends Component {
         onClickToSms={onClickToSms}
         onCreateContact={onCreateContact}
         onViewContact={onViewContact}
-        mergeToConference={this.mergeToConference}
         outboundSmsPermission={outboundSmsPermission}
         internalSmsPermission={internalSmsPermission}
         isLoggedContact={isLoggedContact}
@@ -129,9 +121,13 @@ export default class ActiveCallsPanel extends Component {
         webphoneToVoicemail={webphoneToVoicemail}
         enableContactFallback={enableContactFallback}
         sourceIcons={sourceIcons}
-        activeCurrentCalls={activeCurrentCalls}
-        onConfirmMergeCall={this.showConfirmMergeModal}
+        isWebRTC={isWebRTC}
+        hasConferenceCall={hasConferenceCall}
         disableMerge={disableMerge}
+        currentCall={activeCurrentCalls[0]}
+        mergeToConference={mergeToConference}
+        isSessionAConferenceCall={isSessionAConferenceCall}
+        onConfirmMergeCall={this.showConfirmMergeModal}
       />
     );
   }
@@ -144,7 +140,7 @@ export default class ActiveCallsPanel extends Component {
       otherDeviceCalls,
       className,
       currentLocale,
-      isMerging,
+      showSpinner,
     } = this.props;
     if (!this.hasCalls()) {
       return (
@@ -152,7 +148,7 @@ export default class ActiveCallsPanel extends Component {
           className={classnames(styles.root, className)}
         >
           <p className={styles.noCalls}>{i18n.getString('noActiveCalls', currentLocale)}</p>
-          {isMerging && <SpinnerOverlay className={styles.spinner} />}
+          {showSpinner ? <SpinnerOverlay className={styles.spinner} /> : null}
         </div>
       );
     }
@@ -173,16 +169,13 @@ export default class ActiveCallsPanel extends Component {
             onCancel={this.hideConfirmMergeModal}
           />
         </div>
-        {isMerging && <SpinnerOverlay className={styles.spinner} />}
+        {showSpinner ? <SpinnerOverlay className={styles.spinner} /> : null}
       </div>
     );
   }
 }
 
 ActiveCallsPanel.propTypes = {
-  isMerging: PropTypes.bool,
-  disableMerge: PropTypes.bool,
-  callingMode: PropTypes.string.isRequired,
   currentLocale: PropTypes.string.isRequired,
   className: PropTypes.string,
   activeRingCalls: PropTypes.array.isRequired,
@@ -199,8 +192,6 @@ ActiveCallsPanel.propTypes = {
   outboundSmsPermission: PropTypes.bool,
   internalSmsPermission: PropTypes.bool,
   isLoggedContact: PropTypes.func,
-  isSessionAConferenceCall: PropTypes.func.isRequired,
-  mergeToConference: PropTypes.func.isRequired,
   onLogCall: PropTypes.func,
   webphoneAnswer: PropTypes.func,
   webphoneReject: PropTypes.func,
@@ -213,12 +204,15 @@ ActiveCallsPanel.propTypes = {
   loggingMap: PropTypes.object,
   onCallsEmpty: PropTypes.func,
   sourceIcons: PropTypes.object,
-  conference: PropTypes.object,
+  isWebRTC: PropTypes.bool.isRequired,
+  hasConferenceCall: PropTypes.bool,
+  showSpinner: PropTypes.bool,
+  disableMerge: PropTypes.bool,
+  mergeToConference: PropTypes.func,
+  isSessionAConferenceCall: PropTypes.func,
 };
 
 ActiveCallsPanel.defaultProps = {
-  isMerging: false,
-  disableMerge: false,
   className: undefined,
   brand: 'RingCentral',
   showContactDisplayPlaceholder: true,
@@ -239,5 +233,9 @@ ActiveCallsPanel.defaultProps = {
   autoLog: false,
   onCallsEmpty: undefined,
   sourceIcons: undefined,
-  conference: null,
+  hasConferenceCall: false,
+  showSpinner: false,
+  disableMerge: false,
+  mergeToConference: i => i,
+  isSessionAConferenceCall: () => false,
 };

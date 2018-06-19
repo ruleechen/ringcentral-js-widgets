@@ -117,7 +117,7 @@ class CallCtrlPage extends Component {
     const {
       session,
       layout,
-      isMerging,
+      showSpinner,
       addDisabled,
       mergeDisabled,
       getPartyProfiles,
@@ -185,7 +185,7 @@ class CallCtrlPage extends Component {
         recipientsContactInfoRenderer={this.props.recipientsContactInfoRenderer}
         recipientsContactPhoneRenderer={this.props.recipientsContactPhoneRenderer}
         layout={layout}
-        isMerging={isMerging}
+        showSpinner={showSpinner}
         direction={session.direction}
         addDisabled={addDisabled}
         mergeDisabled={mergeDisabled}
@@ -245,7 +245,7 @@ CallCtrlPage.propTypes = {
   recipientsContactInfoRenderer: PropTypes.func,
   recipientsContactPhoneRenderer: PropTypes.func,
   layout: PropTypes.string.isRequired,
-  isMerging: PropTypes.bool,
+  showSpinner: PropTypes.bool,
   addDisabled: PropTypes.bool,
   mergeDisabled: PropTypes.bool,
   getPartyProfiles: PropTypes.func,
@@ -261,7 +261,7 @@ CallCtrlPage.defaultProps = {
   recipientsContactPhoneRenderer: undefined,
   onAdd: i => i,
   onMerge: i => i,
-  isMerging: false,
+  showSpinner: false,
   addDisabled: false,
   mergeDisabled: false,
   getPartyProfiles: i => i,
@@ -289,7 +289,7 @@ function mapToProps(_, {
   const nameMatches =
     currentSession.direction === callDirections.outbound ? toMatches : fromMatches;
   const isOnConference = conferenceCall.isConferenceSession(currentSession.id)
-    || (conferenceCall.state.isMerging && (currentSession.to
+    || (conferenceCall.isMerging && (currentSession.to
       && currentSession.to.indexOf('conf_') === 0));
 
   const conferenceData = Object.values(conferenceCall.conferences)[0];
@@ -297,15 +297,15 @@ function mapToProps(_, {
   let mergeDisabled = false;
   if (conferenceData) {
     mergeDisabled = conferenceCall.isOverload(conferenceData.conference.id)
-    // in case webphone.activeSession has not been updated yet
-    || !Object.keys(currentSession).length
-    || !(currentSession.data && Object.keys(currentSession.data).length);
+      // in case webphone.activeSession has not been updated yet
+      || !Object.keys(currentSession).length
+      || !(currentSession.data && Object.keys(currentSession.data).length);
   }
 
   let addDisabled = false;
   if (conferenceData) {
     addDisabled = !Object.keys(currentSession).length
-    || conferenceCall.isOverload(conferenceData.conference.id);
+      || conferenceCall.isOverload(conferenceData.conference.id);
   }
   const isMerging = (
     Object
@@ -314,7 +314,7 @@ function mapToProps(_, {
       .find(id => id === currentSession.id)
     || (isOnConference)
   )
-    && conferenceCall.state.isMerging;
+    && conferenceCall.isMerging;
 
   layout = isOnConference ? callCtrlLayout.conferenceCtrl : layout;
 
@@ -329,7 +329,7 @@ function mapToProps(_, {
     calls: callMonitor.calls,
     searchContactList: contactSearch.sortedResult,
     layout,
-    isMerging,
+    showSpinner: isMerging,
     addDisabled,
     mergeDisabled,
   };

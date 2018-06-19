@@ -132,7 +132,7 @@ class CallCtrlPanel extends Component {
         getPartyProfiles={this.props.getPartyProfiles}
       >
         {this.props.children}
-        {this.props.isMerging ? <SpinnerOverlay /> : null}
+        {this.props.showSpinner ? <SpinnerOverlay /> : null}
       </ActiveCallPanel>
     );
   }
@@ -185,7 +185,7 @@ CallCtrlPanel.propTypes = {
   recipientsContactPhoneRenderer: PropTypes.func,
   getAvatarUrl: PropTypes.func,
   layout: PropTypes.string.isRequired,
-  isMerging: PropTypes.bool,
+  showSpinner: PropTypes.bool,
   direction: PropTypes.string,
   addDisabled: PropTypes.bool,
   mergeDisabled: PropTypes.bool,
@@ -214,7 +214,7 @@ CallCtrlPanel.defaultProps = {
   recipientsContactPhoneRenderer: undefined,
   onAdd: i => i,
   onMerge: i => i,
-  isMerging: false,
+  showSpinner: false,
   direction: null,
   addDisabled: false,
   mergeDisabled: false,
