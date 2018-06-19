@@ -75,6 +75,7 @@ function WebphoneButtons({
   showMergeCall,
   onMergeCall,
   disableMerge,
+  currentLocale,
 }) {
   if (!session || !webphoneAnswer || !webphoneHangup) {
     return null;
@@ -83,9 +84,9 @@ function WebphoneButtons({
   let resumeFunc = webphoneResume;
   let endIcon = EndIcon;
   const mergeIcon = MergeIntoConferenceIcon;
-  let rejectTitle = i18n.getString('hangup');
-  const acceptTitle = i18n.getString('accept');
-  const mergeTitle = i18n.getString('mergeToConference');
+  let rejectTitle = i18n.getString('hangup', currentLocale);
+  const acceptTitle = i18n.getString('accept', currentLocale);
+  const mergeTitle = i18n.getString('mergeToConference', currentLocale);
   if (
     session.direction === callDirections.inbound &&
     session.callStatus === sessionStatus.connecting
@@ -93,7 +94,7 @@ function WebphoneButtons({
     hangupFunc = webphoneReject;
     resumeFunc = webphoneAnswer;
     endIcon = VoicemailIcon;
-    rejectTitle = i18n.getString('toVoicemail');
+    rejectTitle = i18n.getString('toVoicemail', currentLocale);
   }
   return (
     <div className={styles.webphoneButtons}>
@@ -154,6 +155,7 @@ WebphoneButtons.propTypes = {
   showMergeCall: PropTypes.bool,
   onMergeCall: PropTypes.func,
   disableMerge: PropTypes.bool,
+  currentLocale: PropTypes.string.isRequired,
 };
 
 WebphoneButtons.defaultProps = {
@@ -493,6 +495,7 @@ export default class ActiveCallItem extends Component {
             showMergeCall={showMergeCall}
             onMergeCall={onMergeCall}
             disableMerge={disableMerge}
+            currentLocale={currentLocale}
           />
           {extraButton}
         </div>

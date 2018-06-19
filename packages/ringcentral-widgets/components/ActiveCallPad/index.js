@@ -181,7 +181,7 @@ export default function ActiveCallPad(props) {
   } else {
     conferenceCallButton = props.layout === callCtrlLayout.mergeCtrl ?
       (
-        <div className={styles.button}>
+        <div className={styles.button} title={i18n.getString('mergeToConference', props.currentLocale)}>
           <CircleButton
             className={props.mergeDisabled ? styles.disabled : styles.mergeButton}
             onClick={props.mergeDisabled ? i => i : () => {
@@ -196,7 +196,7 @@ export default function ActiveCallPad(props) {
         </div>
       )
       : (
-        <div className={styles.button}>
+        <div className={styles.button} title={i18n.getString('add', props.currentLocale)}>
           <CircleButton
             className={props.addDisabled ? styles.disabled : styles.combineButton}
             onClick={props.addDisabled ? i => i : () => {
