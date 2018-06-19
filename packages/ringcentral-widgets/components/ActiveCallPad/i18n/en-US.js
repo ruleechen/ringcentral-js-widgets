@@ -8,6 +8,7 @@ export default {
   stopRecord: 'Stop',
   record: 'Record',
   add: 'Add',
+  mergeToConference: 'Merge',
   transfer: 'Transfer',
   flip: 'Flip',
 };

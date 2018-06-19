@@ -14,7 +14,7 @@ import {
   isCallConnected,
 } from '../../lib/callLogHelpers';
 import ensureExist from '../../lib/ensureExist';
-import { isRing, isOnHold } from '../Webphone/webphoneHelper';
+import { isRing, isOnHold, sortSession } from '../Webphone/webphoneHelper';
 
 function matchWephoneSessionWithAcitveCall(sessions, callItem) {
   if (!sessions || !callItem.sipData) {
@@ -236,6 +236,11 @@ export default class CallMonitor extends RcModule {
             activityMatches: (activityMapping[callItem.sessionId]) || [],
             toNumberEntity,
           };
+        }).sort((l, r) => {
+          if (!l.webphoneSession || !r.webphoneSession) {
+            return false;
+          }
+          return sortSession(l.webphoneSession, r.webphoneSession);
         });
         return calls;
       }

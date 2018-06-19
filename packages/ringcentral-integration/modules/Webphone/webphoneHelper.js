@@ -36,7 +36,8 @@ export function normalizeSession(session) {
     recordStatus: session.recordStatus || recordStatus.idle,
     contactMatch: session.contactMatch,
     minimized: !!session.minimized,
-    data: session.data || null
+    data: session.data || null,
+    lastHoldingTime: session.lastHoldingTime || 0
   };
 }
 
@@ -50,4 +51,11 @@ export function isRing(session) {
 
 export function isOnHold(session) {
   return !!(session && session.callStatus === sessionStatus.onHold);
+}
+
+export function sortSession(l, r) {
+  if (r.lastHoldingTime !== l.lastHoldingTime) {
+    return r.lastHoldingTime - l.lastHoldingTime;
+  }
+  return r.startTime - l.startTime;
 }

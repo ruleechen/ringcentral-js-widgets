@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 import getModuleStatusReducer from '../../lib/getModuleStatusReducer';
 import connectionStatus from './connectionStatus';
-import { isRing, isOnHold } from './webphoneHelper';
+import { isRing, isOnHold, sortSession } from './webphoneHelper';
 
 export function getVideoElementPreparedReducer(types) {
   return (state = false, { type }) => {
@@ -86,7 +86,7 @@ export function getActiveSessionIdReducer(types) {
         }
         onHoldSessions =
           sessions.filter(sessionItem => isOnHold(sessionItem));
-        if (onHoldSessions && onHoldSessions[0]) {
+        if (onHoldSessions.length && onHoldSessions[0]) {
           return onHoldSessions[0].id;
         }
         return null;
@@ -155,7 +155,7 @@ export function getSessionsReducer(types) {
   return (state = [], { type, sessions }) => {
     switch (type) {
       case types.updateSessions:
-        return sessions;
+        return sessions.sort(sortSession);
       case types.destroySessions:
         return [];
       default:

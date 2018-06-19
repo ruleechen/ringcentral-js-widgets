@@ -38,8 +38,8 @@ export default function ConfirmMergeModal({
         {i18n.getString('confirmMergeToConference', currentLocale)}
       </div>
       <div className={styles.content}>
-        <p className={styles.contentText}><ConferenceCallIcon /><span>{i18n.getString('conferenceCall')}</span></p>
-        <span title={i18n.getString('mergeToConference')} className={styles.webphoneButton}>
+        <p className={styles.contentText}><ConferenceCallIcon /><span>{i18n.getString('conferenceCall', currentLocale)}</span></p>
+        <span title={i18n.getString('mergeToConference', currentLocale)} className={styles.webphoneButton}>
           <CircleButton
             className={styles.mergeButton}
             onClick={(e) => {

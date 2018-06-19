@@ -68,7 +68,6 @@ function mapToFunctions(_, {
         return;
       }
       if (!conferenceData) {
-        await sleep(200);
         await webphone.resume(session.id);
         routerInteraction.push('/conferenceCall/mergeCtrl');
       }

@@ -10,11 +10,11 @@ import permissionsMessages from '../RolesAndPermissions/permissionsMessages';
 import conferenceErrors from './conferenceCallErrors';
 // import webphoneErrors from '../Webphone/webphoneErrors';
 import ensureExist from '../../lib/ensureExist';
-import sleep from '../../lib/sleep';
+// import sleep from '../../lib/sleep';
 import callingModes from '../CallingSettings/callingModes';
 
+const DEFAULT_TIMEOUT = 30000;// time out for conferencing session being accepted.
 const DEFAULT_TTL = 5000;// timer to update the conference information
-const DEFAULT_WAIT = 800;// timer to bring-in after conference creation
 const MAXIMUM_CAPACITY = 10;
 
 
@@ -76,7 +76,7 @@ export default class ConferenceCall extends RcModule {
     webphone,
     pulling = true,
     capacity = MAXIMUM_CAPACITY,
-    spanForBringIn = DEFAULT_WAIT,
+    timeout = DEFAULT_TIMEOUT,
     ...options
   }) {
     super({
@@ -106,9 +106,9 @@ export default class ConferenceCall extends RcModule {
     // we need the constructed actions
     this._reducer = getConferenceCallReducer(this.actionTypes);
     this._ttl = DEFAULT_TTL;
+    this._timout = timeout;
     this._timers = {};
     this._pulling = pulling;
-    this._spanForBringIn = spanForBringIn;
     this.capacity = capacity;
   }
 
@@ -518,13 +518,20 @@ export default class ConferenceCall extends RcModule {
   }
 
   setCapatity(capacity = MAXIMUM_CAPACITY) {
+    if (typeof capacity !== 'number') {
+      throw new Error('The capcity must be a number');
+    }
     this.capacity = capacity;
+    return capacity;
   }
 
-  setSpanForBringIn(span = DEFAULT_WAIT) {
-    this._spanForBringIn = span;
+  setTimeout(timeout = DEFAULT_TIMEOUT) {
+    if (typeof timeout !== 'number') {
+      throw new Error('The timeout must be a number');
+    }
+    this._timout = timeout;
+    return timeout;
   }
-
   _init() {
     this.store.dispatch({
       type: this.actionTypes.initSuccess
@@ -613,14 +620,22 @@ export default class ConferenceCall extends RcModule {
       return conferenceId;
     }
     const { id } = await this.makeConference(true);
-    /**
-     * HACK: 800ms came from exprience, if we try to bring other calls into the conference
-     * immediately, the api will throw 403 error which says: can't find the host of the
-     * conference.
-     */
-    await new Promise(resolve => setTimeout(resolve, this._spanForBringIn));
-    await this._mergeToConference(webphoneSessions);
 
+    await Promise.race([
+      new Promise((resolve, reject) => {
+        const session = this.conferences[id].session;
+        session.on('accepted', () => resolve());
+        session.on('cancel', () => reject(new Error('conferecing cancel')));
+        session.on('failed', () => reject(new Error('conferecing failed')));
+        session.on('rejected', () => reject(new Error('conferecing rejected')));
+        session.on('terminated', () => reject(new Error('conferecing terminated')));
+      }),
+      new Promise((resolve, reject) => {
+        setTimeout(() => reject(new Error('conferecing timeout')), this._timout);
+      })
+    ]);
+
+    await this._mergeToConference(webphoneSessions);
     return id;
   }
 
