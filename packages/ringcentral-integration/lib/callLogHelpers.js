@@ -24,10 +24,6 @@ export function isRinging(call = {}) {
   return call.telephonyStatus === telephonyStatuses.ringing;
 }
 
-export function isCallConnected(call = {}) {
-  return call.telephonyStatus === telephonyStatuses.callConnected;
-}
-
 const callResultsToMissedMap = HashMap.fromSet({
   set: Object.keys(callResults).map(key => callResults[key]),
   getValue: result => (

@@ -1,5 +1,4 @@
 import 'core-js/fn/array/find';
-import { filter, any } from 'ramda';
 import { Module } from '../../lib/di';
 import RcModule from '../../lib/RcModule';
 import moduleStatuses from '../../enums/moduleStatuses';
@@ -11,10 +10,9 @@ import {
   isRinging,
   hasRingingCalls,
   sortByStartTime,
-  isCallConnected,
 } from '../../lib/callLogHelpers';
 import ensureExist from '../../lib/ensureExist';
-import { isRing, isOnHold, sortSession } from '../Webphone/webphoneHelper';
+import { isRing, isOnHold, sortByLastHoldingTime } from '../Webphone/webphoneHelper';
 
 function matchWephoneSessionWithAcitveCall(sessions, callItem) {
   if (!sessions || !callItem.sipData) {
@@ -137,14 +135,13 @@ export default class CallMonitor extends RcModule {
       reducer: getCallMatchedReducer(this.actionTypes),
     });
 
-    this._callsSequenceCache = {};
     this.addSelector('normalizedCalls',
       () => this._detailedPresence.calls,
       () => this._accountInfo.countryCode,
       () => this._webphone && this._webphone.sessions,
       (callsFromPresence, countryCode, sessions) => {
         let sessionsCache = sessions || [];
-        const calls = callsFromPresence.map((callItem) => {
+        return callsFromPresence.map((callItem) => {
           // use account countryCode to normalize number due to API issues [RCINT-3419]
           const fromNumber = normalizeNumber({
             phoneNumber: callItem.from && callItem.from.phoneNumber,
@@ -170,50 +167,9 @@ export default class CallMonitor extends RcModule {
             ),
             webphoneSession,
           };
-        });
-        // classify
-        const sequencedConnectedCalls = filter(call => (
-          isCallConnected(call) &&
-          (call.id in this._callsSequenceCache)
-        ), calls);
-        const newConnectedCalls = filter(call => (
-          isCallConnected(call) &&
-          !any(x => x === call, sequencedConnectedCalls)
-        ), calls);
-        const sequencedCalls = filter(call => (
-          !any(x => x === call, sequencedConnectedCalls) &&
-          !any(x => x === call, newConnectedCalls) &&
-          (call.id in this._callsSequenceCache)
-        ), calls);
-        const newCalls = filter(call => (
-          !any(x => x === call, sequencedConnectedCalls) &&
-          !any(x => x === call, newConnectedCalls) &&
-          !any(x => x === call, sequencedCalls)
-        ), calls);
-        // sort
-        const sortBySequenceCache = (a, b) => {
-          const sequenceA = this._callsSequenceCache[a.id];
-          const sequenceB = this._callsSequenceCache[b.id];
-          if (sequenceA === sequenceB) { return 0; }
-          return sequenceA < sequenceB ? -1 : 1;
-        };
-        // concat
-        const sortedCalls = [].concat(
-          newConnectedCalls.sort(sortByStartTime)
-        ).concat(
-          sequencedConnectedCalls.sort(sortBySequenceCache)
-        ).concat(
-          newCalls.sort(sortByStartTime)
-        ).concat(
-          sequencedCalls.sort(sortBySequenceCache)
-        );
-        // cache
-        this._callsSequenceCache = {};
-        for (let i = 0; i < sortedCalls.length; i += 1) {
-          this._callsSequenceCache[sortedCalls[i].id] = i;
-        }
-        // out
-        return sortedCalls;
+        }).sort((l, r) => (
+          sortByLastHoldingTime(l.webphoneSession, r.webphoneSession)
+        ));
       },
     );
 
@@ -236,11 +192,6 @@ export default class CallMonitor extends RcModule {
             activityMatches: (activityMapping[callItem.sessionId]) || [],
             toNumberEntity,
           };
-        }).sort((l, r) => {
-          if (!l.webphoneSession || !r.webphoneSession) {
-            return false;
-          }
-          return sortSession(l.webphoneSession, r.webphoneSession);
         });
         return calls;
       }

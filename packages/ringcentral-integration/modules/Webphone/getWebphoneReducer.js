@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 import getModuleStatusReducer from '../../lib/getModuleStatusReducer';
 import connectionStatus from './connectionStatus';
-import { isRing, isOnHold, sortSession } from './webphoneHelper';
+import { isRing, isOnHold, sortByLastHoldingTime } from './webphoneHelper';
 
 export function getVideoElementPreparedReducer(types) {
   return (state = false, { type }) => {
@@ -155,7 +155,7 @@ export function getSessionsReducer(types) {
   return (state = [], { type, sessions }) => {
     switch (type) {
       case types.updateSessions:
-        return sessions.sort(sortSession);
+        return sessions.sort(sortByLastHoldingTime);
       case types.destroySessions:
         return [];
       default:
