@@ -112,9 +112,17 @@ export default class ConferenceCall extends RcModule {
     this.capacity = capacity;
   }
 
-  // only can be used after webphone._onCallStartFunc
   isConferenceSession(sessionId) {
-    return !!this.findConferenceWithSession(sessionId);
+    // only can be used after webphone._onCallStartFunc
+    let res = !!this.findConferenceWithSession(sessionId);
+
+    if (this.isMerging && !res) {
+      const session = this._webphone.sessions.find(session => session.id === sessionId);
+      res = session && session.to &&
+      session.to.indexOf('conf_') === 0;
+    }
+
+    return res;
   }
 
   findConferenceWithSession(sessionId) {

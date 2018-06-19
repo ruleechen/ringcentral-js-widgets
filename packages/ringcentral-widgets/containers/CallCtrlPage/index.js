@@ -288,9 +288,7 @@ function mapToProps(_, {
   const toMatches = (contactMapping && contactMapping[currentSession.to]) || [];
   const nameMatches =
     currentSession.direction === callDirections.outbound ? toMatches : fromMatches;
-  const isOnConference = conferenceCall.isConferenceSession(currentSession.id)
-    || (conferenceCall.isMerging && (currentSession.to
-      && currentSession.to.indexOf('conf_') === 0));
+  const isOnConference = conferenceCall.isConferenceSession(currentSession.id);
 
   const conferenceData = Object.values(conferenceCall.conferences)[0];
 

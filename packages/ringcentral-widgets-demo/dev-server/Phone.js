@@ -232,23 +232,13 @@ export default class BasePhone extends RcModule {
       }
     };
 
-    /**
-     * HACK: webphone._onCallStartFunc happens before session's accepted event,
-     * so we can't use conferenceCall.isConferenceSession()
-     * @param {object} session
-     */
     webphone._onCallStartFunc = (session) => {
       if (routerInteraction.currentPath.indexOf('/conferenceCall/dialer/') === 0) {
         routerInteraction.push('/conferenceCall/mergeCtrl');
         return;
       }
 
-      const isConferenceCallSession = (
-        session.to &&
-        session.to.indexOf('conf_') === 0 &&
-        session.callStatus === 'webphone-session-connecting' &&
-        conferenceCall.conferenceCallStatus === conferenceCallStatus.requesting
-      );
+      const isConferenceCallSession = conferenceCall.isConferenceSession(session.id);
 
       if (
         routerInteraction.currentPath !== '/calls/active' &&
