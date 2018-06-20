@@ -22,6 +22,7 @@ $tmpWidth: calc(100% - 53px - 7px - 98px - 20px);
   display: flex;
   align-items: center;
   width: 100%;
+  min-height: 62px;
   @include secondary-font;
 }
 
