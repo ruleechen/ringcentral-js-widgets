@@ -207,7 +207,8 @@ export default class BasePhone extends RcModule {
       if (
         routerInteraction.currentPath === '/conferenceCall/mergeCtrl' &&
         conferenceCall.state.mergingPair.from &&
-        conferenceCall.state.mergingPair.from.id === session.id
+        conferenceCall.state.mergingPair.from.id === session.id &&
+        currentSession
       ) {
         routerInteraction.push('/calls/active');
         return;
@@ -219,36 +220,31 @@ export default class BasePhone extends RcModule {
       }
 
       if (
-        routerInteraction.currentPath === '/calls/active' &&
+        !![
+          '/conferenceCall/mergeCtrl',
+          '/conferenceCall/dialer/',
+          '/calls/active'
+        ].find(path => path === routerInteraction.currentPath) &&
         (!currentSession || session.id === currentSession.id)
       ) {
-        routerInteraction.goBack();
         if (
           routerInteraction.currentPath === '/conferenceCall/mergeCtrl' ||
           routerInteraction.currentPath.indexOf('/conferenceCall/dialer/') === 0
         ) {
           routerInteraction.push('/dialer');
+          return;
         }
+        routerInteraction.goBack();
       }
     };
 
-    /**
-     * HACK: webphone._onCallStartFunc happens before session's accepted event,
-     * so we can't use conferenceCall.isConferenceSession()
-     * @param {object} session
-     */
     webphone._onCallStartFunc = (session) => {
       if (routerInteraction.currentPath.indexOf('/conferenceCall/dialer/') === 0) {
         routerInteraction.push('/conferenceCall/mergeCtrl');
         return;
       }
 
-      const isConferenceCallSession = (
-        session.to &&
-        session.to.indexOf('conf_') === 0 &&
-        session.callStatus === 'webphone-session-connecting' &&
-        conferenceCall.conferenceCallStatus === conferenceCallStatus.requesting
-      );
+      const isConferenceCallSession = conferenceCall.isConferenceSession(session.id);
 
       if (
         routerInteraction.currentPath !== '/calls/active' &&

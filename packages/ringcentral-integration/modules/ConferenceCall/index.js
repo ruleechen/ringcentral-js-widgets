@@ -112,9 +112,17 @@ export default class ConferenceCall extends RcModule {
     this.capacity = capacity;
   }
 
-  // only can be used after webphone._onCallStartFunc
   isConferenceSession(sessionId) {
-    return !!this.findConferenceWithSession(sessionId);
+    // only can be used after webphone._onCallStartFunc
+    let res = !!this.findConferenceWithSession(sessionId);
+
+    if (this.isMerging && !res) {
+      const session = this._webphone.sessions.find(session => session.id === sessionId);
+      res = session && session.to &&
+      session.to.indexOf('conf_') === 0;
+    }
+
+    return res;
   }
 
   findConferenceWithSession(sessionId) {
@@ -392,7 +400,7 @@ export default class ConferenceCall extends RcModule {
            * if create conference successfully but failed to bring-in,
            *  then terminate the conference.
            */
-          if (conferenceState && conferenceState.conference.parties.length < 2) {
+          if (conferenceState && conferenceState.profiles.length < 1) {
             this.terminateConference(conferenceState.conference.id);
           }
           this._alert.warning({
@@ -615,7 +623,9 @@ export default class ConferenceCall extends RcModule {
       for (const webphoneSession of webphoneSessions) {
         await this.bringInToConference(conferenceId, webphoneSession, true);
       }
-
+      if (!this.conferences[conferenceId].profiles.length) {
+        throw new Error('bring-in operations failed, not all intended parties were brought in');
+      }
       this.startPollingConferenceStatus(conferenceId);
       return conferenceId;
     }
