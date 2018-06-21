@@ -224,7 +224,7 @@ export default class BasePhone extends RcModule {
           '/conferenceCall/mergeCtrl',
           '/conferenceCall/dialer/',
           '/calls/active'
-        ].find(path => path === routerInteraction.currentPath) &&
+        ].find(path => routerInteraction.currentPath.indexOf(path) !== -1) &&
         (!currentSession || session.id === currentSession.id)
       ) {
         if (
