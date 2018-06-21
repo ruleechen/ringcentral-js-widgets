@@ -235,12 +235,6 @@ export default class ConferenceCall extends RcModule {
         || webphoneSession.direction !== callDirections.outbound
         || this.isOverload(id)
     ) {
-      if (!propagete) {
-        this._alert.warning({
-          message: conferenceErrors.bringInFailed,
-        });
-      }
-
       return null;
     }
     const { conference, session } = conferenceState;
@@ -272,9 +266,6 @@ export default class ConferenceCall extends RcModule {
         message: e.toString()
       });
       if (!propagete) {
-        this._alert.warning({
-          message: conferenceErrors.bringInFailed,
-        });
         return null;
       }
       throw e;
@@ -621,7 +612,7 @@ export default class ConferenceCall extends RcModule {
       this.stopPollingConferenceStatus(conferenceId);
       // for the sake of participants ordering, we can't concurrently bring in the participants
       for (const webphoneSession of webphoneSessions) {
-        await this.bringInToConference(conferenceId, webphoneSession, true);
+        await this.bringInToConference(conferenceId, webphoneSession);
       }
       if (!this.conferences[conferenceId].profiles.length) {
         throw new Error('bring-in operations failed, not all intended parties were brought in');
