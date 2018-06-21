@@ -207,7 +207,8 @@ export default class BasePhone extends RcModule {
       if (
         routerInteraction.currentPath === '/conferenceCall/mergeCtrl' &&
         conferenceCall.state.mergingPair.from &&
-        conferenceCall.state.mergingPair.from.id === session.id
+        conferenceCall.state.mergingPair.from.id === session.id &&
+        currentSession
       ) {
         routerInteraction.push('/calls/active');
         return;
@@ -219,16 +220,22 @@ export default class BasePhone extends RcModule {
       }
 
       if (
-        routerInteraction.currentPath === '/calls/active' &&
+        !![
+          '/conferenceCall/mergeCtrl',
+          '/conferenceCall/dialer/',
+          '/calls/active'
+        ].find(path => routerInteraction.currentPath.indexOf(path) !== -1) &&
         (!currentSession || session.id === currentSession.id)
       ) {
-        routerInteraction.goBack();
         if (
           routerInteraction.currentPath === '/conferenceCall/mergeCtrl' ||
-          routerInteraction.currentPath.indexOf('/conferenceCall/dialer/') === 0
+          routerInteraction.currentPath.indexOf('/conferenceCall/dialer/') === 0 ||
+          !currentSession
         ) {
           routerInteraction.push('/dialer');
+          return;
         }
+        routerInteraction.goBack();
       }
     };
 
