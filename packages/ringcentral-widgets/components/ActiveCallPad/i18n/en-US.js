@@ -1,5 +1,5 @@
 export default {
-  unmute: 'Unmute',
+  unmute: 'Muted',
   mute: 'Mute',
   keypad: 'Keypad',
   hold: 'Hold',
