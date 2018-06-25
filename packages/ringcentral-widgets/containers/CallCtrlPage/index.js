@@ -303,7 +303,8 @@ function mapToProps(_, {
   let addDisabled = false;
   if (conferenceData) {
     addDisabled = !Object.keys(currentSession).length
-      || conferenceCall.isOverload(conferenceData.conference.id);
+      || conferenceCall.isOverload(conferenceData.conference.id)
+      || !(currentSession.data && Object.keys(currentSession.data).length); // for conference
   }
   const isMerging = (
     Object
