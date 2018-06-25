@@ -292,20 +292,22 @@ function mapToProps(_, {
 
   const conferenceData = Object.values(conferenceCall.conferences)[0];
 
-  let mergeDisabled = false;
+  /**
+   * button disabled criteria
+   */
+  const initialVal = !(currentSession.data && Object.keys(currentSession.data).length) || false;
+  let mergeDisabled = initialVal;
+  let addDisabled = initialVal;
+
   if (conferenceData) {
-    mergeDisabled = conferenceCall.isOverload(conferenceData.conference.id)
-      // in case webphone.activeSession has not been updated yet
-      || !Object.keys(currentSession).length
-      || !(currentSession.data && Object.keys(currentSession.data).length);
+    const newVal = conferenceCall.isOverload(conferenceData.conference.id)
+    // in case webphone.activeSession has not been updated yet
+    || !Object.keys(currentSession).length;
+    // update
+    mergeDisabled = newVal;
+    addDisabled = newVal;
   }
 
-  let addDisabled = false;
-  if (conferenceData) {
-    addDisabled = !Object.keys(currentSession).length
-      || conferenceCall.isOverload(conferenceData.conference.id)
-      || !(currentSession.data && Object.keys(currentSession.data).length); // for conference
-  }
   const isMerging = (
     Object
       .values(conferenceCall.state.mergingPair)
