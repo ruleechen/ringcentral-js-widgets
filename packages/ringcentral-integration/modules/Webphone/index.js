@@ -722,6 +722,7 @@ export default class Webphone extends RcModule {
     try {
       this._holdOtherSession(session.id);
       this._onAccepted(session, 'inbound');
+      this._beforeCallStart(session);
       await session.accept(this.acceptOptions);
       this._onCallStart(session);
       this.store.dispatch({ // for track
@@ -1168,6 +1169,7 @@ export default class Webphone extends RcModule {
     });
   }
 
+  // for outbound call
   _beforeCallStart(session) {
     this._addSession(session);
     const normalizedSession = normalizeSession(session);
