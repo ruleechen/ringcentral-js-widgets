@@ -295,9 +295,8 @@ function mapToProps(_, {
   /**
    * button disabled criteria
    */
-  const initialVal = !(currentSession.data && Object.keys(currentSession.data).length) || false;
-  let mergeDisabled = initialVal;
-  let addDisabled = initialVal;
+  let mergeDisabled = !(currentSession.data && Object.keys(currentSession.data).length) || false;
+  let addDisabled = false;
 
   if (conferenceData) {
     const newVal = conferenceCall.isOverload(conferenceData.conference.id)
