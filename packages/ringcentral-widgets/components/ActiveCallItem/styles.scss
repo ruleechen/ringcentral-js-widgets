@@ -10,6 +10,7 @@ $tmpWidth: calc(100% - 53px - 7px - 98px - 20px);
   width: 100%;
   border-bottom: 1px solid #e2e2e2;
   margin-bottom: 7px;
+  min-height: 62px;
 }
 // .root:first-child {
 //   margin-top: -5px;
@@ -22,7 +23,6 @@ $tmpWidth: calc(100% - 53px - 7px - 98px - 20px);
   display: flex;
   align-items: center;
   width: 100%;
-  min-height: 62px;
   @include secondary-font;
 }
 

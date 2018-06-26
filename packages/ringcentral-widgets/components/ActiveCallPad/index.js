@@ -44,6 +44,7 @@ export default function ActiveCallPad(props) {
         className={btnClassName}
         icon={MuteIcon}
         title={i18n.getString('unmute', props.currentLocale)}
+        disabled={props.isOnHold}
       />
     ) :
     (
@@ -52,6 +53,7 @@ export default function ActiveCallPad(props) {
         className={btnClassName}
         title={i18n.getString('mute', props.currentLocale)}
         icon={UnmuteIcon}
+        disabled={props.isOnHold}
       />
     );
 
