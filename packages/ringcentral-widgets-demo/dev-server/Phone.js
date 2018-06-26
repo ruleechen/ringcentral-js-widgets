@@ -206,9 +206,9 @@ export default class BasePhone extends RcModule {
     webphone._onCallEndFunc = (session, currentSession) => {
       if (
         routerInteraction.currentPath === '/conferenceCall/mergeCtrl' &&
-        webphone.cachedSession
+        webphone.cachedSessions
         && ((currentSession
-          && currentSession.id === webphone.cachedSession.id
+          && webphone.cachedSessions.find(cachedSession => cachedSession.id === currentSession.id)
         ) || !currentSession)
       ) {
         return;

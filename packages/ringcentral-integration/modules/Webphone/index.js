@@ -22,7 +22,7 @@ import {
   normalizeSession,
   isRing,
   isOnHold,
-  sortByLastHoldingTime,
+  sortByCreationTimeDesc,
 } from './webphoneHelper';
 import getWebphoneReducer from './getWebphoneReducer';
 
@@ -145,21 +145,30 @@ export default class Webphone extends RcModule {
     this.addSelector('activeSession',
       () => this.activeSessionId,
       () => this.sessions,
-      () => this.cachedSession,
-      (activeSessionId, sessions, cachedSession) => {
+      () => this.cachedSessions,
+      (activeSessionId, sessions, cachedSessions) => {
         if (!activeSessionId) {
           return null;
         }
         const realActiveSession = sessions.find(
           session => session.id === activeSessionId
         );
-        if (cachedSession) {
+        if (cachedSessions) {
           // means that the conference is being merging
-          if (realActiveSession && realActiveSession.to &&
-            realActiveSession.to.indexOf('conf_') === 0) {
-            return cachedSession;
+          if (
+            (
+              realActiveSession &&
+              (
+                ((realActiveSession.to
+                  && realActiveSession.to.indexOf('conf_') === 0))// realActiveSession is a conference
+                || (cachedSessions.find(cachedSession => cachedSession.id === realActiveSession.id))// realActiveSession is cached
+              )
+            )
+            || !realActiveSession) {
+            return cachedSessions.sort(sortByCreationTimeDesc)[0];
           }
-          return [cachedSession, realActiveSession].sort(sortByLastHoldingTime)[0];
+
+          return [...cachedSessions, realActiveSession].sort(sortByCreationTimeDesc)[0];
         }
         return realActiveSession;
       }
@@ -1154,10 +1163,10 @@ export default class Webphone extends RcModule {
     });
   }
 
-  updateSessionCaching(session) {
+  updateSessionCaching(sessions) {
     this.store.dispatch({
       type: this.actionTypes.updateSessionCaching,
-      session
+      sessions
     });
   }
 
@@ -1345,8 +1354,8 @@ export default class Webphone extends RcModule {
     return this.state.lastEndedSessions;
   }
 
-  get cachedSession() {
-    return this.state.cachedSession;
+  get cachedSessions() {
+    return this.state.cachedSessions;
   }
 
   get videoElementPrepared() {

@@ -379,7 +379,7 @@ export default class ConferenceCall extends RcModule {
        * HACK: we need to preserve the merging session in prevent the glitch of
        * the call control page.
        */
-      this._webphone.updateSessionCaching(sessionDatas[webphoneSessions.length - 1]);
+      this._webphone.updateSessionCaching(sessionDatas);
 
       const pSips = sipInstances.map((instance) => {
         const p = new Promise((resolve) => {

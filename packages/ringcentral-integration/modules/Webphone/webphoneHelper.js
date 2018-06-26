@@ -53,12 +53,16 @@ export function isOnHold(session) {
   return !!(session && session.callStatus === sessionStatus.onHold);
 }
 
-export function sortByLastHoldingTime(l, r) {
+export function sortByCreationTimeDesc(l, r) {
+  return r.startTime - l.startTime;
+}
+
+export function sortByLastHoldingTimeDesc(l, r) {
   if (!l || !r) {
     return 0;
   }
   if (r.lastHoldingTime !== l.lastHoldingTime) {
     return r.lastHoldingTime - l.lastHoldingTime;
   }
-  return r.startTime - l.startTime;
+  return sortByCreationTimeDesc(l, r);
 }
