@@ -170,6 +170,20 @@ export function getSessionsReducer(types) {
   };
 }
 
+// HACK: for conference call merging
+export function getCachedSessionReducer(types) {
+  return (state = null, { type, session }) => {
+    switch (type) {
+      case types.updateSessionCaching:
+        return session;
+      case types.clearSessionCaching:
+        return null;
+      default:
+        return state;
+    }
+  };
+}
+
 export default function getWebphoneReducer(types) {
   return combineReducers({
     status: getModuleStatusReducer(types),
@@ -182,5 +196,6 @@ export default function getWebphoneReducer(types) {
     ringSessionId: getRingSessionIdReducer(types),
     sessions: getSessionsReducer(types),
     lastEndedSessions: getLastEndedSessionsReducer(types),
+    cachedSession: getCachedSessionReducer(types),
   });
 }

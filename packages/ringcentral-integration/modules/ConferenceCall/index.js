@@ -371,6 +371,16 @@ export default class ConferenceCall extends RcModule {
        */
       sipInstances = webphoneSessions
         .map(webphoneSession => this._webphone._sessions.get(webphoneSession.id));
+      const sessionDatas = webphoneSessions
+        .map(webphoneSession => this._webphone.sessions
+          .find(session => session.id === webphoneSession.id)
+        );
+      /**
+       * HACK: we need to preserve the merging session in prevent the glitch of
+       * the call control page.
+       */
+      this._webphone.updateSessionCaching(sessionDatas[webphoneSessions.length - 1]);
+
       const pSips = sipInstances.map((instance) => {
         const p = new Promise((resolve) => {
           instance.on('terminated', () => {
@@ -401,6 +411,7 @@ export default class ConferenceCall extends RcModule {
             type: this.actionTypes.mergeFailed,
           });
         });
+      this._webphone.clearSessionCaching();
     } else {
       try {
         conferenceId = await this._mergeToConference(webphoneSessions);
@@ -414,7 +425,7 @@ export default class ConferenceCall extends RcModule {
          * if create conference successfully but failed to bring-in,
          *  then terminate the conference.
          */
-        if (conferenceState && conferenceState.conference.parties.length < 2) {
+        if (conferenceState && conferenceState.conference.parties.length < 1) {
           this.terminateConference(conferenceState.conference.id);
         }
         this._alert.warning({

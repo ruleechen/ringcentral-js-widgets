@@ -22,6 +22,7 @@ import {
   normalizeSession,
   isRing,
   isOnHold,
+  sortByLastHoldingTime,
 } from './webphoneHelper';
 import getWebphoneReducer from './getWebphoneReducer';
 
@@ -144,14 +145,23 @@ export default class Webphone extends RcModule {
     this.addSelector('activeSession',
       () => this.activeSessionId,
       () => this.sessions,
-      (activeSessionId, sessions) => {
+      () => this.cachedSession,
+      (activeSessionId, sessions, cachedSession) => {
         if (!activeSessionId) {
           return null;
         }
-        const activeSession = sessions.find(
+        const realActiveSession = sessions.find(
           session => session.id === activeSessionId
         );
-        return activeSession;
+        if (cachedSession) {
+          // means that the conference is being merging
+          if (realActiveSession && realActiveSession.to &&
+            realActiveSession.to.indexOf('conf_') === 0) {
+            return cachedSession;
+          }
+          return [cachedSession, realActiveSession].sort(sortByLastHoldingTime)[0];
+        }
+        return realActiveSession;
       }
     );
 
@@ -1144,6 +1154,19 @@ export default class Webphone extends RcModule {
     });
   }
 
+  updateSessionCaching(session) {
+    this.store.dispatch({
+      type: this.actionTypes.updateSessionCaching,
+      session
+    });
+  }
+
+  clearSessionCaching() {
+    this.store.dispatch({
+      type: this.actionTypes.clearSessionCaching,
+    });
+  }
+
   _updateSessions() {
     this.store.dispatch({
       type: this.actionTypes.updateSessions,
@@ -1320,6 +1343,10 @@ export default class Webphone extends RcModule {
 
   get lastEndedSessions() {
     return this.state.lastEndedSessions;
+  }
+
+  get cachedSession() {
+    return this.state.cachedSession;
   }
 
   get videoElementPrepared() {
