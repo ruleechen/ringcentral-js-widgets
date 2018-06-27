@@ -623,7 +623,7 @@ export default class ConferenceCall extends RcModule {
       this.stopPollingConferenceStatus(conferenceId);
       // for the sake of participants ordering, we can't concurrently bring in the participants
       for (const webphoneSession of webphoneSessions) {
-        await this.bringInToConference(conferenceId, webphoneSession);
+        await this.bringInToConference(conferenceId, webphoneSession, true);
       }
       if (!this.conferences[conferenceId].profiles.length) {
         throw new Error('bring-in operations failed, not all intended parties were brought in');

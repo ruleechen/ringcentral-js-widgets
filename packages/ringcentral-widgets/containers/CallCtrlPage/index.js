@@ -303,7 +303,7 @@ function mapToProps(_, {
     // in case webphone.activeSession has not been updated yet
     || !Object.keys(currentSession).length;
     // update
-    mergeDisabled = newVal;
+    mergeDisabled = newVal || !Object.keys(currentSession.data).length;
     addDisabled = newVal;
   }
 
