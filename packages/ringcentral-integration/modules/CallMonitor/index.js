@@ -12,7 +12,7 @@ import {
   sortByStartTime,
 } from '../../lib/callLogHelpers';
 import ensureExist from '../../lib/ensureExist';
-import { isRing, isOnHold, sortByLastHoldingTime } from '../Webphone/webphoneHelper';
+import { isRing, isOnHold, sortByLastHoldingTimeDesc } from '../Webphone/webphoneHelper';
 
 function matchWephoneSessionWithAcitveCall(sessions, callItem) {
   if (!sessions || !callItem.sipData) {
@@ -168,7 +168,7 @@ export default class CallMonitor extends RcModule {
             webphoneSession,
           };
         }).sort((l, r) => (
-          sortByLastHoldingTime(l.webphoneSession, r.webphoneSession)
+          sortByLastHoldingTimeDesc(l.webphoneSession, r.webphoneSession)
         ));
       },
     );
