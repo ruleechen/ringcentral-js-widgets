@@ -16,7 +16,7 @@ export default function ConferenceInfo({
       onClick={(e) => { e.preventDefault(); onClick(); }}
     >
       {
-        Array.isArray(displayedProfiles)
+        Array.isArray(displayedProfiles) && displayedProfiles.length
         ? (
           <div className={styles.avatarContainer}>
             {
@@ -35,12 +35,11 @@ export default function ConferenceInfo({
                 </div>
               )
             )
+          }{
+            remains
+              ? (<div className={classnames(styles.avatar, styles.remains)}>{`+${remains}`}</div>)
+              : null
           }
-            {
-          remains ? (
-            <div className={classnames(styles.avatar, styles.remains)}>{`+${remains}`}</div>
-          ) : null
-        }
           </div>
         )
         : (
