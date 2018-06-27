@@ -141,9 +141,11 @@ export default class CallMonitor extends RcModule {
       () => this._accountInfo.countryCode,
       () => { // gathering all the session datas, including caching
         if (this._webphone && Array.isArray(this._webphone.cachedSessions)) {
-          const sessinObj = [...this._webphone.cachedSessions, ...this._webphone.sessions]
+          const sessinObj = [...this._webphone.sessions, ...this._webphone.cachedSessions]
             .reduce((accum, session) => {
-              accum[session.id] = session;
+              if (!accum[session.id]) {
+                accum[session.id] = session;
+              }
               return accum;
             }, {});
           return Object.values(sessinObj);
@@ -154,17 +156,14 @@ export default class CallMonitor extends RcModule {
         let sessionsCache = sessions || [];
 
         if (Array.isArray(cachedCallsFromPresence)) {
-          const cachedMap = cachedCallsFromPresence
-            .reduce((accum, cachedCall) => {
-              accum[cachedCall.id] = cachedCall;
+          const cachedMap = [...callsFromPresence, ...cachedCallsFromPresence,]
+            .reduce((accum, callItem) => {
+              if (!accum[callItem.id]) {
+                accum[callItem.id] = callItem;
+              }
               return accum;
             }, {});
 
-          callsFromPresence.forEach((data) => {
-            if (!cachedMap[data.id]) {
-              cachedMap[data.id] = data;
-            }
-          });
           callsFromPresence = Object.values(cachedMap);
         }
 
@@ -470,7 +469,7 @@ export default class CallMonitor extends RcModule {
         this._detailedPresence.calls.forEach((call) => {
           if (
             Array.isArray(this.cachedCallsFromPresence)
-            && this.cachedCallsFromPresence.find(data => data.id === call)
+            && this.cachedCallsFromPresence.find(data => data.id === call.id)
           ) {
             return;
           }

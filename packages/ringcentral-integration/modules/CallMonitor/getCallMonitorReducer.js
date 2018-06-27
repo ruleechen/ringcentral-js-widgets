@@ -21,14 +21,14 @@ export function getCachedCallsFromPresenceReducer(types) {
   return (state = null, { type, call }) => {
     switch (type) {
       case types.updateCallsCaching:
-        call.cached = true;
-
         if (Array.isArray(state)) {
           if (state.find(cachedCall => cachedCall.id === call.id)) {
             return state;
           }
+          call.cached = true;
           return [...state, call];
         }
+        call.cached = true;
         return [call];
       case types.clearCallsCaching:
       case types.reset:
