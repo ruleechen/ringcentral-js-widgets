@@ -175,6 +175,7 @@ export function getCachedSessionsReducer(types) {
   return (state = null, { type, sessions }) => {
     switch (type) {
       case types.updateSessionCaching:
+        sessions.forEach((session) => { session.cached = true ;});
         return sessions;
       case types.clearSessionCaching:
         return null;
