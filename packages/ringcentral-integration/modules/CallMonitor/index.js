@@ -1,4 +1,5 @@
 import 'core-js/fn/array/find';
+import { equals } from 'ramda';
 import { Module } from '../../lib/di';
 import RcModule from '../../lib/RcModule';
 import moduleStatuses from '../../enums/moduleStatuses';
@@ -152,11 +153,9 @@ export default class CallMonitor extends RcModule {
         }
         return this._webphone && this._webphone.sessions;
       },
-      (callsFromPresence, cachedCallsFromPresence, countryCode, sessions) => {
-        let sessionsCache = sessions || [];
-
+      (callsFromPresence, cachedCallsFromPresence, countryCode, sessions = []) => {
         if (Array.isArray(cachedCallsFromPresence)) {
-          const cachedMap = [...callsFromPresence, ...cachedCallsFromPresence,]
+          const cachedMap = [...callsFromPresence, ...cachedCallsFromPresence]
             .reduce((accum, callItem) => {
               if (!accum[callItem.id]) {
                 accum[callItem.id] = callItem;
@@ -177,8 +176,8 @@ export default class CallMonitor extends RcModule {
             phoneNumber: callItem.to && callItem.to.phoneNumber,
             countryCode,
           });
-          const webphoneSession = matchWephoneSessionWithAcitveCall(sessionsCache, callItem);
-          sessionsCache = sessionsCache.filter(x => x !== webphoneSession);
+          const webphoneSession = matchWephoneSessionWithAcitveCall(sessions, callItem);
+          sessions = sessions.filter(x => x !== webphoneSession);
           return {
             ...callItem,
             from: {
@@ -380,7 +379,7 @@ export default class CallMonitor extends RcModule {
     ) {
       const uniqueNumbers = this._selectors.uniqueNumbers();
       if (
-        this._lastProcessedNumbers !== uniqueNumbers &&
+        !equals(this._lastProcessedNumbers, uniqueNumbers) &&
         (!this._tabManager || this._tabManager.active)
       ) {
         this._lastProcessedNumbers = uniqueNumbers;
@@ -390,7 +389,7 @@ export default class CallMonitor extends RcModule {
       }
       const sessionIds = this._selectors.sessionIds();
       if (
-        this._lastProcessedIds !== sessionIds &&
+        !equals(this._lastProcessedIds, sessionIds) &&
         (!this._tabManager || this._tabManager.active)
       ) {
         this._lastProcessedIds = sessionIds;
