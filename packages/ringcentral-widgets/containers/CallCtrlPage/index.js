@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import formatNumber from 'ringcentral-integration/lib/formatNumber';
 import callDirections from 'ringcentral-integration/enums/callDirections';
-
+import callingModes from 'ringcentral-integration/modules/CallingSettings/callingModes';
 import withPhone from '../../lib/withPhone';
 import callCtrlLayout from '../../lib/callCtrlLayout';
 import CallCtrlPanel from '../../components/CallCtrlPanel';
@@ -279,6 +279,7 @@ function mapToProps(_, {
     callMonitor,
     contactSearch,
     conferenceCall,
+    callingSettings,
   },
   layout = callCtrlLayout.normalCtrl,
 }) {
@@ -295,10 +296,12 @@ function mapToProps(_, {
   /**
    * button disabled criteria
    */
-  let mergeDisabled = !(currentSession.data && Object.keys(currentSession.data).length) || false;
-  let addDisabled = false;
+  const isWebRTC = callingSettings.callingMode === callingModes.webphone;
+  let mergeDisabled = !(currentSession.data && Object.keys(currentSession.data).length)
+  || !isWebRTC;
+  let addDisabled = !isWebRTC;
 
-  if (conferenceData) {
+  if (conferenceData && isWebRTC) {
     const newVal = conferenceCall.isOverload(conferenceData.conference.id)
     // in case webphone.activeSession has not been updated yet
     || !Object.keys(currentSession).length;

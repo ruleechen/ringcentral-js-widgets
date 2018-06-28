@@ -870,6 +870,14 @@ export default class Webphone extends RcModule {
       }
       session.hold();
     });
+
+    // update the caching
+    if (Array.isArray(this.cachedSessions)) {
+      this.cachedSessions.forEach((cache) => {
+        cache.callStatus = sessionStatus.onHold;
+        cache.isOnHold = true;
+      });
+    }
   }
 
   @proxify

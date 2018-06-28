@@ -8,6 +8,7 @@ import getConferenceCallReducer from './getConferenceCallReducer';
 import proxify from '../../lib/proxy/proxify';
 import permissionsMessages from '../RolesAndPermissions/permissionsMessages';
 import conferenceErrors from './conferenceCallErrors';
+import { isConferenceSession } from '../Webphone/webphoneHelper';
 // import webphoneErrors from '../Webphone/webphoneErrors';
 import ensureExist from '../../lib/ensureExist';
 // import sleep from '../../lib/sleep';
@@ -118,8 +119,7 @@ export default class ConferenceCall extends RcModule {
 
     if (this.isMerging && !res) {
       const session = this._webphone.sessions.find(session => session.id === sessionId);
-      res = session && session.to &&
-      session.to.indexOf('conf_') === 0;
+      res = isConferenceSession(session);
     }
 
     return res;
@@ -632,18 +632,22 @@ export default class ConferenceCall extends RcModule {
       return conferenceId;
     }
     const { id } = await this.makeConference(true);
-
+    let confereceAccepted = false;
     await Promise.race([
       new Promise((resolve, reject) => {
         const session = this.conferences[id].session;
-        session.on('accepted', () => resolve());
+        session.on('accepted', () => {
+          confereceAccepted = true;
+          resolve();
+        });
         session.on('cancel', () => reject(new Error('conferecing cancel')));
         session.on('failed', () => reject(new Error('conferecing failed')));
         session.on('rejected', () => reject(new Error('conferecing rejected')));
         session.on('terminated', () => reject(new Error('conferecing terminated')));
       }),
       new Promise((resolve, reject) => {
-        setTimeout(() => reject(new Error('conferecing timeout')), this._timout);
+        setTimeout(() => (confereceAccepted ? resolve() : reject(new Error('conferecing timeout')))
+          , this._timout);
       })
     ]);
 

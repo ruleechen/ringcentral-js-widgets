@@ -1,4 +1,5 @@
 import 'core-js/fn/array/find';
+import { equals } from 'ramda';
 import { Module } from '../../lib/di';
 import RcModule from '../../lib/RcModule';
 import moduleStatuses from '../../enums/moduleStatuses';
@@ -12,7 +13,7 @@ import {
   sortByStartTime,
 } from '../../lib/callLogHelpers';
 import ensureExist from '../../lib/ensureExist';
-import { isRing, isOnHold, sortByLastHoldingTimeDesc } from '../Webphone/webphoneHelper';
+import { isRing, isOnHold, sortByLastHoldingTimeDesc, isConferenceSession } from '../Webphone/webphoneHelper';
 
 function matchWephoneSessionWithAcitveCall(sessions, callItem) {
   if (!sessions || !callItem.sipData) {
@@ -137,10 +138,34 @@ export default class CallMonitor extends RcModule {
 
     this.addSelector('normalizedCalls',
       () => this._detailedPresence.calls,
+      () => this.cachedCallsFromPresence,
       () => this._accountInfo.countryCode,
-      () => this._webphone && this._webphone.sessions,
-      (callsFromPresence, countryCode, sessions) => {
-        let sessionsCache = sessions || [];
+      () => { // gathering all the session datas, including caching
+        if (this._webphone && Array.isArray(this._webphone.cachedSessions)) {
+          const sessinObj = [...this._webphone.sessions, ...this._webphone.cachedSessions]
+            .reduce((accum, session) => {
+              if (!accum[session.id]) {
+                accum[session.id] = session;
+              }
+              return accum;
+            }, {});
+          return Object.values(sessinObj);
+        }
+        return this._webphone && this._webphone.sessions;
+      },
+      (callsFromPresence, cachedCallsFromPresence, countryCode, sessions = []) => {
+        if (Array.isArray(cachedCallsFromPresence)) {
+          const cachedMap = [...callsFromPresence, ...cachedCallsFromPresence]
+            .reduce((accum, callItem) => {
+              if (!accum[callItem.id]) {
+                accum[callItem.id] = callItem;
+              }
+              return accum;
+            }, {});
+
+          callsFromPresence = Object.values(cachedMap);
+        }
+
         return callsFromPresence.map((callItem) => {
           // use account countryCode to normalize number due to API issues [RCINT-3419]
           const fromNumber = normalizeNumber({
@@ -151,8 +176,8 @@ export default class CallMonitor extends RcModule {
             phoneNumber: callItem.to && callItem.to.phoneNumber,
             countryCode,
           });
-          const webphoneSession = matchWephoneSessionWithAcitveCall(sessionsCache, callItem);
-          sessionsCache = sessionsCache.filter(x => x !== webphoneSession);
+          const webphoneSession = matchWephoneSessionWithAcitveCall(sessions, callItem);
+          sessions = sessions.filter(x => x !== webphoneSession);
           return {
             ...callItem,
             from: {
@@ -169,7 +194,13 @@ export default class CallMonitor extends RcModule {
           };
         }).sort((l, r) => (
           sortByLastHoldingTimeDesc(l.webphoneSession, r.webphoneSession)
-        ));
+        )).filter((callItem) => {
+        // filtering out the conferece during merging
+          if (Array.isArray(cachedCallsFromPresence)) {
+            return !isConferenceSession(callItem.webphoneSession);
+          }
+          return true;
+        });
       },
     );
 
@@ -354,7 +385,7 @@ export default class CallMonitor extends RcModule {
     ) {
       const uniqueNumbers = this._selectors.uniqueNumbers();
       if (
-        this._lastProcessedNumbers !== uniqueNumbers &&
+        !equals(this._lastProcessedNumbers, uniqueNumbers) &&
         (!this._tabManager || this._tabManager.active)
       ) {
         this._lastProcessedNumbers = uniqueNumbers;
@@ -364,7 +395,7 @@ export default class CallMonitor extends RcModule {
       }
       const sessionIds = this._selectors.sessionIds();
       if (
-        this._lastProcessedIds !== sessionIds &&
+        !equals(this._lastProcessedIds, sessionIds) &&
         (!this._tabManager || this._tabManager.active)
       ) {
         this._lastProcessedIds = sessionIds;
@@ -438,6 +469,27 @@ export default class CallMonitor extends RcModule {
           }
         });
       }
+
+      if (Array.isArray(this._webphone.cachedSessions)) {
+        this._detailedPresence.calls.forEach((call) => {
+          if (
+            Array.isArray(this.cachedCallsFromPresence)
+            && this.cachedCallsFromPresence.find(data => data.id === call.id)
+          ) {
+            return;
+          }
+          if (matchWephoneSessionWithAcitveCall(this._webphone.cachedSessions, call)) {
+            this.store.dispatch({
+              type: this.actionTypes.updateCallsCaching,
+              call,
+            });
+          }
+        });
+      } else if (Array.isArray(this.cachedCallsFromPresence)) {
+        this.store.dispatch({
+          type: this.actionTypes.clearCallsCaching,
+        });
+      }
     }
   }
   initialize() {
@@ -496,5 +548,9 @@ export default class CallMonitor extends RcModule {
 
   get otherDeviceCalls() {
     return this._selectors.otherDeviceCalls();
+  }
+
+  get cachedCallsFromPresence() {
+    return this.state.cachedCallsFromPresence;
   }
 }
