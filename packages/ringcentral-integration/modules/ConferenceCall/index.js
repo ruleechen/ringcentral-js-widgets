@@ -8,6 +8,7 @@ import getConferenceCallReducer from './getConferenceCallReducer';
 import proxify from '../../lib/proxy/proxify';
 import permissionsMessages from '../RolesAndPermissions/permissionsMessages';
 import conferenceErrors from './conferenceCallErrors';
+import { isConferenceSession } from '../Webphone/webphoneHelper';
 // import webphoneErrors from '../Webphone/webphoneErrors';
 import ensureExist from '../../lib/ensureExist';
 // import sleep from '../../lib/sleep';
@@ -118,8 +119,7 @@ export default class ConferenceCall extends RcModule {
 
     if (this.isMerging && !res) {
       const session = this._webphone.sessions.find(session => session.id === sessionId);
-      res = session && session.to &&
-      session.to.indexOf('conf_') === 0;
+      res = isConferenceSession(session);
     }
 
     return res;

@@ -66,3 +66,11 @@ export function sortByLastHoldingTimeDesc(l, r) {
   }
   return sortByCreationTimeDesc(l, r);
 }
+
+/**
+ * HACK: this function is not very reliable, only use it before the merging complete.
+ */
+export function isConferenceSession(session) {
+  return session && session.to &&
+    session.to.indexOf('conf_') === 0;
+}
