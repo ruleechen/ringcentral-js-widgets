@@ -304,9 +304,9 @@ function mapToProps(_, {
   if (conferenceData && isWebRTC) {
     const newVal = conferenceCall.isOverload(conferenceData.conference.id)
     // in case webphone.activeSession has not been updated yet
-    || !Object.keys(currentSession).length;
+    || !(currentSession.data && Object.keys(currentSession.data).length);
     // update
-    mergeDisabled = newVal || !Object.keys(currentSession.data).length;
+    mergeDisabled = newVal || !(currentSession.data && Object.keys(currentSession.data).length);
     addDisabled = newVal;
   }
 
