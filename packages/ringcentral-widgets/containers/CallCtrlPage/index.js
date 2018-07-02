@@ -387,7 +387,7 @@ function mapToFunctions(_, {
       }
       const sessionData = find(x => x.id === sessionId, webphone.sessions);
       if (sessionData) {
-        routerInteraction.push(`/conferenceCall/dialer/${sessionData.from}`);
+        routerInteraction.push(`/conferenceCall/dialer/${sessionData.fromNumber}`);
       }
     },
     gotoNormalCallCtrl: () => routerInteraction.push('/calls/active'),

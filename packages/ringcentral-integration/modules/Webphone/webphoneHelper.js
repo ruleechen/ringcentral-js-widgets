@@ -23,6 +23,7 @@ export function normalizeSession(session) {
     to: session.request.to.uri.user,
     toUserName: session.request.to.displayName,
     from: session.request.from.uri.user,
+    fromNumber: session.fromNumber,
     fromUserName: session.request.from.displayName,
     startTime: session.startTime && (new Date(session.startTime)).getTime(),
     creationTime: session.creationTime,

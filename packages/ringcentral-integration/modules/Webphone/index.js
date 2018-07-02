@@ -1157,6 +1157,7 @@ export default class Webphone extends RcModule {
     session.direction = callDirections.outbound;
     session.callStatus = sessionStatus.connecting;
     session.creationTime = Date.now();
+    session.fromNumber = fromNumber;
     this._onAccepted(session);
     this._holdOtherSession(session.id);
     this._beforeCallStart(session);
