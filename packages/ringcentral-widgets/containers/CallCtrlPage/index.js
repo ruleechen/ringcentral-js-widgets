@@ -318,8 +318,17 @@ function mapToProps(_, {
     || (isOnConference)
   )
     && conferenceCall.isMerging;
-
-  layout = isOnConference ? callCtrlLayout.conferenceCtrl : layout;
+  if (isOnConference) {
+    layout = callCtrlLayout.conferenceCtrl;
+  } else if (
+    (
+      layout === callCtrlLayout.mergeCtrl
+      && !conferenceCall.state.mergingPair.from
+    ) // means is about to merge to a conference
+    && !Object.keys(conferenceCall.conferences).length // and the conference has been closed
+  ) {
+    layout = callCtrlLayout.normalCtrl;// then change to normal call control
+  }
 
   return {
     brand: brand.fullName,
