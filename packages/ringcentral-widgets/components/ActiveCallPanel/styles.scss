@@ -49,7 +49,6 @@ $conferenceAvatarSize: 55px;;
   text-align: center;
   color: $lightblack;
   padding-bottom: 15px;
-  padding-top: 20px;
   margin-left: auto;
   margin-right: auto;
   box-sizing: border-box;
@@ -101,12 +100,12 @@ $conferenceAvatarSize: 55px;;
 }
 
 .timeCounter {
-  position: absolute;
-  top: 20px;
-  right: 20px;
   color: $grey-light;
   font-size: 12px;
   font-weight: 300;
+  text-align: right;
+  padding: 0 24px;
+  margin-top: 10px;
 }
 
 .callPad {
@@ -138,7 +137,7 @@ $conferenceAvatarSize: 55px;;
   }
   
   .avatarContainer{
-    padding: 15px 15px 0 15px;
+    padding: 0 15px;
     text-align: center;
     font-size: 0;
     .avatar{

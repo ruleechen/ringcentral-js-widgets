@@ -106,23 +106,25 @@ class ActiveCallPanel extends React.Component {
       mergeDisabled,
     } = this.props;
 
-    const timeCounter = startTime ?
+    const timeCounter =
       (
-        <span className={styles.timeCounter}>
-          <DurationCounter startTime={startTime} offset={startTimeOffset} />
+        <div className={styles.timeCounter}>
+          {
+            startTime
+            ? <DurationCounter startTime={startTime} offset={startTimeOffset} />
+            : <span ariaHidden="true">&nbsp;</span>
+          }
+        </div>
+      );
+    const backHeader = (<BackHeader
+      onBackClick={onBackButtonClick}
+      backButton={(
+        <span className={styles.backButton}>
+          <i className={classnames(dynamicsFont.arrow, styles.backIcon)} />
+          <span className={styles.backLabel}>{backButtonLabel}</span>
         </span>
-      ) : null;
-    const backHeader = (calls.length > 1 || layout === callCtrlLayout.conferenceCtrl) ? (
-      <BackHeader
-        onBackClick={onBackButtonClick}
-        backButton={(
-          <span className={styles.backButton}>
-            <i className={classnames(dynamicsFont.arrow, styles.backIcon)} />
-            <span className={styles.backLabel}>{backButtonLabel}</span>
-          </span>
         )}
-      />
-    ) : <BackHeader className={styles.hidden} />;
+      />);
 
     return (
       <div className={styles.root}>
