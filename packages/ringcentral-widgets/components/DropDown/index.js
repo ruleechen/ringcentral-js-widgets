@@ -245,8 +245,8 @@ class DropDown extends Component {
       >
         <div className={styles.dropdown}>
           {children}
-          <div className={styles.tail} />
         </div>
+        <div className={styles.tail} />
       </div>
     );
   }
