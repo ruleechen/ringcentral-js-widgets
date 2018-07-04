@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import { isFunction } from 'ringcentral-integration/lib/di/utils/is_type';
+import { isFunction, isObject } from 'ringcentral-integration/lib/di/utils/is_type';
 import Enum from 'ringcentral-integration/lib/Enum';
 
 import styles from './styles.scss';
@@ -55,6 +55,7 @@ const transitionEnd = () => {
       return transEndEventNames[name];
     }
   }
+  return null;
 };
 
 const getPageOffset = (el) => {
@@ -76,16 +77,13 @@ const getRelativeOffset = (el) => {
   if (!el) {
     return null;
   }
-  let tmp = el.parentElement;
+  let tmp = el;
   while (window.getComputedStyle(tmp).position === 'static') {
     res.top += el.offsetTop;
     res.left += el.offsetLeft;
     tmp = tmp.parentElement;
   }
-  return {
-    top: el.offsetTop,
-    left: el.offsetLeft,
-  };
+  return res;
 };
 
 class DropDown extends Component {
@@ -93,6 +91,7 @@ class DropDown extends Component {
     super(props);
 
     this.state = {
+      cachedPositioning: null,
       visibility: null,
       position: null,
       transitionEndEvtName: transitionEnd(),
@@ -125,51 +124,76 @@ class DropDown extends Component {
     }));
   }
 
-  checkPosition(props = this.props) {
-    const { dom: { current } } = this;
-    const documentElement = document.documentElement;
-    const parentElement = current.parentElement;
-    const parentComputedStyle = window.getComputedStyle(parentElement);
-    const parentDemension = getDimensions(parentElement);
-    const currentDemension = getDimensions(current);
-
-    let position;
-    let originalCSSPosition;
-    let top;
-
-    if (props.fixed) {
-      originalCSSPosition = window.getComputedStyle(documentElement).position;
-      position = getPageOffset(parentElement);
-      top = props.direction === POSITION.top
-        ? position && position.top - currentDemension.height
-        : position && (position.top + parentDemension.height);
+  changeTriggerElmPosition(fixed = this.props.fixed, triggerElm = this.props.triggerElm) {
+    const RELATIVE = 'relative';
+    let elm;
+    if (!fixed) {
+      elm = triggerElm;
     } else {
-      originalCSSPosition = parentElement && parentElement.nodeType === 1
-        ? parentComputedStyle.position
-        : '';
-      position = getRelativeOffset(current);
-      top = props.direction === POSITION.top
-        ? position && -currentDemension.height
-        : position && position.top;
+      elm = document.body;
     }
-    const left = position
-    && (position.left + parentDemension.width / 2 - currentDemension.width / 2);
+    if (elm) {
+      elm.style.position = RELATIVE;
+    }
+  }
 
+  recordPositioning(triggerElm = this.props.triggerElm) {
+    if (triggerElm) {
+      const cachedPositioning = this.props.fixed ? {
+        elm: document.body,
+        position: window.getComputedStyle(document.body).position
+      } : {
+        elm: triggerElm,
+        position: window.getComputedStyle(triggerElm).position
+      };
+      this.setState(prevState => ({
+        ...prevState,
+        cachedPositioning,
+      }));
+    }
+  }
 
-    this.setState(preState => ({
-      ...preState,
-      position: {
-        left,
-        top,
-      },
-      parent: {
-        element: parentElement,
-        originalCSSPosition,
-      },
-    }));
+  restorePositioning() {
+    if (this.state.cachedPositioning && this.state.cachedPositioning.elm) {
+      this.state.cachedPositioning.elm.style.potition = this.state.cachedPositioning.position;
+    }
+  }
+
+  checkPosition(props = this.props) {
+    const triggerElm = this.props.triggerElm;
+
+    if (triggerElm) {
+      const { dom: { current } } = this;
+      const demensionOfTrigger = getDimensions(triggerElm);
+      const currentDemension = getDimensions(current);
+
+      let offset;
+
+      if (props.fixed) {
+        offset = getPageOffset(triggerElm);
+      } else {
+        offset = getRelativeOffset(triggerElm);
+      }
+
+      const top = props.direction === POSITION.top
+        ? offset && offset.top - currentDemension.height
+        : offset && (offset.top + demensionOfTrigger.height);
+      const left = offset
+      && (offset.left + demensionOfTrigger.width / 2 - currentDemension.width / 2);
+
+      this.setState(preState => ({
+        ...preState,
+        position: {
+          left,
+          top,
+        },
+      }));
+    }
   }
 
   componentDidMount() {
+    this.recordPositioning();
+    this.changeTriggerElmPosition();
     this.checkPosition();
     this.setVisibility();
     window.addEventListener('resize', this.state.onResize);
@@ -180,6 +204,11 @@ class DropDown extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    if (nextProps.triggerElm !== this.props.triggerElm) {
+      this.restorePositioning();
+      this.recordPositioning(nextProps.triggerElm);
+      this.changeTriggerElmPosition(nextProps.fixed, nextProps.triggerElm);
+    }
     if (
       nextProps.children !== this.props.children
       || nextProps.fixed !== this.props.fixed
@@ -216,6 +245,7 @@ class DropDown extends Component {
       this.dom.current.removeEventListener(this.state.transitionEndEvtName,
         this.state.onTransitionEnd);
     }
+    this.restorePositioning();
   }
 
   render() {
@@ -248,6 +278,7 @@ class DropDown extends Component {
 }
 
 DropDown.propTypes = {
+  triggerElm: PropTypes.object,
   fixed: PropTypes.bool,
   direction: PropTypes.string,
   open: PropTypes.bool,
@@ -259,6 +290,7 @@ DropDown.propTypes = {
 };
 
 DropDown.defaultProps = {
+  triggerElm: null,
   fixed: false,
   direction: 'bottom',
   open: false,

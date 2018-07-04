@@ -9,20 +9,21 @@ $background-color:#fff;
   transform: scale(0);
   transform-origin: center bottom;
   opacity:0;
+  display: inline-block;
   position: relative;
   * {
     box-sizing: border-box;
   }
 
   .dropdown{
-    display: block;
+    display: inline-block;
     text-align:center;
     background: $background-color;
     position:relative;
     z-index:2;
     padding:5px;
-    min-width: 36px;
-    min-height: 28px;
+    min-width: 15px;
+    min-height: 15px;
   }
 }
 
