@@ -52,7 +52,7 @@ const transitionEnd = () => {
 
   for (const name in transEndEventNames) {
     if (el.style[name] !== undefined) {
-      return { end: transEndEventNames[name] };
+      return transEndEventNames[name];
     }
   }
 };
@@ -102,7 +102,7 @@ class DropDown extends Component {
       parent: null,
       transitionEndEvtName: transitionEnd(),
       onResize: () => this.checkPosition(),
-      onTransitionEnd: () => (!this.props.open ? this.setNotVisible() : null),
+      onTransitionEnd: () => (!this.props.open ? this.setInVisible() : null),
     };
 
     this.dom = React.createRef();
@@ -123,7 +123,7 @@ class DropDown extends Component {
     }));
   }
 
-  setNotVisible() {
+  setInVisible() {
     this.setState(preState => ({
       ...preState,
       visibility: 'hidden',
@@ -235,6 +235,7 @@ class DropDown extends Component {
           styles[direction],
         )}
         style={{
+          visibility: this.state.visibility,
           position: fixed ? 'fixed' : 'absolute',
           ...this.state.position,
         }}
