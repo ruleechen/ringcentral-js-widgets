@@ -93,13 +93,8 @@ class DropDown extends Component {
     super(props);
 
     this.state = {
-      size: {
-        height: 0,
-        width: 0,
-      },
       visibility: null,
       position: null,
-      parent: null,
       transitionEndEvtName: transitionEnd(),
       onResize: () => this.checkPosition(),
       onTransitionEnd: () => (!this.props.open ? this.setInVisible() : null),
