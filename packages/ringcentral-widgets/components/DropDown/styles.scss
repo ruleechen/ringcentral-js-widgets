@@ -1,4 +1,4 @@
-$box-shadow:5px 5px 5px #e2e2e2;
+$box-shadow:0 2px 5px 0 rgba(0, 0, 0, 0.15);;
 $transition-duration: .2s;
 $background-color:#fff;
 
@@ -44,7 +44,6 @@ $background-color:#fff;
   text-align:center;
   background: $background-color;
   position:relative;
-  border-radius:5px;
   z-index:1;
   box-shadow: $box-shadow;
   padding:5px;
