@@ -97,12 +97,15 @@ $conferenceCallBtnPaddingLeft: ($conferenceCallBtnWidth - $callBtnWidth)/2;
   text-align:left;
   
   .buttonItem{
+    width: 100%;
+    cursor: pointer;
     overflow:hidden;
     font-size: 12px;
     line-height: 12px;
-    padding:10px 31px 10px 0;
+    padding:10px 20px 10px 0;
     display: flex;
     flex-direction: row;
+    flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center;
     
@@ -144,6 +147,8 @@ $conferenceCallBtnPaddingLeft: ($conferenceCallBtnWidth - $callBtnWidth)/2;
     border-top: .5px solid $silver;
   }
   .buttonItem.disabled{
+    cursor: not-allowed;
+
     .buttonIcon{
       color: $silver;
     }
