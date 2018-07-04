@@ -1,8 +1,10 @@
-$box-shadow:2px 2px 2px #e2e2e2;
+$box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.15);
 $transition-duration: .2s;
 $background-color:#fff;
 
 .dropdownContainer{
+  $background-color:#fff;
+  box-shadow: $box-shadow;
   transition: transform ease-in-out $transition-duration,opacity ease-in-out $transition-duration;
   transform: scale(0);
   transform-origin: center bottom;
@@ -17,8 +19,7 @@ $background-color:#fff;
     text-align:center;
     background: $background-color;
     position:relative;
-    z-index:1;
-    box-shadow: $box-shadow;
+    z-index:2;
     padding:5px;
     min-width: 36px;
     min-height: 28px;
@@ -28,7 +29,7 @@ $background-color:#fff;
 .top,
 .bottom{
   .tail{
-    z-index:2;
+    z-index:1;
     position: absolute;
     display:inline-block;
     width:10px;
