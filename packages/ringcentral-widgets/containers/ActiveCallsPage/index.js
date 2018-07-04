@@ -163,4 +163,9 @@ function mapToFunctions(_, {
 
 const ActiveCallsPage = withPhone(connect(mapToProps, mapToFunctions)(ActiveCallsPanel));
 
-export default ActiveCallsPage;
+export {
+  mapToProps,
+  mapToFunctions,
+  ActiveCallsPage as default,
+};
+

@@ -123,7 +123,13 @@ $fixed-icon-width: 21px;
 
 .mergeButton {
   circle {
-    fill: #ff8800;
+    fill: $snow;
+    stroke: $rc-blue;
+    stroke-width: 15px;
+  }
+  g,
+  path {
+    fill: $rc-blue;
   }
 }
 .disabled,

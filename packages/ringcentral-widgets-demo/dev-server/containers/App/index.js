@@ -29,6 +29,7 @@ import FeedbackPage from 'ringcentral-widgets/containers/FeedbackPage';
 import UserGuidePage from 'ringcentral-widgets/containers/UserGuidePage';
 import ConferenceCallDialerPage from 'ringcentral-widgets/containers/ConferenceCallDialerPage';
 import ConferenceCallMergeCtrlPage from 'ringcentral-widgets/containers/ConferenceCallMergeCtrlPage';
+import CallsOnholdPage from 'ringcentral-widgets/containers/CallsOnholdPage';
 
 import ContactSourceFilter from 'ringcentral-widgets/components/ContactSourceFilter';
 import MeetingScheduleButton from 'ringcentral-widgets/components/MeetingScheduleButton';
@@ -270,6 +271,16 @@ export default function App({
                     onBackButtonClick={() => {
                       phone.routerInteraction.push('/calls');
                     }}
+                  />
+                )} />
+              <Route
+                path="/conferenceCall/callsOnhold"
+                component={() => (
+                  <CallsOnholdPage
+                    onLogCall={async () => { await sleep(1000); }}
+                    onCreateContact={() => { }}
+                    onCallsEmpty={() => { }}
+                    sourceIcons={sourceIcons}
                   />
                 )} />
             </Route>
