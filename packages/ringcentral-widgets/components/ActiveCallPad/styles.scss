@@ -87,3 +87,82 @@ $conferenceCallBtnPaddingLeft: ($conferenceCallBtnWidth - $callBtnWidth)/2;
   height: 20%;
   padding-top: 4%;
 }
+
+.relative{
+  position: relative;
+}
+
+.buttonPopup{
+  padding: 10px 10px;
+  text-align:left;
+  
+  .buttonItem{
+    overflow:hidden;
+    font-size: 12px;
+    line-height: 12px;
+    padding:10px 31px 10px 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    
+    .buttonName{
+      color: #666;
+    }
+    .buttonIcon+.buttonName{
+      margin-left:5px;
+    }
+    .buttonActive {
+      circle {
+        fill: $primary-color;
+        stroke: $primary-color;
+      }
+      path {
+        fill: $rc-blue;
+      }
+    }
+    .buttonDisabled {
+      circle {
+        fill: $lightgray;
+        stroke: $gray;
+      }
+      path {
+        fill: $silver;
+      }
+      g {
+        cursor: default;
+    
+        &:hover {
+          circle {
+            stroke: $gray;
+          }
+        }
+      }
+    }
+  }
+  .buttonItem+.buttonItem{
+    border-top: .5px solid $silver;
+  }
+  .buttonItem.disabled{
+    .buttonIcon{
+      color: $silver;
+    }
+  }
+  .buttonItem:first-of-type{
+    padding-top:0;
+  }
+  .buttonItem:last-of-type{
+    padding-bottom:0;
+  }
+}
+
+.moreButtonContainer{
+  display: inline-block;
+  width: 33.3333%;
+  height: 50%;
+
+  .moreButton{
+    height: 100%;
+    width:100%;
+  }
+}

@@ -112,7 +112,7 @@ class ActiveCallPanel extends React.Component {
           {
             startTime
             ? <DurationCounter startTime={startTime} offset={startTimeOffset} />
-            : <span ariaHidden="true">&nbsp;</span>
+            : <span aria-hidden="true">&nbsp;</span>
           }
         </div>
       );
