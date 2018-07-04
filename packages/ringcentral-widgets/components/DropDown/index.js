@@ -11,6 +11,35 @@ const POSITION = new Enum([
   'left',
 ]);
 
+
+const getDimensions = (element) => {
+  const PROPERTIES = {
+    position: 'fixed',
+    visibility: 'hidden',
+  };
+
+  if (element.nodeType) {
+    let clonedEl = element.cloneNode(true);
+
+    Object.keys(PROPERTIES).forEach((key) => {
+      clonedEl.style[key] = PROPERTIES[key];
+    });
+
+    document.body.appendChild(clonedEl);
+
+    const result = {
+      width: element.offsetWidth,
+      height: element.offsetHeight
+    };
+
+    document.body.removeChild(clonedEl);
+    clonedEl = null;
+
+    return result;
+  }
+  return null;
+};
+
 const transitionEnd = () => {
   const el = document.createElement('bootstrap');
 
@@ -28,7 +57,7 @@ const transitionEnd = () => {
   }
 };
 
-const getOffset = (el) => {
+const getPageOffset = (el) => {
   if (!el) {
     return null;
   }
@@ -39,6 +68,23 @@ const getOffset = (el) => {
   return {
     top: rect.top + scrollTop,
     left: rect.left + scollLeft,
+  };
+};
+
+const getRelativeOffset = (el) => {
+  const res = { top: 0, left: 0 };
+  if (!el) {
+    return null;
+  }
+  let tmp = el.parentElement;
+  while (window.getComputedStyle(tmp).position === 'static') {
+    res.top += el.offsetTop;
+    res.left += el.offsetLeft;
+    tmp = tmp.parentElement;
+  }
+  return {
+    top: el.offsetTop,
+    left: el.offsetLeft,
   };
 };
 
@@ -89,24 +135,31 @@ class DropDown extends Component {
     const documentElement = document.documentElement;
     const parentElement = current.parentElement;
     const parentComputedStyle = window.getComputedStyle(parentElement);
+    const parentDemension = getDimensions(parentElement);
+    const currentDemension = getDimensions(current);
 
-    let originalCSSPosition;
     let position;
+    let originalCSSPosition;
+    let top;
 
     if (props.fixed) {
       originalCSSPosition = window.getComputedStyle(documentElement).position;
-      position = getOffset(current);
+      position = getPageOffset(parentElement);
+      top = props.direction === POSITION.top
+        ? position && position.top - getDimensions(current).height
+        : position && (position.top + parentDemension.height);
     } else {
       originalCSSPosition = parentElement && parentElement.nodeType === 1
         ? parentComputedStyle.position
         : '';
-      position = current ? current.getBoundingClientRect() : null;
+      position = getRelativeOffset(current);
+      top = props.direction === POSITION.top
+        ? position && -getDimensions(current).height
+        : position && position.top;
     }
+    const left = position
+    && (position.left + parentDemension.width / 2 - getDimensions(current).width / 2);
 
-    const top = props.direction === POSITION.top
-      ? position && position.top
-      : position && (position.top + parentElement.offsetHeight + current.offsetHeight);
-    const left = position && (position.left + parentComputedStyle.width / 2);
 
     this.setState(preState => ({
       ...preState,
@@ -179,14 +232,14 @@ class DropDown extends Component {
           open
           ? styles.opened
           : null,
-          styles[direction]
+          styles[direction],
         )}
         style={{
           position: fixed ? 'fixed' : 'absolute',
           ...this.state.position,
         }}
       >
-        <div className="dropdown" id="dropdown">
+        <div className={styles.dropdown}>
           {children}
           <div className={styles.tail} />
         </div>
