@@ -185,7 +185,10 @@ class DropDown extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.children !== this.props.children) {
+    if (
+      nextProps.children !== this.props.children
+      || nextProps.fixed !== this.props.fixed
+    ) {
       this.checkPosition(nextProps);
     }
     if (nextProps.open !== this.props.open) {
