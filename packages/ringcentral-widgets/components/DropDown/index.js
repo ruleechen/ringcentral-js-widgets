@@ -141,7 +141,7 @@ class DropDown extends Component {
       originalCSSPosition = window.getComputedStyle(documentElement).position;
       position = getPageOffset(parentElement);
       top = props.direction === POSITION.top
-        ? position && position.top - getDimensions(current).height
+        ? position && position.top - currentDemension.height
         : position && (position.top + parentDemension.height);
     } else {
       originalCSSPosition = parentElement && parentElement.nodeType === 1
@@ -149,11 +149,11 @@ class DropDown extends Component {
         : '';
       position = getRelativeOffset(current);
       top = props.direction === POSITION.top
-        ? position && -getDimensions(current).height
+        ? position && -currentDemension.height
         : position && position.top;
     }
     const left = position
-    && (position.left + parentDemension.width / 2 - getDimensions(current).width / 2);
+    && (position.left + parentDemension.width / 2 - currentDemension.width / 2);
 
 
     this.setState(preState => ({
