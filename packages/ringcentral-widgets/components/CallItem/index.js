@@ -346,7 +346,11 @@ export default class CallItem extends Component {
     const fallbackContactName = this.getFallbackContactName();
     const ringing = isRinging(this.props.call);
     const missed = isInbound(this.props.call) && isMissed(this.props.call);
-    const parsedInfo = parseNumber(phoneNumber);
+    const parsedInfo = parseNumber({
+      phoneNumber,
+      countryCode,
+      areaCode,
+    });
     const isExtension = !parsedInfo.hasPlus &&
       parsedInfo.number.length <= 6;
     const showClickToSms = !!(
@@ -453,7 +457,7 @@ export default class CallItem extends Component {
           callTitle={i18n.getString('call', currentLocale)}
           createEntityTitle={i18n.getString('addEntity', currentLocale)}
           viewEntityTitle={i18n.getString('viewDetails', currentLocale)}
-          externalViewEntity={() => externalViewEntity && externalViewEntity(this.props.call)}
+          externalViewEntity={externalViewEntity && (() => externalViewEntity(this.props.call))}
           externalHasEntity={externalHasEntity && externalHasEntity(this.props.call)}
         />
       </div>

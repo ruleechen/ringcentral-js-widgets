@@ -422,7 +422,11 @@ export default class ActiveCallItem extends Component {
       disableMerge
     } = this.props;
     const phoneNumber = this.getPhoneNumber();
-    const parsedInfo = parseNumber(phoneNumber);
+    const parsedInfo = parseNumber({
+      phoneNumber,
+      countryCode,
+      areaCode,
+    });
     const isExtension = !parsedInfo.hasPlus &&
       parsedInfo.number.length <= 6;
     const showClickToSms = !!(
