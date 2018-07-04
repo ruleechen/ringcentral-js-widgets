@@ -72,8 +72,7 @@ class ActiveCallPad extends Component {
     const isRecordButtonActive = this.props.recordStatus === recordStatus.recording;
     const isRecordDisabled = this.props.recordStatus === recordStatus.pending;
 
-    const btnClassName = this.props.layout === callCtrlLayout.conferenceCtrl
-      ? styles.conferenceCallButton : styles.callButton;
+    const btnClassName = styles.callButton;
     const muteButton = this.props.isOnMute ?
       (
         <ActiveCallButton

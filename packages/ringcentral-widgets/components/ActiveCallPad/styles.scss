@@ -12,8 +12,7 @@ $conferenceCallBtnPaddingLeft: ($conferenceCallBtnWidth - $callBtnWidth)/2;
   padding-right: 9%;
 }
 
-.callButton,
-.conferenceCallButton {
+.callButton {
   box-sizing: border-box;
   padding: 2px;
   height: 50%;
@@ -21,11 +20,6 @@ $conferenceCallBtnPaddingLeft: ($conferenceCallBtnWidth - $callBtnWidth)/2;
 
 .callButton{
   width: $callBtnWidth;
-}
-
-.conferenceCallButton{
-  width: $conferenceCallBtnWidth;
-  padding: 0 $conferenceCallBtnPaddingLeft;
 }
 
 .buttonRow {
@@ -165,6 +159,7 @@ $conferenceCallBtnPaddingLeft: ($conferenceCallBtnWidth - $callBtnWidth)/2;
   display: inline-block;
   width: 33.3333%;
   height: 50%;
+  box-sizing: border-box;
 
   .moreButton{
     height: 100%;
