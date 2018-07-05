@@ -1,7 +1,6 @@
 import { connect } from 'react-redux';
 
 import withPhone from '../../lib/withPhone';
-import allCallsLayout from '../../lib/allCallsLayout';
 
 import CallsOnholdPanel from '../../components/CallsOnholdPanel';
 
@@ -29,6 +28,7 @@ function mapToProps(_, {
   };
 }
 function mapToFunctions(_, {
+  params,
   phone,
   phone: {
     webphone,
@@ -38,12 +38,14 @@ function mapToFunctions(_, {
   ...props
 }) {
   const baseProps = mapToBaseFunctions(_, {
+    params,
     phone,
     ...props,
   });
   return {
     ...baseProps,
     async onMerge(sessionId) {
+      routerInteraction.replace('/calls/active');
       const session = webphone._sessions.get(sessionId);
       conferenceCall.setMergeParty({ to: session });
       const sessionToMergeWith = conferenceCall.state.mergingPair.from;
@@ -58,15 +60,13 @@ function mapToFunctions(_, {
          * need to wait for webphone.getActiveSessionIdReducer to update
          */
         webphone.resume(conferenceData.session.id);
-        return;
-      }
-      if (!conferenceData) {
-        await webphone.resume(session.id);
-        routerInteraction.push('/conferenceCall/mergeCtrl');
       }
     },
     onBackButtonClick() {
       routerInteraction.goBack();
+    },
+    onAdd() {
+      routerInteraction.push(`/conferenceCall/dialer/${params.fromNumber}`);
     }
   };
 }

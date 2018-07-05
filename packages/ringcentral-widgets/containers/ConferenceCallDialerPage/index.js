@@ -20,7 +20,7 @@ function ConferenceCallDialerPanel({
     <BackHeader
       key="header"
       onBackClick={onBack}>
-      {i18n.getString('addToConference')}
+      {i18n.getString('activeCall')}
     </BackHeader>,
     <DialerPanel
       key="dialer"

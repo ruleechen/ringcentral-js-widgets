@@ -245,6 +245,9 @@ export default class BasePhone extends RcModule {
           routerInteraction.push('/dialer');
           return;
         }
+        if (routerInteraction.currentPath !== '/calls/active') { // mean have params
+          routerInteraction.push('/calls/active');
+        }
         routerInteraction.goBack();
       }
     };

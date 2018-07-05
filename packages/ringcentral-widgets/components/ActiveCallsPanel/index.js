@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import SpinnerOverlay from '../SpinnerOverlay';
 import ActiveCallList from '../ActiveCallList';
-import ConfirmMergeModal from './ConfirmMergeModal';
+import ConfirmMergeModal from '../ConfirmMergeModal';
 import styles from './styles.scss';
 import i18n from './i18n';
 

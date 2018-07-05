@@ -258,7 +258,7 @@ export default function App({
                   <ConferenceCallDialerPage
                     params={routerProps.params}
                     onBack={() => {
-                      phone.routerInteraction.goBack();
+                      phone.routerInteraction.push('/calls/active');
                     }} />
                 )} />
               <Route
@@ -274,9 +274,10 @@ export default function App({
                   />
                 )} />
               <Route
-                path="/conferenceCall/callsOnhold"
-                component={() => (
+                path="/conferenceCall/callsOnhold/:fromNumber/:fromSessionId"
+                component={routerProps => (
                   <CallsOnholdPage
+                    params={routerProps.params}
                     onLogCall={async () => { await sleep(1000); }}
                     onCreateContact={() => { }}
                     onCallsEmpty={() => { }}

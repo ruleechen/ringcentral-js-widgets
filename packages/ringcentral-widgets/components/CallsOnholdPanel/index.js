@@ -4,7 +4,6 @@ import classnames from 'classnames';
 import ActiveCallItem from '../ActiveCallItem';
 import CircleButton from '../CircleButton';
 import BackHeader from '../BackHeader';
-import allCallsLayout from '../../lib/allCallsLayout';
 import styles from './styles.scss';
 import i18n from './i18n';
 import CombineIcon from '../../assets/images/Combine.svg';
@@ -37,7 +36,8 @@ export default function CallsOnholdContainer({
   disableMerge,
   onBackButtonClick,
   backButtonLabel,
-  onMergeCall,
+  onMerge,
+  onAdd,
 }) {
   const backHeader = (<BackHeader
     className={styles.header}
@@ -74,7 +74,7 @@ export default function CallsOnholdContainer({
             onLogCall={onLogCall}
             onViewContact={onViewContact}
             onCreateContact={onCreateContact}
-            onMergeCall={onMergeCall}
+            onMergeCall={() => onMerge(call.webphoneSession.id)}
             loggingMap={loggingMap}
             webphoneAnswer={webphoneAnswer}
             webphoneReject={webphoneReject}
@@ -99,6 +99,7 @@ export default function CallsOnholdContainer({
             className={styles.addBtnIcon}
             icon={CombineIcon}
             showBorder={false}
+            onClick={onAdd}
             />
         </div>
       </div>
@@ -109,7 +110,7 @@ export default function CallsOnholdContainer({
 
 CallsOnholdContainer.propTypes = {
   currentLocale: PropTypes.string.isRequired,
-  onMergeCall: PropTypes.func,
+  onMerge: PropTypes.func,
   calls: PropTypes.array.isRequired,
   areaCode: PropTypes.string.isRequired,
   countryCode: PropTypes.string.isRequired,
@@ -135,6 +136,7 @@ CallsOnholdContainer.propTypes = {
   onClickToSms: PropTypes.func,
   onCreateContact: PropTypes.func,
   disableMerge: PropTypes.bool,
+  onAdd: PropTypes.func,
 };
 
 CallsOnholdContainer.defaultProps = {
@@ -154,11 +156,11 @@ CallsOnholdContainer.defaultProps = {
   onViewContact: undefined,
   webphoneToVoicemail: undefined,
   sourceIcons: undefined,
-  layout: allCallsLayout.callsOnhold,
   backButtonLabel: 'Active Call',
   onBackButtonClick: undefined,
-  onMergeCall: undefined,
+  onMerge: undefined,
   onClickToSms: undefined,
   onCreateContact: undefined,
   disableMerge: false,
+  onAdd: i => i,
 };

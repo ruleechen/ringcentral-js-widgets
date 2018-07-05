@@ -1,0 +1,67 @@
+@import '~normalize-css/normalize.css';
+@import '~ringcentral-widgets/lib/commonStyles/colors.scss';
+
+.confirmMergeModal {
+  min-width: 260px;
+
+  .header{
+    text-align: center;
+  }
+
+  .contentText {
+    margin-top: 5px;
+    font-weight: bold;
+
+    span{
+      font-weight: normal;
+    }
+  }
+
+  .cancelBtn {
+    display: none;
+  }
+
+  .confirmBtn {
+    display: none;
+  }
+
+  .closeBtn {
+    position: absolute;
+    top: 15px;
+    right: 11px;
+  }
+
+  .content{
+    overflow: hidden;
+    .contentText{
+      float: left;
+      svg{
+        margin-bottom: -2px;
+      }
+      svg+span{
+        margin-left:5px;
+      }
+    }
+
+    .webphoneButton{   
+      float: right;
+    }
+
+    .mergeButton {
+      width: 26px;
+      circle {
+        fill: $snow;
+        stroke: $rc-blue;
+        stroke-width: 15px;
+      }
+      g,
+      path {
+        fill: $rc-blue;
+      }
+    }
+
+    &::after{
+      clear: both;
+    }
+  }
+}
