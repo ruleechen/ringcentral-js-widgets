@@ -121,6 +121,7 @@ class CallCtrlPage extends Component {
       addDisabled,
       mergeDisabled,
       getPartyProfiles,
+      hasConference,
     } = this.props;
     if (!session.id) {
       return null;
@@ -190,6 +191,7 @@ class CallCtrlPage extends Component {
         addDisabled={addDisabled}
         mergeDisabled={mergeDisabled}
         getPartyProfiles={getPartyProfiles}
+        hasConference={hasConference}
       >
         {this.props.children}
       </CallCtrlPanel>
@@ -250,6 +252,7 @@ CallCtrlPage.propTypes = {
   mergeDisabled: PropTypes.bool,
   getPartyProfiles: PropTypes.func,
   gotoNormalCallCtrl: PropTypes.func,
+  hasConference: PropTypes.bool,
 };
 
 CallCtrlPage.defaultProps = {
@@ -266,6 +269,7 @@ CallCtrlPage.defaultProps = {
   mergeDisabled: false,
   getPartyProfiles: i => i,
   gotoNormalCallCtrl: i => i,
+  hasConference: false,
 };
 
 function mapToProps(_, {
@@ -335,6 +339,7 @@ function mapToProps(_, {
     showSpinner: isMerging,
     addDisabled,
     mergeDisabled,
+    hasConference: !!conferenceData,
   };
 }
 
@@ -395,6 +400,29 @@ function mapToFunctions(_, {
         } else { // goto dialer directly
           routerInteraction.push(`/conferenceCall/dialer/${sessionData.fromNumber}`);
         }
+      }
+    },
+    async onMerge(sessionId) {
+      routerInteraction.replace(`${routerInteraction.currentPath}/\${sessionId}`);
+      const session = webphone._sessions.get(sessionId);
+      conferenceCall.setMergeParty({ to: session });
+      const sessionToMergeWith = conferenceCall.state.mergingPair.from;
+      const webphoneSessions = sessionToMergeWith
+        ? [sessionToMergeWith, session]
+        : [session];
+      await conferenceCall.mergeToConference(webphoneSessions);
+      const conferenceData = Object.values(conferenceCall.conferences)[0];
+      if (conferenceData && conferenceData.session.isOnHold().local) {
+        /**
+         * because session termination operation in conferenceCall._mergeToConference,
+         * need to wait for webphone.getActiveSessionIdReducer to update
+         */
+        webphone.resume(conferenceData.session.id);
+        return;
+      }
+      if (!conferenceData) {
+        await webphone.resume(session.id);
+        routerInteraction.push('/conferenceCall/mergeCtrl');
       }
     },
     gotoNormalCallCtrl: () => routerInteraction.push('/calls/active'),
