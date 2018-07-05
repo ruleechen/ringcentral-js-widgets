@@ -45,6 +45,7 @@ function mapToFunctions(_, {
   return {
     ...baseProps,
     async onMerge(sessionId) {
+      routerInteraction.replace('/calls/active');
       const session = webphone._sessions.get(sessionId);
       conferenceCall.setMergeParty({ to: session });
       const sessionToMergeWith = conferenceCall.state.mergingPair.from;
@@ -59,11 +60,6 @@ function mapToFunctions(_, {
          * need to wait for webphone.getActiveSessionIdReducer to update
          */
         webphone.resume(conferenceData.session.id);
-        return;
-      }
-      if (!conferenceData) {
-        await webphone.resume(session.id);
-        routerInteraction.push('/conferenceCall/mergeCtrl');
       }
     },
     onBackButtonClick() {

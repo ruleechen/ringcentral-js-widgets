@@ -274,7 +274,7 @@ export default function App({
                   />
                 )} />
               <Route
-                path="/conferenceCall/callsOnhold/:fromNumber"
+                path="/conferenceCall/callsOnhold/:fromNumber/:fromSessionId"
                 component={routerProps => (
                   <CallsOnholdPage
                     params={routerProps.params}

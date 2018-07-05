@@ -36,7 +36,7 @@ export default function CallsOnholdContainer({
   disableMerge,
   onBackButtonClick,
   backButtonLabel,
-  onMergeCall,
+  onMerge,
   onAdd,
 }) {
   const backHeader = (<BackHeader
@@ -74,7 +74,7 @@ export default function CallsOnholdContainer({
             onLogCall={onLogCall}
             onViewContact={onViewContact}
             onCreateContact={onCreateContact}
-            onMergeCall={onMergeCall}
+            onMergeCall={() => onMerge(call.webphoneSession.id)}
             loggingMap={loggingMap}
             webphoneAnswer={webphoneAnswer}
             webphoneReject={webphoneReject}
@@ -110,7 +110,7 @@ export default function CallsOnholdContainer({
 
 CallsOnholdContainer.propTypes = {
   currentLocale: PropTypes.string.isRequired,
-  onMergeCall: PropTypes.func,
+  onMerge: PropTypes.func,
   calls: PropTypes.array.isRequired,
   areaCode: PropTypes.string.isRequired,
   countryCode: PropTypes.string.isRequired,
@@ -158,7 +158,7 @@ CallsOnholdContainer.defaultProps = {
   sourceIcons: undefined,
   backButtonLabel: 'Active Call',
   onBackButtonClick: undefined,
-  onMergeCall: undefined,
+  onMerge: undefined,
   onClickToSms: undefined,
   onCreateContact: undefined,
   disableMerge: false,

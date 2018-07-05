@@ -383,14 +383,15 @@ function mapToFunctions(_, {
     onAdd(sessionId) {
       const sessionData = find(x => x.id === sessionId, webphone.sessions);
       if (sessionData) {
+        const isConferenceCallSession = conferenceCall.isConferenceSession(sessionId);
+        if (!isConferenceCallSession) {
+          const session = webphone._sessions.get(sessionId);
+          conferenceCall.setMergeParty({ from: session });
+        }
         if (callMonitor.activeOnHoldCalls.length) {
-          const isConferenceCallSession = conferenceCall.isConferenceSession(sessionId);
-          if (!isConferenceCallSession) {
-            const session = webphone._sessions.get(sessionId);
-            conferenceCall.setMergeParty({ from: session });
-          }
           // goto 'calls on hold' page
-          routerInteraction.push(`/conferenceCall/callsOnhold/${sessionData.fromNumber}`);
+          routerInteraction
+            .push(`/conferenceCall/callsOnhold/${sessionData.fromNumber}/${sessionData.id}`);
         } else { // goto dialer directly
           routerInteraction.push(`/conferenceCall/dialer/${sessionData.fromNumber}`);
         }
