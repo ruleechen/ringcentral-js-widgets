@@ -345,6 +345,7 @@ function mapToFunctions(_, {
     contactSearch,
     conferenceCall,
     routerInteraction,
+    callMonitor,
   },
   getAvatarUrl,
   onBackButtonClick,
@@ -380,14 +381,19 @@ function mapToFunctions(_, {
     recipientsContactInfoRenderer,
     recipientsContactPhoneRenderer,
     onAdd(sessionId) {
-      const isConferenceCallSession = conferenceCall.isConferenceSession(sessionId);
-      if (!isConferenceCallSession) {
-        const session = webphone._sessions.get(sessionId);
-        conferenceCall.setMergeParty({ from: session });
-      }
       const sessionData = find(x => x.id === sessionId, webphone.sessions);
       if (sessionData) {
-        routerInteraction.push(`/conferenceCall/dialer/${sessionData.fromNumber}`);
+        if (callMonitor.activeOnHoldCalls.length) {
+          const isConferenceCallSession = conferenceCall.isConferenceSession(sessionId);
+          if (!isConferenceCallSession) {
+            const session = webphone._sessions.get(sessionId);
+            conferenceCall.setMergeParty({ from: session });
+          }
+          // goto 'calls on hold' page
+          routerInteraction.push(`/conferenceCall/callsOnhold/${sessionData.fromNumber}`);
+        } else { // goto dialer directly
+          routerInteraction.push(`/conferenceCall/dialer/${sessionData.fromNumber}`);
+        }
       }
     },
     gotoNormalCallCtrl: () => routerInteraction.push('/calls/active'),

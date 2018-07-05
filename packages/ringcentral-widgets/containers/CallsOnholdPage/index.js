@@ -1,7 +1,6 @@
 import { connect } from 'react-redux';
 
 import withPhone from '../../lib/withPhone';
-import allCallsLayout from '../../lib/allCallsLayout';
 
 import CallsOnholdPanel from '../../components/CallsOnholdPanel';
 
@@ -29,6 +28,7 @@ function mapToProps(_, {
   };
 }
 function mapToFunctions(_, {
+  params,
   phone,
   phone: {
     webphone,
@@ -38,6 +38,7 @@ function mapToFunctions(_, {
   ...props
 }) {
   const baseProps = mapToBaseFunctions(_, {
+    params,
     phone,
     ...props,
   });
@@ -67,6 +68,9 @@ function mapToFunctions(_, {
     },
     onBackButtonClick() {
       routerInteraction.goBack();
+    },
+    onAdd() {
+      routerInteraction.push(`/conferenceCall/dialer/${params.fromNumber}`);
     }
   };
 }
