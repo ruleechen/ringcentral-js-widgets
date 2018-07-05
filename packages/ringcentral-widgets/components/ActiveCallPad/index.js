@@ -116,6 +116,7 @@ class ActiveCallPad extends Component {
         iconX={190}
         iconY={165}
     />,
+      // eslint-disable-next-line
       this.props.layout === callCtrlLayout.mergeCtrl
         ? <ActiveCallButton
           onClick={this.props.mergeDisabled ? i => i : () => {
@@ -126,15 +127,27 @@ class ActiveCallPad extends Component {
           icon={MergeIcon}
           disabled={this.props.mergeDisabled}
       />
-        : <ActiveCallButton
-          onClick={this.props.addDisabled ? i => i : () => {
-          this.props.onAdd();
-        }}
-          title={i18n.getString('add', this.props.currentLocale)}
-          className={btnClassName}
-          icon={CombineIcon}
-          disabled={this.props.addDisabled}
-       />,
+        : (
+          this.props.hasConference && !this.props.isOnConference ?
+            <ActiveCallButton
+              onClick={this.props.addDisabled ? i => i : () => {
+                this.props.onAdd();
+              }}
+              title={i18n.getString('mergeToConference', this.props.currentLocale)}
+              className={btnClassName}
+              icon={MergeIcon}
+              disabled={this.props.mergeDisabled}
+          /> :
+            <ActiveCallButton
+              onClick={this.props.addDisabled ? i => i : () => {
+                this.props.onAdd();
+              }}
+              title={i18n.getString('add', this.props.currentLocale)}
+              className={btnClassName}
+              icon={CombineIcon}
+              disabled={this.props.addDisabled}
+            />
+        ),
       <ActiveCallButton
         onClick={onRecordClicked}
         title={recordTitle}
@@ -235,6 +248,8 @@ ActiveCallPad.propTypes = {
   direction: PropTypes.string,
   addDisabled: PropTypes.bool,
   mergeDisabled: PropTypes.bool,
+  isOnConference: PropTypes.bool,
+  hasConference: PropTypes.bool,
 };
 
 ActiveCallPad.defaultProps = {
@@ -247,6 +262,8 @@ ActiveCallPad.defaultProps = {
   mergeDisabled: null,
   onAdd: i => i,
   onMerge: i => i,
+  isOnConference: false,
+  hasConference: false,
 };
 
 export default ActiveCallPad;

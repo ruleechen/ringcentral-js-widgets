@@ -47,7 +47,9 @@ class ActiveCallPanel extends React.Component {
   }
 
   onAdd() {
-    if (this.props.hasConference && this.props.layout === callCtrlLayout.normalCtrl) {
+    if (this.props.hasConference
+      && !this.props.isOnConference
+      && this.props.layout === callCtrlLayout.normalCtrl) {
       this.setState(prevState => ({
         ...prevState,
         isModalOpen: true,
@@ -125,12 +127,13 @@ class ActiveCallPanel extends React.Component {
       showContactDisplayPlaceholder,
       brand,
       flipNumbers,
-      calls,
       sourceIcons,
       layout,
       direction,
       addDisabled,
       mergeDisabled,
+      isOnConference,
+      hasConference,
     } = this.props;
 
     const timeCounter =
@@ -208,6 +211,8 @@ class ActiveCallPanel extends React.Component {
             direction={direction}
             addDisabled={addDisabled}
             mergeDisabled={mergeDisabled}
+            isOnConference={isOnConference}
+            hasConference={hasConference}
           />
           {children}
           {
@@ -269,6 +274,7 @@ ActiveCallPanel.propTypes = {
   mergeDisabled: PropTypes.bool,
   getPartyProfiles: PropTypes.func,
   hasConference: PropTypes.bool,
+  isOnConference: PropTypes.bool,
 };
 
 ActiveCallPanel.defaultProps = {
@@ -293,6 +299,7 @@ ActiveCallPanel.defaultProps = {
   mergeDisabled: false,
   getPartyProfiles: i => i,
   hasConference: false,
+  isOnConference: false,
 };
 
 export default ActiveCallPanel;
