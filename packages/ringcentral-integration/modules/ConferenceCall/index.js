@@ -8,6 +8,7 @@ import getConferenceCallReducer from './getConferenceCallReducer';
 import proxify from '../../lib/proxy/proxify';
 import permissionsMessages from '../RolesAndPermissions/permissionsMessages';
 import conferenceErrors from './conferenceCallErrors';
+import { isConferenceSession } from '../Webphone/webphoneHelper';
 // import webphoneErrors from '../Webphone/webphoneErrors';
 import ensureExist from '../../lib/ensureExist';
 // import sleep from '../../lib/sleep';
@@ -118,8 +119,7 @@ export default class ConferenceCall extends RcModule {
 
     if (this.isMerging && !res) {
       const session = this._webphone.sessions.find(session => session.id === sessionId);
-      res = session && session.to &&
-      session.to.indexOf('conf_') === 0;
+      res = isConferenceSession(session);
     }
 
     return res;
@@ -371,6 +371,16 @@ export default class ConferenceCall extends RcModule {
        */
       sipInstances = webphoneSessions
         .map(webphoneSession => this._webphone._sessions.get(webphoneSession.id));
+      const sessionDatas = webphoneSessions
+        .map(webphoneSession => this._webphone.sessions
+          .find(session => session.id === webphoneSession.id)
+        );
+      /**
+       * HACK: we need to preserve the merging session in prevent the glitch of
+       * the call control page.
+       */
+      this._webphone.updateSessionCaching(sessionDatas);
+
       const pSips = sipInstances.map((instance) => {
         const p = new Promise((resolve) => {
           instance.on('terminated', () => {
@@ -401,6 +411,7 @@ export default class ConferenceCall extends RcModule {
             type: this.actionTypes.mergeFailed,
           });
         });
+      this._webphone.clearSessionCaching();
     } else {
       try {
         conferenceId = await this._mergeToConference(webphoneSessions);
@@ -414,7 +425,7 @@ export default class ConferenceCall extends RcModule {
          * if create conference successfully but failed to bring-in,
          *  then terminate the conference.
          */
-        if (conferenceState && conferenceState.conference.parties.length < 2) {
+        if (conferenceState && conferenceState.conference.parties.length < 1) {
           this.terminateConference(conferenceState.conference.id);
         }
         this._alert.warning({
@@ -612,7 +623,7 @@ export default class ConferenceCall extends RcModule {
       this.stopPollingConferenceStatus(conferenceId);
       // for the sake of participants ordering, we can't concurrently bring in the participants
       for (const webphoneSession of webphoneSessions) {
-        await this.bringInToConference(conferenceId, webphoneSession);
+        await this.bringInToConference(conferenceId, webphoneSession, true);
       }
       if (!this.conferences[conferenceId].profiles.length) {
         throw new Error('bring-in operations failed, not all intended parties were brought in');
@@ -621,18 +632,22 @@ export default class ConferenceCall extends RcModule {
       return conferenceId;
     }
     const { id } = await this.makeConference(true);
-
+    let confereceAccepted = false;
     await Promise.race([
       new Promise((resolve, reject) => {
         const session = this.conferences[id].session;
-        session.on('accepted', () => resolve());
+        session.on('accepted', () => {
+          confereceAccepted = true;
+          resolve();
+        });
         session.on('cancel', () => reject(new Error('conferecing cancel')));
         session.on('failed', () => reject(new Error('conferecing failed')));
         session.on('rejected', () => reject(new Error('conferecing rejected')));
         session.on('terminated', () => reject(new Error('conferecing terminated')));
       }),
       new Promise((resolve, reject) => {
-        setTimeout(() => reject(new Error('conferecing timeout')), this._timout);
+        setTimeout(() => (confereceAccepted ? resolve() : reject(new Error('conferecing timeout')))
+          , this._timout);
       })
     ]);
 

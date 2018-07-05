@@ -73,6 +73,7 @@ function WebphoneButtons({
   webphoneHangup,
   webphoneResume,
   showMergeCall,
+  showAnswer,
   onMergeCall,
   disableMerge,
   currentLocale,
@@ -112,7 +113,7 @@ function WebphoneButtons({
               iconWidth={260}
               iconX={120}
               icon={mergeIcon}
-              showBorder={false}
+              showBorder
               disabled={disableMerge}
             />
           </span>
@@ -131,17 +132,21 @@ function WebphoneButtons({
           showBorder={false}
         />
       </span>
-      <span title={acceptTitle} className={styles.webphoneButton}>
-        <CircleButton
-          className={styles.answerButton}
-          onClick={(e) => {
-            e.stopPropagation();
-            resumeFunc(session.id);
-          }}
-          icon={AnswerIcon}
-          showBorder={false}
-        />
-      </span>
+      {
+        showAnswer ?
+          <span title={acceptTitle} className={styles.webphoneButton}>
+            <CircleButton
+              className={styles.answerButton}
+              onClick={(e) => {
+                e.stopPropagation();
+                resumeFunc(session.id);
+              }}
+              icon={AnswerIcon}
+              showBorder={false}
+            />
+          </span>
+          : null
+     }
     </div>
   );
 }
@@ -153,6 +158,7 @@ WebphoneButtons.propTypes = {
   webphoneHangup: PropTypes.func,
   webphoneResume: PropTypes.func,
   showMergeCall: PropTypes.bool,
+  showAnswer: PropTypes.bool,
   onMergeCall: PropTypes.func,
   disableMerge: PropTypes.bool,
   currentLocale: PropTypes.string.isRequired,
@@ -166,6 +172,7 @@ WebphoneButtons.defaultProps = {
   webphoneHangup: undefined,
   webphoneResume: undefined,
   showMergeCall: false,
+  showAnswer: true,
   onMergeCall: undefined,
 };
 
@@ -419,12 +426,18 @@ export default class ActiveCallItem extends Component {
       externalHasEntity,
       showMergeCall,
       onMergeCall,
-      disableMerge
+      disableMerge,
+      hasActionMenu,
+      showAnswer,
     } = this.props;
     const phoneNumber = this.getPhoneNumber();
-    const parsedInfo = parseNumber(phoneNumber);
+    const parsedInfo = parseNumber({
+      phoneNumber,
+      countryCode,
+      areaCode,
+    });
     const isExtension = !parsedInfo.hasPlus &&
-      parsedInfo.number.length <= 6;
+      parsedInfo.number && parsedInfo.number.length <= 6;
     const showClickToSms = !!(
       onClickToSms &&
       (
@@ -496,13 +509,13 @@ export default class ActiveCallItem extends Component {
             onMergeCall={onMergeCall}
             disableMerge={disableMerge}
             currentLocale={currentLocale}
+            showAnswer={showAnswer}
           />
           {extraButton}
         </div>
         {
-          isOnConferenceCall
-            ? null
-            : <ActionMenu
+          hasActionMenu
+            ? <ActionMenu
               extended={this.state.extended}
               onToggle={this.toggleExtended}
               currentLocale={currentLocale}
@@ -528,6 +541,7 @@ export default class ActiveCallItem extends Component {
               externalViewEntity={() => externalViewEntity && externalViewEntity(this.props.call)}
               externalHasEntity={externalHasEntity && externalHasEntity(this.props.call)}
             />
+            : null
         }
       </div>
     );
@@ -585,6 +599,8 @@ ActiveCallItem.propTypes = {
   externalViewEntity: PropTypes.func,
   externalHasEntity: PropTypes.func,
   disableMerge: PropTypes.bool,
+  hasActionMenu: PropTypes.bool,
+  showAnswer: PropTypes.bool,
 };
 
 ActiveCallItem.defaultProps = {
@@ -615,4 +631,6 @@ ActiveCallItem.defaultProps = {
   externalHasEntity: undefined,
   isOnConferenceCall: false,
   disableMerge: false,
+  hasActionMenu: true,
+  showAnswer: true,
 };

@@ -11,4 +11,5 @@ export default {
   mergeToConference: 'Merge',
   transfer: 'Transfer',
   flip: 'Flip',
+  more: 'Call Actions',
 };

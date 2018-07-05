@@ -21,11 +21,12 @@ function mapToProps(_, {
   const conferenceList = Object.values(conferenceCall.conferences);
   const conference = conferenceList.length ? conferenceList[0] : null;
   let disableMerge;
+  const isWebRTC = callingSettings.callingMode === callingModes.webphone;
 
   if (conference) {
     disableMerge = conferenceCall.isOverload(conference.conference.id);
   } else {
-    disableMerge = false;
+    disableMerge = !isWebRTC;
   }
   return {
     currentLocale: locale.currentLocale,
@@ -47,7 +48,7 @@ function mapToProps(_, {
     brand: brand.fullName,
     showContactDisplayPlaceholder,
     autoLog: !!(callLogger && callLogger.autoLog),
-    isWebRTC: (callingSettings.callingMode === callingModes.webphone),
+    isWebRTC,
     hasConferenceCall: !!conference,
     disableMerge,
   };
@@ -162,4 +163,9 @@ function mapToFunctions(_, {
 
 const ActiveCallsPage = withPhone(connect(mapToProps, mapToFunctions)(ActiveCallsPanel));
 
-export default ActiveCallsPage;
+export {
+  mapToProps,
+  mapToFunctions,
+  ActiveCallsPage as default,
+};
+

@@ -130,6 +130,8 @@ class CallCtrlPanel extends Component {
         addDisabled={this.props.addDisabled}
         mergeDisabled={this.props.mergeDisabled}
         getPartyProfiles={this.props.getPartyProfiles}
+        hasConference={this.props.hasConference}
+        isOnConference={this.props.isOnConference}
       >
         {this.props.children}
         {this.props.showSpinner ? <SpinnerOverlay /> : null}
@@ -190,6 +192,8 @@ CallCtrlPanel.propTypes = {
   addDisabled: PropTypes.bool,
   mergeDisabled: PropTypes.bool,
   getPartyProfiles: PropTypes.func,
+  hasConference: PropTypes.bool,
+  isOnConference: PropTypes.bool,
 };
 
 CallCtrlPanel.defaultProps = {
@@ -219,6 +223,8 @@ CallCtrlPanel.defaultProps = {
   addDisabled: false,
   mergeDisabled: false,
   getPartyProfiles: i => i,
+  hasConference: false,
+  isOnConference: false,
 };
 
 export default CallCtrlPanel;

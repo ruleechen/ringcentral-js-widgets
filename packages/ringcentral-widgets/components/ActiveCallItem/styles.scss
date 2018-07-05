@@ -3,6 +3,7 @@
 
 // TODO: fix the whole style with flex
 $tmpWidth: calc(100% - 53px - 7px - 98px - 20px);
+$fixed-icon-width: 21px;
 
 .root {
   display: block;
@@ -10,6 +11,7 @@ $tmpWidth: calc(100% - 53px - 7px - 98px - 20px);
   width: 100%;
   border-bottom: 1px solid #e2e2e2;
   margin-bottom: 7px;
+  min-height: 62px;
 }
 // .root:first-child {
 //   margin-top: -5px;
@@ -22,13 +24,14 @@ $tmpWidth: calc(100% - 53px - 7px - 98px - 20px);
   display: flex;
   align-items: center;
   width: 100%;
-  min-height: 62px;
   @include secondary-font;
 }
 
 .callIcon {
+  display: inline-flex;
   font-size: 22px;
   color: #666;
+  width: $fixed-icon-width;
 }
 
 .infoWrapper {
@@ -37,13 +40,13 @@ $tmpWidth: calc(100% - 53px - 7px - 98px - 20px);
   justify-content: center;
   flex: 1;
   height: 100%;
-  max-height: 31px;
-  max-width: calc(100% - 19px);
-  padding-left: 12px;
+  max-width: calc(100% - #{$fixed-icon-width});
+  padding-left: 6px;
+  padding-right: 8px;
+  overflow: hidden;
   box-sizing: border-box;
   // Add bellow style if you have calllog button on callitem
-  // margin-right: 33px;
-  // max-width: calc(100% - 33px - 19px);
+  // max-width: calc(100% - 23px - 21px);
 }
 
 .activeCall {
@@ -65,14 +68,6 @@ $tmpWidth: calc(100% - 53px - 7px - 98px - 20px);
   animation-direction: alternate;
   animation-duration: 0.5s;
   animation-iteration-count: infinite;
-}
-
-.details {
-  position: absolute;
-  left: 46px;
-  bottom: 12px;
-  font-size: 12px;
-  color: #979797;
 }
 
 .contactDisplay {
@@ -128,7 +123,13 @@ $tmpWidth: calc(100% - 53px - 7px - 98px - 20px);
 
 .mergeButton {
   circle {
-    fill: #ff8800;
+    fill: $snow;
+    stroke: $rc-blue;
+    stroke-width: 15px;
+  }
+  g,
+  path {
+    fill: $rc-blue;
   }
 }
 .disabled,

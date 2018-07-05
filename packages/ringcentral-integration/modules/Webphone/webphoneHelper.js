@@ -23,6 +23,7 @@ export function normalizeSession(session) {
     to: session.request.to.uri.user,
     toUserName: session.request.to.displayName,
     from: session.request.from.uri.user,
+    fromNumber: session.fromNumber,
     fromUserName: session.request.from.displayName,
     startTime: session.startTime && (new Date(session.startTime)).getTime(),
     creationTime: session.creationTime,
@@ -53,12 +54,24 @@ export function isOnHold(session) {
   return !!(session && session.callStatus === sessionStatus.onHold);
 }
 
-export function sortByLastHoldingTime(l, r) {
+export function sortByCreationTimeDesc(l, r) {
+  return r.startTime - l.startTime;
+}
+
+export function sortByLastHoldingTimeDesc(l, r) {
   if (!l || !r) {
     return 0;
   }
   if (r.lastHoldingTime !== l.lastHoldingTime) {
     return r.lastHoldingTime - l.lastHoldingTime;
   }
-  return r.startTime - l.startTime;
+  return sortByCreationTimeDesc(l, r);
+}
+
+/**
+ * HACK: this function is not very reliable, only use it before the merging complete.
+ */
+export function isConferenceSession(session) {
+  return session && session.to &&
+    session.to.indexOf('conf_') === 0;
 }

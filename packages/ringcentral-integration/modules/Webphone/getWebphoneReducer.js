@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 import getModuleStatusReducer from '../../lib/getModuleStatusReducer';
 import connectionStatus from './connectionStatus';
-import { isRing, isOnHold, sortByLastHoldingTime } from './webphoneHelper';
+import { isRing, isOnHold, sortByLastHoldingTimeDesc } from './webphoneHelper';
 
 export function getVideoElementPreparedReducer(types) {
   return (state = false, { type }) => {
@@ -161,9 +161,24 @@ export function getSessionsReducer(types) {
   return (state = [], { type, sessions }) => {
     switch (type) {
       case types.updateSessions:
-        return sessions.sort(sortByLastHoldingTime);
+        return sessions.sort(sortByLastHoldingTimeDesc);
       case types.destroySessions:
         return [];
+      default:
+        return state;
+    }
+  };
+}
+
+// HACK: for conference call merging
+export function getCachedSessionsReducer(types) {
+  return (state = null, { type, sessions }) => {
+    switch (type) {
+      case types.updateSessionCaching:
+        sessions.forEach((session) => { session.cached = true ;});
+        return sessions;
+      case types.clearSessionCaching:
+        return null;
       default:
         return state;
     }
@@ -182,5 +197,6 @@ export default function getWebphoneReducer(types) {
     ringSessionId: getRingSessionIdReducer(types),
     sessions: getSessionsReducer(types),
     lastEndedSessions: getLastEndedSessionsReducer(types),
+    cachedSessions: getCachedSessionsReducer(types),
   });
 }

@@ -6,6 +6,7 @@ import throttle from 'ringcentral-integration/lib/throttle';
 import CallInfo from './CallInfo';
 import ConferenceInfo from './ConferenceInfo';
 import BackHeader from '../BackHeader';
+import ConfirmMergeModal from '../ConfirmMergeModal';
 import Panel from '../Panel';
 import DurationCounter from '../DurationCounter';
 import ActiveCallPad from '../ActiveCallPad';
@@ -45,6 +46,31 @@ class ActiveCallPanel extends React.Component {
     }
   }
 
+  onAdd() {
+    if (this.props.hasConference
+      && !this.props.isOnConference
+      && this.props.layout === callCtrlLayout.normalCtrl) {
+      this.setState(prevState => ({
+        ...prevState,
+        isModalOpen: true,
+      }));
+    } else {
+      this.props.onAdd();
+    }
+  }
+
+  confirmMergeCall() {
+    this.props.onMerge();
+    this.hideConfirmMergeModal();
+  }
+
+  hideConfirmMergeModal() {
+    this.setState(prevState => ({
+      ...prevState,
+      isModalOpen: false
+    }));
+  }
+
   componentDidMount() {
     this.handleResize(this.props);
     window.addEventListener('resize', this.state.resizeFunc);
@@ -56,6 +82,9 @@ class ActiveCallPanel extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     this.handleResize(nextProps);
+    if (!nextProps.hasConference && this.state.isModalOpen) {
+      this.hideConfirmMergeModal();
+    }
   }
 
   openPartiesModal() {
@@ -98,31 +127,34 @@ class ActiveCallPanel extends React.Component {
       showContactDisplayPlaceholder,
       brand,
       flipNumbers,
-      calls,
       sourceIcons,
       layout,
       direction,
       addDisabled,
       mergeDisabled,
+      isOnConference,
+      hasConference,
     } = this.props;
 
-    const timeCounter = startTime ?
+    const timeCounter =
       (
-        <span className={styles.timeCounter}>
-          <DurationCounter startTime={startTime} offset={startTimeOffset} />
+        <div className={styles.timeCounter}>
+          {
+            startTime
+            ? <DurationCounter startTime={startTime} offset={startTimeOffset} />
+            : <span aria-hidden="true">&nbsp;</span>
+          }
+        </div>
+      );
+    const backHeader = (<BackHeader
+      onBackClick={onBackButtonClick}
+      backButton={(
+        <span className={styles.backButton}>
+          <i className={classnames(dynamicsFont.arrow, styles.backIcon)} />
+          <span className={styles.backLabel}>{backButtonLabel}</span>
         </span>
-      ) : null;
-    const backHeader = (calls.length > 1 || layout === callCtrlLayout.conferenceCtrl) ? (
-      <BackHeader
-        onBackClick={onBackButtonClick}
-        backButton={(
-          <span className={styles.backButton}>
-            <i className={classnames(dynamicsFont.arrow, styles.backIcon)} />
-            <span className={styles.backLabel}>{backButtonLabel}</span>
-          </span>
         )}
-      />
-    ) : <BackHeader className={styles.hidden} />;
+      />);
 
     return (
       <div className={styles.root}>
@@ -169,7 +201,7 @@ class ActiveCallPanel extends React.Component {
             onStopRecord={onStopRecord}
             onShowKeyPad={onShowKeyPad}
             onHangup={onHangup}
-            onAdd={onAdd}
+            onAdd={() => this.onAdd()}
             onMerge={onMerge}
             onShowFlipPanel={onShowFlipPanel}
             onToggleTransferPanel={onToggleTransferPanel}
@@ -179,8 +211,20 @@ class ActiveCallPanel extends React.Component {
             direction={direction}
             addDisabled={addDisabled}
             mergeDisabled={mergeDisabled}
+            isOnConference={isOnConference}
+            hasConference={hasConference}
           />
           {children}
+          {
+            layout === callCtrlLayout.normalCtrl ?
+              <ConfirmMergeModal
+                currentLocale={currentLocale}
+                show={!!this.state.isModalOpen}
+                onMerge={() => this.confirmMergeCall()}
+                onCancel={() => this.hideConfirmMergeModal()}
+              /> :
+             null
+          }
         </Panel>
       </div>
     );
@@ -229,6 +273,8 @@ ActiveCallPanel.propTypes = {
   addDisabled: PropTypes.bool,
   mergeDisabled: PropTypes.bool,
   getPartyProfiles: PropTypes.func,
+  hasConference: PropTypes.bool,
+  isOnConference: PropTypes.bool,
 };
 
 ActiveCallPanel.defaultProps = {
@@ -252,6 +298,8 @@ ActiveCallPanel.defaultProps = {
   addDisabled: false,
   mergeDisabled: false,
   getPartyProfiles: i => i,
+  hasConference: false,
+  isOnConference: false,
 };
 
 export default ActiveCallPanel;
