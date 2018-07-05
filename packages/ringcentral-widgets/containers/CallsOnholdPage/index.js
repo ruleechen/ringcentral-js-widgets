@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 
 import withPhone from '../../lib/withPhone';
-
+import callDirections from '../enums/callDirections';
 import CallsOnholdPanel from '../../components/CallsOnholdPanel';
 
 import {
@@ -24,7 +24,7 @@ function mapToProps(_, {
 
   return {
     ...baseProps,
-    calls: callMonitor.activeOnHoldCalls,
+    calls: callMonitor.activeOnHoldCalls.filter(call => call.direction !== callDirections.inbound),
   };
 }
 function mapToFunctions(_, {
