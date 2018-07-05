@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
+import callDirections from 'ringcentral-integration/enums/callDirections';
 
 import withPhone from '../../lib/withPhone';
-import callDirections from '../enums/callDirections';
 import CallsOnholdPanel from '../../components/CallsOnholdPanel';
 
 import {

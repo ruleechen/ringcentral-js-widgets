@@ -134,7 +134,7 @@ function ActiveCallList({
               autoLog={autoLog}
               sourceIcons={sourceIcons}
               disableMerge={disableMerge}
-              hasActionMenu={isOnConferenceCall}
+              hasActionMenu={!isOnConferenceCall}
             />
           );
         })
