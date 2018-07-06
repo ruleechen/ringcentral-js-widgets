@@ -4,26 +4,20 @@ import styles from './styles.scss';
 import classnames from 'classnames';
 import dynamicsFont from '../../assets/DynamicsFont/DynamicsFont.scss';
 import DefaultAvatar from '../../assets/images/DefaultAvatar.svg'
-function MergeInfo ({ calls, timeCounter, currentCall, avatar }) {
-  console.log(currentCall)
-  let lastTo = JSON.parse(localStorage.getItem('lastTo'))
-  let callee_avatar
-  if (lastTo.avatarUrl) {
-    callee_avatar = (<img src={lastTo.avatarUrl} alt="avatar" />)
-  } else {
-    callee_avatar = (<img src={DefaultAvatar} className={styles.callee_avatar} alt="avatar" />)
-  }
-  return (
+import i18n from './i18n';
+function MergeInfo ({ calls, timeCounter, currentCall, avatar, currentLocale, lastTo }) {
+ let default_avatar = (<img src={DefaultAvatar} className={styles.callee_avatar} alt="avatar" />)
+  return lastTo ? (
     <div className={styles.mergeInfo}>
       <div className={styles.merge_item}>
-        <div className={styles.callee_avatar} style={{backgroundImage: `url(${lastTo.avatarUrl})`}}>
-
+        <div className={styles.callee_avatar} style={!lastTo.isOnConference ? {backgroundImage: `url(${lastTo.avatarUrl})`} : {background: '#fff'}}>
+          { lastTo.isOnConference || !lastTo.avatarUrl ? <DefaultAvatar className={styles.defaut_avatar}/> : null}
         </div>
         <div className={styles.callee_name}>
-          {lastTo.nameMatches.length ? lastTo.nameMatches[0].name : lastTo.fallBackName}
+          {lastTo.isOnConference ? i18n.getString('conference',currentLocale) : lastTo.name }
         </div>
         <div className={styles.callee_status}>
-          OnHold
+          {i18n.getString('onHold', currentLocale)}
         </div>
       </div>
       <div className={styles.merge_item_active}>
@@ -38,7 +32,7 @@ function MergeInfo ({ calls, timeCounter, currentCall, avatar }) {
           </div>
       </div>
     </div>
-  )
+  ) : (<span></span>);
 }
 MergeInfo.defaultProps = {
   calls: [],

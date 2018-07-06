@@ -3,7 +3,7 @@
 @import '../../lib/commonStyles/fonts.scss';
 
 $userInfoHeight: 140px;
-$conferenceAvatarSize: 55px;;
+$conferenceAvatarSize: 51px;;
 
 .root {
   @include full-size;
@@ -181,31 +181,38 @@ $conferenceAvatarSize: 55px;;
 }
 .mergeInfo {
   min-height: 115px;
-  background-color: red;
   overflow: hidden;
   .merge_item {
     height: 30px;
-    background: #2f2f2f;
+    opacity: 0.8;
     .callee_avatar {
       width: 26px;
       height: 26px;
-      background-color: black;
       border: solid 2px #ffffff;
       border-radius: 15px;
       background-size: 100% 100%;
       float: left;
       margin-right: 35px;
+      @media only screen and (min-width: 150px) and (max-width: 265px) {
+        margin-right: 11%;
+      }
     }
     .callee_name {
       font-size: 15px;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: normal;
       letter-spacing: normal;
       color: #666666;
       float: left;
       line-height: 30px;
+      max-width: 51%;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      @media only screen and (max-width: 150px) {
+        display: none;
+      }
+      @media only screen and (min-width: 150px) and (max-width: 265px) {
+       max-width: 30%;
+      }
     }
     .callee_status {
       font-size: 12px;
@@ -221,7 +228,6 @@ $conferenceAvatarSize: 55px;;
   }
   .merge_item_active {
     height: 45px;
-    background: #4cd964;
     .callee_avatar_active {
       width: 42px;
       height: 42px;
@@ -230,6 +236,9 @@ $conferenceAvatarSize: 55px;;
       background-size: 100% 100%;
       float: left;
       margin-right: 20px;
+      @media only screen and (min-width: 150px) and (max-width: 265px) {
+        margin-right: 6%;
+      }
     }
     .callee_name_active {
       font-size: 18px;
@@ -240,10 +249,18 @@ $conferenceAvatarSize: 55px;;
       letter-spacing: normal;
       color: #303030;
       float: left;
-
+      max-width: 51%;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      @media only screen and (max-width: 150px) {
+        display: none;
+      }
+      @media only screen and (min-width: 150px) and (max-width: 265px) {
+        max-width: 30%;
+      }
     }
     .callee_status_active {
-
       float: right;
       .timeCounter {
         font-size: 12px;
@@ -253,6 +270,8 @@ $conferenceAvatarSize: 55px;;
         line-height: 45px;
         letter-spacing: normal;
         color: #2f2f2f;
+        margin: 0;
+        padding: 0;
       }
     }
   }

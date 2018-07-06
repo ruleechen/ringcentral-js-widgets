@@ -17,8 +17,8 @@ class CallCtrlPage extends Component {
     this.state = {
       selectedMatcherIndex: 0,
       avatarUrl: null,
+      lastTo: null
     };
-
     this.onSelectMatcherName = (option) => {
       const nameMatches = this.props.nameMatches || [];
       let selectedMatcherIndex = nameMatches.findIndex(
@@ -62,8 +62,9 @@ class CallCtrlPage extends Component {
       this.props.onTransfer(value, this.props.session.id);
     this.onPark = () =>
       this.props.onPark(this.props.session.id);
-    this.onAdd = () =>
+    this.onAdd = () => {
       this.props.onAdd(this.props.session.id);
+    }
     this.onMerge = () =>
       this.props.onMerge(this.props.session.id);
   }
@@ -71,6 +72,7 @@ class CallCtrlPage extends Component {
   componentDidMount() {
     this._mounted = true;
     this._updateAvatarAndMatchIndex(this.props);
+    this.getLastTo()
   }
 
   componentWillReceiveProps(nextProps) {
@@ -112,6 +114,43 @@ class CallCtrlPage extends Component {
       });
     }
   }
+  getLastTo() {
+    if (Object.keys(this.props.phone.conferenceCall.state.mergingPair).length && this.props.phone.conferenceCall.state.mergingPair.from) {
+      if (this.props.phone.callMonitor.calls.length) {
+        let lastCall = this.props.phone.callMonitor.calls.filter((item) => {
+          return item.webphoneSession ? item.webphoneSession.id === this.props.phone.conferenceCall.state.mergingPair.from.id : null
+        })[0]
+        if (lastCall) {
+          let lastTo = {
+            avatarUrl: lastCall.toMatches[0].profileImageUrl,
+            name: lastCall.toName,
+            status: lastCall.telephonyStatus,
+            isOnConference: false
+          }
+          this.setState({
+            lastTo: lastTo
+          })
+          // to fetch avatarurl again if the profileimageurl is null
+          if (!lastCall.toMatches[0].profileImageUrl) {
+            this.props.getAvatarUrl(lastCall.toMatches[0]).then((avatarUrl) => {
+              this.setState(prev => ({
+                lastTo: {
+                  ...prev.lastTo,
+                  avatarUrl: avatarUrl
+                }
+              }))
+            })
+          }
+        }
+      }
+    } else {
+      this.setState({
+        lastTo: {
+          isOnConference: true
+        }
+      })
+    }
+  }
 
   render() {
     const {
@@ -122,9 +161,8 @@ class CallCtrlPage extends Component {
       mergeDisabled,
       getPartyProfiles,
       hasConference,
-      isOnConference,
+      isOnConference
     } = this.props;
-    console.log(session,'session')
     if (!session.id) {
       return null;
     }
@@ -195,6 +233,7 @@ class CallCtrlPage extends Component {
         getPartyProfiles={getPartyProfiles}
         hasConference={hasConference}
         isOnConference={isOnConference}
+        lastTo={this.state.lastTo}
       >
         {this.props.children}
       </CallCtrlPanel>
@@ -274,7 +313,7 @@ CallCtrlPage.defaultProps = {
   getPartyProfiles: i => i,
   gotoNormalCallCtrl: i => i,
   hasConference: false,
-  isOnConference: false,
+  isOnConference: false
 };
 
 function mapToProps(_, {
@@ -392,7 +431,6 @@ function mapToFunctions(_, {
     recipientsContactInfoRenderer,
     recipientsContactPhoneRenderer,
     onAdd(sessionId) {
-      // (a → Boolean) → [a] → a | undefined Ramda
       const sessionData = find(x => x.id === sessionId, webphone.sessions);
       if (sessionData) {
         const isConferenceCallSession = conferenceCall.isConferenceSession(sessionId);
@@ -442,7 +480,7 @@ function mapToFunctions(_, {
         return conferenceCall.getOnlinePartyProfiles(conferenceData.conference.id);
       }
       return null;
-    },
+    }
   };
 }
 

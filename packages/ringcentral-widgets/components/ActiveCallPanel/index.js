@@ -26,8 +26,8 @@ class ActiveCallPanel extends React.Component {
         avatarUrl: this.props.avatarUrl,
         nameMatches: this.props.nameMatches,
         fallBackName: this.props.fallBackName
-      }
-      // lastTo: null
+      },
+       lastTo: null
     };
   }
 
@@ -63,21 +63,6 @@ class ActiveCallPanel extends React.Component {
     } else {
       this.props.onAdd();
     }
-    // console.log(this.props,'onadd')
-    // this.setState(prevState => ({
-    //   ...prevState,
-    //   lastTo: {
-    //     avatarUrl: this.props.avatarUrl,
-    //     nameMatches: this.props.nameMatches,
-    //     fallBackName: this.props.fallBackName
-    //   }
-    // }))
-    let lastTo = {
-      avatarUrl: this.props.avatarUrl,
-      nameMatches: this.props.nameMatches,
-      fallBackName: this.props.fallBackName
-    }
-    localStorage.setItem('lastTo', JSON.stringify(lastTo))
   }
 
   confirmMergeCall() {
@@ -91,7 +76,6 @@ class ActiveCallPanel extends React.Component {
       isModalOpen: false
     }));
   }
-
   componentDidMount() {
     this.handleResize(this.props);
     window.addEventListener('resize', this.state.resizeFunc);
@@ -156,7 +140,6 @@ class ActiveCallPanel extends React.Component {
       isOnConference,
       hasConference,
     } = this.props;
-    console.log(this.props)
     const timeCounter =
       (
         <div className={styles.timeCounter}>
@@ -196,7 +179,7 @@ class ActiveCallPanel extends React.Component {
               ? (<MergeInfo
                    calls={this.props.calls}
                    timeCounter={timeCounter}
-                   lastTo={this.state.lastTo}
+                   lastTo={this.props.lastTo}
                    currentCall={this.state.currentCall}
                    avatar={avatarUrl}
                  />)
