@@ -32,23 +32,50 @@ function CallIcon({
   inboundTitle,
   outboundTitle,
   isOnConferenceCall,
+  showAvatar,
+  avatarUrl,
+  // extraNum
 }) {
   const title = (direction === callDirections.inbound) ? inboundTitle : outboundTitle;
-  return (
-    <div className={styles.callIcon}>
-      {isOnConferenceCall
-        ? <ConferenceCallIcon />
-        : <span
-          className={classnames(
-            callIconMap[direction],
-            styles.activeCall,
-            ringing && styles.ringing,
-          )}
-          title={title}
-        />
-      }
-    </div>
-  );
+  let symbol;
+  if (showAvatar) {
+    if (isOnConferenceCall) {
+      // todo: use participant's avatar
+      symbol = <ConferenceCallIcon />;
+    } else {
+      symbol = (
+        <div
+          className={classnames(styles.callIcon, styles.avatar)}
+          style={avatarUrl
+          ? { backgroundImage: `url(${avatarUrl})` }
+          : { backgroundColor: '#fff' }}
+        >
+          {
+          avatarUrl
+          ? null
+          : <i className={classnames(dynamicsFont.portrait, styles.icon)} />
+          }
+        </div>
+      );
+    }
+  } else {
+    symbol = (
+      <div className={styles.callIcon}>
+        {isOnConferenceCall
+          ? <ConferenceCallIcon />
+          : <span
+            className={classnames(
+              callIconMap[direction],
+              styles.activeCall,
+              ringing && styles.ringing,
+            )}
+            title={title}
+          />
+        }
+      </div>
+    );
+  }
+  return symbol;
 }
 
 CallIcon.propTypes = {
@@ -57,6 +84,8 @@ CallIcon.propTypes = {
   isOnConferenceCall: PropTypes.bool,
   inboundTitle: PropTypes.string,
   outboundTitle: PropTypes.string,
+  showAvatar: PropTypes.bool,
+  avatarUrl: PropTypes.string
 };
 
 CallIcon.defaultProps = {
@@ -64,6 +93,8 @@ CallIcon.defaultProps = {
   isOnConferenceCall: false,
   inboundTitle: undefined,
   outboundTitle: undefined,
+  showAvatar: false,
+  avatarUrl: null,
 };
 
 function WebphoneButtons({
@@ -429,6 +460,8 @@ export default class ActiveCallItem extends Component {
       disableMerge,
       hasActionMenu,
       showAnswer,
+      avatarUrl,
+      showAvatar,
     } = this.props;
     const phoneNumber = this.getPhoneNumber();
     const parsedInfo = parseNumber({
@@ -469,6 +502,8 @@ export default class ActiveCallItem extends Component {
             outboundTitle={i18n.getString('outboundCall', currentLocale)}
             missedTitle={i18n.getString('missedCall', currentLocale)}
             isOnConferenceCall={isOnConferenceCall}
+            showAvatar={showAvatar}
+            avatarUrl={avatarUrl}
           />
           <div className={styles.infoWrapper}>
             <ContactDisplay
@@ -601,6 +636,8 @@ ActiveCallItem.propTypes = {
   disableMerge: PropTypes.bool,
   hasActionMenu: PropTypes.bool,
   showAnswer: PropTypes.bool,
+  avatarUrl: PropTypes.string,
+  showAvatar: PropTypes.bool,
 };
 
 ActiveCallItem.defaultProps = {
@@ -633,4 +670,6 @@ ActiveCallItem.defaultProps = {
   disableMerge: false,
   hasActionMenu: true,
   showAnswer: true,
+  avatarUrl: null,
+  showAvatar: false,
 };

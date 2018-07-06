@@ -282,6 +282,7 @@ export default function App({
                     onCreateContact={() => { }}
                     onCallsEmpty={() => { }}
                     sourceIcons={sourceIcons}
+                    getAvatarUrl={getAvatarUrl}
                   />
                 )} />
             </Route>

@@ -64,7 +64,7 @@ class CallCtrlPage extends Component {
       this.props.onPark(this.props.session.id);
     this.onAdd = () => {
       this.props.onAdd(this.props.session.id);
-    }
+    };
     this.onMerge = () =>
       this.props.onMerge(this.props.session.id);
   }
@@ -72,7 +72,7 @@ class CallCtrlPage extends Component {
   componentDidMount() {
     this._mounted = true;
     this._updateAvatarAndMatchIndex(this.props);
-    this.getLastTo()
+    this.getLastTo();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -117,29 +117,27 @@ class CallCtrlPage extends Component {
   getLastTo() {
     if (Object.keys(this.props.phone.conferenceCall.state.mergingPair).length && this.props.phone.conferenceCall.state.mergingPair.from) {
       if (this.props.phone.callMonitor.calls.length) {
-        let lastCall = this.props.phone.callMonitor.calls.filter((item) => {
-          return item.webphoneSession ? item.webphoneSession.id === this.props.phone.conferenceCall.state.mergingPair.from.id : null
-        })[0]
-        if (lastCall) {
-          let lastTo = {
+        const lastCall = this.props.phone.callMonitor.calls.filter(item => (item.webphoneSession ? item.webphoneSession.id === this.props.phone.conferenceCall.state.mergingPair.from.id : null))[0];
+        if (lastCall && lastCall.toMatches[0]) {
+          const lastTo = {
             avatarUrl: lastCall.toMatches[0].profileImageUrl,
             name: lastCall.toName,
             status: lastCall.telephonyStatus,
             isOnConference: false
-          }
+          };
           this.setState({
-            lastTo: lastTo
-          })
+            lastTo
+          });
           // to fetch avatarurl again if the profileimageurl is null
           if (!lastCall.toMatches[0].profileImageUrl) {
             this.props.getAvatarUrl(lastCall.toMatches[0]).then((avatarUrl) => {
               this.setState(prev => ({
                 lastTo: {
                   ...prev.lastTo,
-                  avatarUrl: avatarUrl
+                  avatarUrl
                 }
-              }))
-            })
+              }));
+            });
           }
         }
       }
@@ -148,7 +146,7 @@ class CallCtrlPage extends Component {
         lastTo: {
           isOnConference: true
         }
-      })
+      });
     }
   }
 
