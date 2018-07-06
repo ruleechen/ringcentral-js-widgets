@@ -4,6 +4,7 @@
 // TODO: fix the whole style with flex
 $tmpWidth: calc(100% - 53px - 7px - 98px - 20px);
 $fixed-icon-width: 21px;
+$fixed-avatar-width:35px;
 
 .root {
   display: block;
@@ -71,9 +72,6 @@ $fixed-icon-width: 21px;
 }
 
 .contactDisplay {
-  position: absolute;
-  top: 5px;
-  left: 45px;
   line-height: 25px;
   max-width: $tmpWidth;
   margin-bottom: 5px;
@@ -87,11 +85,7 @@ $fixed-icon-width: 21px;
 }
 
 .conferenceContactDisplay{
-  position: absolute;
-  top: 0px;
-  bottom: 0px;
-  left: 45px;
-  margin: auto;
+  // margin: auto;
   line-height: 50px;  
 }
 
@@ -103,9 +97,6 @@ $fixed-icon-width: 21px;
 }
 
 .webphoneButtons {
-  position: absolute;
-  right: 20px;
-  bottom: 15px;
   .webphoneButton + .webphoneButton{
     margin-left: 10px;
   }
@@ -161,7 +152,6 @@ $fixed-icon-width: 21px;
 
 .callDetail {
   font-size: 12px;
-  position: absolute;
   top: 30px;
   left: 45px;
   max-width: $tmpWidth;
@@ -220,18 +210,17 @@ $fixed-icon-width: 21px;
 }
 
 .avatar {
-  width: 65px;
-  height: 65px;
-  border-radius: 33px;
+  width: $fixed-avatar-width;
+  height: $fixed-avatar-width;
+  border-radius: 100%;
   margin-left: auto;
   margin-right: auto;
   color: $primary-color;
-  margin-bottom: 5px;
   overflow: hidden;
 
   .icon {
     display: block;
-    font-size: 65px;
+    font-size: $fixed-avatar-width;
     opacity: 0.3;
   }
 }
