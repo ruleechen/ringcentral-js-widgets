@@ -14,6 +14,7 @@ function mapToProps(_, {
   phone,
   phone: {
     callMonitor,
+    contactMatcher,
   },
   ...props
 }) {
@@ -21,10 +22,12 @@ function mapToProps(_, {
     phone,
     ...props,
   });
+  const contactMapping = contactMatcher && contactMatcher.dataMapping;
 
   return {
     ...baseProps,
     calls: callMonitor.activeOnHoldCalls.filter(call => call.direction !== callDirections.inbound),
+    contactMapping,
   };
 }
 function mapToFunctions(_, {
@@ -35,6 +38,7 @@ function mapToFunctions(_, {
     conferenceCall,
     routerInteraction,
   },
+  getAvatarUrl,
   ...props
 }) {
   const baseProps = mapToBaseFunctions(_, {
@@ -67,7 +71,8 @@ function mapToFunctions(_, {
     },
     onAdd() {
       routerInteraction.push(`/conferenceCall/dialer/${params.fromNumber}`);
-    }
+    },
+    getAvatarUrl
   };
 }
 
