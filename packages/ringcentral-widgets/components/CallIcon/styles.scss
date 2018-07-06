@@ -1,0 +1,70 @@
+@import '../../lib/commonStyles/colors';
+@import '../../assets/DynamicsFont/DynamicsFont.scss';
+
+$fixed-avatar-width: 38px;
+$fixed-conference-avatar-width: 34px;
+$extra-num-width:19px;
+$fixed-icon-width: 21px;
+
+.callIcon {
+  display: inline-flex;
+  font-size: 22px;
+  color: #666;
+  width: $fixed-icon-width;
+}
+
+.conferenceAvatar{
+  position:relative;
+  width: $fixed-avatar-width;
+  height: $fixed-avatar-width;
+  .extraNum,
+  .avatar{
+    position: absolute;
+    border-radius: 100%;
+  }
+  .avatar {
+    bottom: 0;
+    left: 0;
+    width: $fixed-conference-avatar-width;
+    height: $fixed-conference-avatar-width;
+    margin-left: auto;
+    margin-right: auto;
+    color: $primary-color;
+    overflow: hidden;
+    
+    .icon {
+      display: block;
+      font-size: $fixed-conference-avatar-width;
+      opacity: 0.3;
+    }
+  }
+  .extraNum{
+    width: $extra-num-width;
+    height: $extra-num-width;
+    background-color: #cee7f2;
+    border: solid 1px $snow;
+    top:0;
+    right:0;
+  }
+}
+svg{
+  width: 100%;
+  text.portrait {
+    font-family: 'dynamics_icon' !important;
+  }
+}
+.avatar {
+  width: $fixed-avatar-width;
+  height: $fixed-avatar-width;
+  border-radius: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  color: $primary-color;
+  overflow: hidden;
+
+  .icon {
+    display: block;
+    font-size: $fixed-avatar-width;
+    opacity: 0.3;
+  }
+}
