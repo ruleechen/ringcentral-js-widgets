@@ -1,5 +1,6 @@
 export default {
   conferenceCall: 'Conference Call',
   onHold: 'On Hold',
-  conference: 'Conference'
+  conference: 'Conference',
+  unknow: 'Unknown'
 };

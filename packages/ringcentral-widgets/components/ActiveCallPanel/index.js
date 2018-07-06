@@ -31,6 +31,7 @@ class ActiveCallPanel extends React.Component {
     };
   }
 
+
   handleResize(props) {
     const MAXIMUM_AVATARS = 4;
     // todo: handle width calculation
