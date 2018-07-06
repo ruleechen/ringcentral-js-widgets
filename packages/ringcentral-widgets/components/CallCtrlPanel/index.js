@@ -132,6 +132,7 @@ class CallCtrlPanel extends Component {
         getPartyProfiles={this.props.getPartyProfiles}
         hasConference={this.props.hasConference}
         isOnConference={this.props.isOnConference}
+        lastTo={this.props.lastTo}
       >
         {this.props.children}
         {this.props.showSpinner ? <SpinnerOverlay /> : null}

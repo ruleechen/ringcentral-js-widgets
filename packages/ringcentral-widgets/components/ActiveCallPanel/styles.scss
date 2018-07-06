@@ -3,7 +3,7 @@
 @import '../../lib/commonStyles/fonts.scss';
 
 $userInfoHeight: 140px;
-$conferenceAvatarSize: 55px;;
+$conferenceAvatarSize: 51px;;
 
 .root {
   @include full-size;
@@ -130,12 +130,12 @@ $conferenceAvatarSize: 55px;;
   text-align:center;
   line-height:1.5;
   font-family: sans-serif;
-  
+
   box-sizing: border-box;
   .info{
     font-size: 15px;
   }
-  
+
   .avatarContainer{
     padding: 0 15px;
     text-align: center;
@@ -177,5 +177,122 @@ $conferenceAvatarSize: 55px;;
     .avatar+.avatar{
       margin-left:-20px;
     }
+  }
+}
+.mergeInfo {
+  min-height: 115px;
+  overflow: hidden;
+  .merge_item {
+    height: 30px;
+    opacity: 0.8;
+    .callee_avatar {
+      width: 26px;
+      height: 26px;
+      border: solid 2px #ffffff;
+      border-radius: 15px;
+      background-size: 100% 100%;
+      float: left;
+      margin-right: 35px;
+      @media only screen and (min-width: 150px) and (max-width: 265px) {
+        margin-right: 11%;
+      }
+    }
+    .callee_name {
+      font-size: 15px;
+      letter-spacing: normal;
+      color: #666666;
+      float: left;
+      line-height: 30px;
+      max-width: 51%;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      @media only screen and (max-width: 150px) {
+        display: none;
+      }
+      @media only screen and (min-width: 150px) and (max-width: 265px) {
+       max-width: 23%;
+      }
+    }
+    .callee_status {
+      font-size: 12px;
+      font-weight: normal;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: normal;
+      letter-spacing: normal;
+      color: #666666;
+      float: right;
+      line-height: 30px;
+    }
+  }
+  .merge_item_active {
+    height: 45px;
+    .callee_avatar_active {
+      width: 42px;
+      height: 42px;
+      border: solid 1.5px #ffffff;
+      border-radius: 100%;
+      background-size: 100% 100%;
+      float: left;
+      margin-right: 20px;
+      @media only screen and (min-width: 150px) and (max-width: 265px) {
+        margin-right: 6%;
+      }
+    }
+    .callee_name_active {
+      font-size: 18px;
+      font-weight: normal;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 45px;
+      letter-spacing: normal;
+      color: #303030;
+      float: left;
+      max-width: 51%;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      @media only screen and (max-width: 150px) {
+        display: none;
+      }
+      @media only screen and (min-width: 150px) and (max-width: 265px) {
+        max-width: 23%;
+      }
+    }
+    .callee_status_active {
+      float: right;
+      .timeCounter {
+        font-size: 12px;
+        font-weight: normal;
+        font-style: normal;
+        font-stretch: normal;
+        line-height: 45px;
+        letter-spacing: normal;
+        color: #2f2f2f;
+        margin: 0;
+        padding: 0;
+      }
+    }
+  }
+  .callee_avatar,.callee_status,.callee_name {
+    // display: inline-block;
+  }
+  .callee_avatar,.callee_avatar_active {
+    border-radius: 100%;
+  }
+  .merge_item,.merge_item_active {
+    padding: 0 17px 0 20px;
+    font-family: HelveticaNeue;
+    &:after {
+      content: " ";
+      display: block;
+      height: 0;
+      clear: both;
+      overflow: hidden;
+    }
+  }
+  >div {
+    margin-top: 20px;
   }
 }
