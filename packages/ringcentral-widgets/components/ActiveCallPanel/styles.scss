@@ -130,12 +130,12 @@ $conferenceAvatarSize: 55px;;
   text-align:center;
   line-height:1.5;
   font-family: sans-serif;
-  
+
   box-sizing: border-box;
   .info{
     font-size: 15px;
   }
-  
+
   .avatarContainer{
     padding: 0 15px;
     text-align: center;
@@ -177,5 +177,103 @@ $conferenceAvatarSize: 55px;;
     .avatar+.avatar{
       margin-left:-20px;
     }
+  }
+}
+.mergeInfo {
+  min-height: 115px;
+  background-color: red;
+  overflow: hidden;
+  .merge_item {
+    height: 30px;
+    background: #2f2f2f;
+    .callee_avatar {
+      width: 26px;
+      height: 26px;
+      background-color: black;
+      border: solid 2px #ffffff;
+      border-radius: 15px;
+      background-size: 100% 100%;
+      float: left;
+      margin-right: 35px;
+    }
+    .callee_name {
+      font-size: 15px;
+      font-weight: normal;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: normal;
+      letter-spacing: normal;
+      color: #666666;
+      float: left;
+      line-height: 30px;
+    }
+    .callee_status {
+      font-size: 12px;
+      font-weight: normal;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: normal;
+      letter-spacing: normal;
+      color: #666666;
+      float: right;
+      line-height: 30px;
+    }
+  }
+  .merge_item_active {
+    height: 45px;
+    background: #4cd964;
+    .callee_avatar_active {
+      width: 42px;
+      height: 42px;
+      border: solid 1.5px #ffffff;
+      border-radius: 100%;
+      background-size: 100% 100%;
+      float: left;
+      margin-right: 20px;
+    }
+    .callee_name_active {
+      font-size: 18px;
+      font-weight: normal;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 45px;
+      letter-spacing: normal;
+      color: #303030;
+      float: left;
+
+    }
+    .callee_status_active {
+
+      float: right;
+      .timeCounter {
+        font-size: 12px;
+        font-weight: normal;
+        font-style: normal;
+        font-stretch: normal;
+        line-height: 45px;
+        letter-spacing: normal;
+        color: #2f2f2f;
+      }
+    }
+  }
+  .callee_avatar,.callee_status,.callee_name {
+    // display: inline-block;
+  }
+  .callee_avatar,.callee_avatar_active {
+    border-radius: 100%;
+  }
+  .merge_item,.merge_item_active {
+    padding: 0 17px 0 20px;
+    font-family: HelveticaNeue;
+    &:after {
+      content: " ";
+      display: block;
+      height: 0;
+      clear: both;
+      overflow: hidden;
+    }
+  }
+  >div {
+    margin-top: 20px;
   }
 }

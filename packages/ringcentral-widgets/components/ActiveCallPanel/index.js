@@ -13,7 +13,7 @@ import ActiveCallPad from '../ActiveCallPad';
 import callCtrlLayout from '../../lib/callCtrlLayout';
 import dynamicsFont from '../../assets/DynamicsFont/DynamicsFont.scss';
 import styles from './styles.scss';
-
+import MergeInfo from './MergeInfo';
 class ActiveCallPanel extends React.Component {
   constructor(props) {
     super(props);
@@ -22,6 +22,12 @@ class ActiveCallPanel extends React.Component {
       remains: 0,
       isPartiesModalOpen: false, // todo: for rendering the parties modal when conferecing
       resizeFunc: throttle(() => this.handleResize(this.props)),
+      currentCall: {
+        avatarUrl: this.props.avatarUrl,
+        nameMatches: this.props.nameMatches,
+        fallBackName: this.props.fallBackName
+      }
+      // lastTo: null
     };
   }
 
@@ -57,6 +63,21 @@ class ActiveCallPanel extends React.Component {
     } else {
       this.props.onAdd();
     }
+    // console.log(this.props,'onadd')
+    // this.setState(prevState => ({
+    //   ...prevState,
+    //   lastTo: {
+    //     avatarUrl: this.props.avatarUrl,
+    //     nameMatches: this.props.nameMatches,
+    //     fallBackName: this.props.fallBackName
+    //   }
+    // }))
+    let lastTo = {
+      avatarUrl: this.props.avatarUrl,
+      nameMatches: this.props.nameMatches,
+      fallBackName: this.props.fallBackName
+    }
+    localStorage.setItem('lastTo', JSON.stringify(lastTo))
   }
 
   confirmMergeCall() {
@@ -135,7 +156,7 @@ class ActiveCallPanel extends React.Component {
       isOnConference,
       hasConference,
     } = this.props;
-
+    console.log(this.props)
     const timeCounter =
       (
         <div className={styles.timeCounter}>
@@ -160,7 +181,7 @@ class ActiveCallPanel extends React.Component {
       <div className={styles.root}>
         {backHeader}
         <Panel className={styles.panel}>
-          {timeCounter}
+          { layout !== callCtrlLayout.mergeCtrl ? timeCounter : null }
           {
             layout === callCtrlLayout.conferenceCtrl
               ? (
@@ -170,7 +191,17 @@ class ActiveCallPanel extends React.Component {
                   onClick={() => this.openPartiesModal()}
                 />
               )
-              : (<CallInfo
+              :
+            layout === callCtrlLayout.mergeCtrl
+              ? (<MergeInfo
+                   calls={this.props.calls}
+                   timeCounter={timeCounter}
+                   lastTo={this.state.lastTo}
+                   currentCall={this.state.currentCall}
+                   avatar={avatarUrl}
+                 />)
+               :
+              (<CallInfo
                 currentLocale={currentLocale}
                 nameMatches={nameMatches}
                 fallBackName={fallBackName}

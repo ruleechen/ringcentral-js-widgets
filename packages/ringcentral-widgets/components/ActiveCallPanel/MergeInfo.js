@@ -1,40 +1,42 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Style from './styles.scss';
+import styles from './styles.scss';
 import classnames from 'classnames';
-import DefaultAvatar from '../../assets/images/DefaultAvatar.svg';
-function MergeInfo ({ calls, timeCounter }) {
+import dynamicsFont from '../../assets/DynamicsFont/DynamicsFont.scss';
+import DefaultAvatar from '../../assets/images/DefaultAvatar.svg'
+function MergeInfo ({ calls, timeCounter, currentCall, avatar }) {
+  console.log(currentCall)
+  let lastTo = JSON.parse(localStorage.getItem('lastTo'))
+  let callee_avatar
+  if (lastTo.avatarUrl) {
+    callee_avatar = (<img src={lastTo.avatarUrl} alt="avatar" />)
+  } else {
+    callee_avatar = (<img src={DefaultAvatar} className={styles.callee_avatar} alt="avatar" />)
+  }
   return (
-    <div className={Style.mergeInfo}>
-      {
-        calls.map((item, index) => {
-          const itemclass = classnames({
-            [Style.merge_item]: true,
-            [Style.merge_active]: item.telephonyStatus !== 'OnHold'
-          })
-          const avatarclass = classnames({
-            [Style.merge_avatar]: true,
-            [Style.merge_avatar_active]: item.telephonyStatus !== 'OnHold'
-          })
-          const nameclass = classnames({
-            [Style.merge_name]: true,
-            [Style.merge_name_active]: item.telephonyStatus !== 'OnHold'
-          })
-          const statusclass = classnames({
-            [Style.merge_status]: true,
-            [Style.merge_status_active]: item.telephonyStatus !== 'OnHold'
-          })
-          return (
-            <div className={itemclass} key={index}>
-              <div className={avatarclass}>
-                {item.toMatches.length ? item.toMatches[0].profileImageUrl ? <img src={item.toMatches[0].profileImageUrl} className={Style.avatar_img}/> : <DefaultAvatar className={Style.avatar_name}/> : <DefaultAvatar className={Style.avatar_name}/>}
-                </div>
-              <div className={nameclass}>{item.toName}</div>
-              <div className={statusclass}>{item.telephonyStatus !== 'OnHold' ? timeCounter : item.telephonyStatus}</div>
-            </div>
-          )
-        })
-      }
+    <div className={styles.mergeInfo}>
+      <div className={styles.merge_item}>
+        <div className={styles.callee_avatar} style={{backgroundImage: `url(${lastTo.avatarUrl})`}}>
+
+        </div>
+        <div className={styles.callee_name}>
+          {lastTo.nameMatches.length ? lastTo.nameMatches[0].name : lastTo.fallBackName}
+        </div>
+        <div className={styles.callee_status}>
+          OnHold
+        </div>
+      </div>
+      <div className={styles.merge_item_active}>
+          <div className={styles.callee_avatar_active} style={{backgroundImage: `url(${avatar})`}}>
+
+          </div>
+          <div className={styles.callee_name_active}>
+            {currentCall.nameMatches.length ? currentCall.nameMatches[0].name : currentCall.fallBackName}
+          </div>
+          <div className={styles.callee_status_active}>
+            {timeCounter}
+          </div>
+      </div>
     </div>
   )
 }

@@ -124,6 +124,7 @@ class CallCtrlPage extends Component {
       hasConference,
       isOnConference,
     } = this.props;
+    console.log(session,'session')
     if (!session.id) {
       return null;
     }
@@ -391,6 +392,7 @@ function mapToFunctions(_, {
     recipientsContactInfoRenderer,
     recipientsContactPhoneRenderer,
     onAdd(sessionId) {
+      // (a → Boolean) → [a] → a | undefined Ramda
       const sessionData = find(x => x.id === sessionId, webphone.sessions);
       if (sessionData) {
         const isConferenceCallSession = conferenceCall.isConferenceSession(sessionId);
