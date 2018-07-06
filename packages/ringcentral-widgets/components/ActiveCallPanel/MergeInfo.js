@@ -35,11 +35,14 @@ function MergeInfo ({ calls, timeCounter, currentCall, avatar, currentLocale, la
   ) : (<span></span>);
 }
 MergeInfo.defaultProps = {
-  calls: [],
-  timeCounter: null
+  calls: []
 }
 MergeInfo.propTypes = {
   calls: PropTypes.array,
-  timeCounter: PropTypes.element
+  timeCounter: PropTypes.element,
+  currentCall: PropTypes.object,
+  avatar: PropTypes.string,
+  currentLocale: PropTypes.string,
+  lastTo: PropTypes.object
 }
 export default MergeInfo;
