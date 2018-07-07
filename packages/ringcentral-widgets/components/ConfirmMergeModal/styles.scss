@@ -8,7 +8,6 @@
   }
 
   .contentText {
-    margin-top: 5px;
     font-weight: bold;
 
     span{
@@ -37,8 +36,11 @@
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center;
+    margin: 5px 0;
+
     .avatar{
-      width: 26px;
+      width: 29px;
+      margin-right: 10px;
     }
     .contentText{
       flex-grow: 1;
@@ -49,8 +51,7 @@
       align-items: center;
   
       svg{
-        height: 26px;
-        width: 26px;
+        width: 100%;
       }
       svg+span{
         margin-left:5px;

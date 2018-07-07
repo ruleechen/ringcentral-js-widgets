@@ -48,6 +48,7 @@ class CallAvatar extends Component {
     if (isOnConferenceCall && extraNum > 0) {
       res = (
         <svg
+          className={styles.callAvatar}
           viewBox={`0 0 ${initialSize} ${initialSize}`}
           preserveAspectRatio="xMidYmid meet"
           xmlns="http://www.w3.org/2000/svg">
@@ -63,9 +64,9 @@ class CallAvatar extends Component {
                       opacity: '.5'
                     }}
                 className={styles.portrait}
-                // HACK: &#xf904; is the font code for the portrait icon
+                // HACK: &#xe904; is the font code for the portrait icon
                 >
-                {'&#xf904;'}
+                {'\ue904'}
               </text>
             </g>
           </defs>
@@ -118,20 +119,24 @@ class CallAvatar extends Component {
       );
     } else {
       res = (
-        <svg viewBox={`0 0 ${initialSize} ${initialSize}`} xmlns="http://www.w3.org/2000/svg">
+        <svg
+          className={styles.callAvatar}
+          viewBox={`0 0 ${initialSize} ${initialSize}`}
+          xmlns="http://www.w3.org/2000/svg">
           <defs>
             <g id="text">
               <text
                 x="0"
                 y="0"
-                dy={`${(initialSize / 2 - 2) * 2}px`}
+                dy="29px"
+                dx="2"
                 style={{
                       fontSize: `${(initialSize / 2 - 2) * 2}px`,
                       fill: $blue,
                       opacity: '.5'
                     }}
                 className={styles.portrait}>
-                    &#xf904;
+                {'\ue904'}
               </text>
             </g>
           </defs>
