@@ -140,6 +140,7 @@ class ActiveCallPanel extends React.Component {
       mergeDisabled,
       isOnConference,
       hasConference,
+      conferencePartiesAvatarUrls,
     } = this.props;
     const timeCounter =
       (
@@ -237,7 +238,7 @@ class ActiveCallPanel extends React.Component {
                 show={!!this.state.isModalOpen}
                 onMerge={() => this.confirmMergeCall()}
                 onCancel={() => this.hideConfirmMergeModal()}
-                displayedProfiles={this.state.displayedProfiles.map(({ avatarUrl }) => avatarUrl)}
+                avatarUrls={conferencePartiesAvatarUrls}
               /> :
              null
           }
@@ -291,6 +292,7 @@ ActiveCallPanel.propTypes = {
   getPartyProfiles: PropTypes.func,
   hasConference: PropTypes.bool,
   isOnConference: PropTypes.bool,
+  conferencePartiesAvatarUrls: PropTypes.arrayOf(PropTypes.string),
 };
 
 ActiveCallPanel.defaultProps = {
@@ -316,6 +318,7 @@ ActiveCallPanel.defaultProps = {
   getPartyProfiles: i => i,
   hasConference: false,
   isOnConference: false,
+  conferencePartiesAvatarUrls: []
 };
 
 export default ActiveCallPanel;
