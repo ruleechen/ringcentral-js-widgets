@@ -1,7 +1,10 @@
 @import '../../lib/commonStyles/colors.scss';
 
+$avatarWidth: 29px;
+$avatarMargin: 10px;
+
 .confirmMergeModal {
-  min-width: 260px;
+  min-width: 190px;
 
   .header{
     text-align: center;
@@ -39,8 +42,8 @@
     margin: 5px 0;
 
     .avatar{
-      width: 29px;
-      margin-right: 10px;
+      width: $avatarWidth;
+      margin-right: $avatarMargin;
     }
     .contentText{
       flex-grow: 1;
@@ -49,29 +52,32 @@
       flex-wrap: nowrap;
       justify-content: flex-start;
       align-items: center;
+      overflow: hidden;
   
       svg{
         width: 100%;
       }
-      svg+span{
-        margin-left:5px;
+
+      span{
+        font-weight: normal;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: calc(100% - 39px);
       }
     }
 
     .webphoneButton{
-      float: right;
-    }
-
-    .mergeButton {
-      width: 26px;
-      circle {
-        fill: $snow;
-        stroke: $rc-blue;
-        stroke-width: 15px;
-      }
-      g,
-      path {
-        fill: $rc-blue;
+      .mergeButton {
+        width: 26px;
+        circle {
+          fill: $snow;
+          stroke: $rc-blue;
+          stroke-width: 15px;
+        }
+        g,
+        path {
+          fill: $rc-blue;
+        }
       }
     }
 
