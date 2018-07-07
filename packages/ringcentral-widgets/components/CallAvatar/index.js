@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styles from './styles.scss';
 
-class CallIcon extends Component {
+class CallAvatar extends Component {
   constructor(props) {
     super(props);
-    this.setState({
+    this.state = {
       avatarUrl: null,
-    });
+    };
   }
 
   loadImg(props = this.props) {
@@ -48,6 +48,24 @@ class CallIcon extends Component {
     if (isOnConferenceCall && extraNum > 0) {
       res = (
         <svg width={initialSize} height={initialSize} xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <g id="text">
+              <text
+                x="0"
+                y="0"
+                dy={`${(initialSize / 2 - 2) * 2}px`}
+                style={{
+                      fontSize: `${avatarCircleRadius}px`,
+                      fill: $blue,
+                      opacity: '.5'
+                    }}
+                className={styles.portrait}
+                // HACK: &#xf904; is the font code for the portrait icon
+                >
+                {'&#xf904;'}
+              </text>
+            </g>
+          </defs>
           <circle
             cx={avatarCircleRadius}
             cy={margin + avatarCircleRadius}
@@ -63,22 +81,9 @@ class CallIcon extends Component {
             </clipPath>
           </g>
           {
-            // HACK: &#xf904; is the font code for the portrait icon
             avatarUrl ?
               <image clipPath="url(#circleClip)" height="100%" width="100%" xlinkHref={avatarUrl} /> :
-              <g>
-                <text
-                  x="0"
-                  y="0"
-                  style={{
-                    fontSize: `${avatarCircleRadius}px`,
-                    fill: $blue,
-                    opacity: '.5'
-                  }}
-                  className={styles.portrait}>
-                  &#xf904;
-                </text>
-              </g>
+              <use xlinkHref="#text" clipPath="url(#circleClip)" />
           }
           <circle
             cx={initialSize - extraNumCircleRadius}
@@ -111,6 +116,22 @@ class CallIcon extends Component {
     } else {
       res = (
         <svg width={initialSize} height={initialSize} xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <g>
+              <text
+                x="0"
+                y="0"
+                dy={`${(initialSize / 2 - 2) * 2}px`}
+                style={{
+                      fontSize: `${(initialSize / 2 - 2) * 2}px`,
+                      fill: $blue,
+                      opacity: '.5'
+                    }}
+                className={styles.portrait}>
+                    &#xf904;
+              </text>
+            </g>
+          </defs>
           <circle
             cx={initialSize / 2}
             cy={initialSize / 2}
@@ -128,19 +149,7 @@ class CallIcon extends Component {
           {
             avatarUrl ?
               <image clipPath="url(#circleClip)" height="100%" width="100%" xlinkHref={avatarUrl} /> :
-              <g>
-                <text
-                  x="0"
-                  y="0"
-                  className={styles.portrait}
-                  style={{
-                    fontSize: `${initialSize - 2}px`,
-                    fill: $blue,
-                    opacity: '.5'
-                  }}>
-                &#xf904;
-                </text>
-              </g>
+              <use xlinkHref="#text" clipPath="url(#circleClip)" />
           }
         </svg>
       );
@@ -150,14 +159,17 @@ class CallIcon extends Component {
 }
 
 
-CallIcon.propTypes = {
+CallAvatar.propTypes = {
   isOnConferenceCall: PropTypes.bool,
   avatarUrl: PropTypes.string,
   extraNum: PropTypes.number,
 };
 
-CallIcon.defaultProps = {
+CallAvatar.defaultProps = {
   isOnConferenceCall: false,
   avatarUrl: null,
   extraNum: 0,
 };
+
+
+export default CallAvatar;
