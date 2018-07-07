@@ -118,7 +118,7 @@ class CallAvatar extends Component {
       );
     } else {
       res = (
-        <svg width={initialSize} height={initialSize} xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox={`0 0 ${initialSize} ${initialSize}`} xmlns="http://www.w3.org/2000/svg">
           <defs>
             <g id="text">
               <text
