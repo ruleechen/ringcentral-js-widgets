@@ -6,7 +6,7 @@ import Modal from '../Modal';
 import Button from '../Button';
 import CircleButton from '../CircleButton';
 import CloseIcon from '../../assets/images/CloseIcon.svg';
-import ConferenceCallIcon from '../../assets/images/ConferenceCallIcon.svg';
+import CallAvatar from '../CallAvatar';
 import MergeIntoConferenceIcon from '../../assets/images/MergeIntoConferenceIcon.svg';
 
 export default function ConfirmMergeModal({
@@ -14,6 +14,7 @@ export default function ConfirmMergeModal({
   show,
   onMerge,
   onCancel,
+  avatarUrls,
 }) {
   return (
     <Modal
@@ -38,7 +39,13 @@ export default function ConfirmMergeModal({
         {i18n.getString('confirmMergeToConference', currentLocale)}
       </div>
       <div className={styles.content}>
-        <p className={styles.contentText}><ConferenceCallIcon /><span>{i18n.getString('conferenceCall', currentLocale)}</span></p>
+        <div className={styles.contentText}>
+          <CallAvatar
+            avatarUrl={avatarUrls[0]}
+            isOnConferenceCall
+            extraNum={avatarUrls.length - 1} />
+          <span>{i18n.getString('conferenceCall', currentLocale)}</span>
+        </div>
         <span title={i18n.getString('mergeToConference', currentLocale)} className={styles.webphoneButton}>
           <CircleButton
             className={styles.mergeButton}
@@ -61,9 +68,11 @@ ConfirmMergeModal.propTypes = {
   show: PropTypes.bool.isRequired,
   onMerge: PropTypes.func,
   onCancel: PropTypes.func,
+  avatarUrls: PropTypes.arrayOf(PropTypes.string),
 };
 
 ConfirmMergeModal.defaultProps = {
   onMerge() {},
-  onCancel() {}
+  onCancel() {},
+  avatarUrls: [],
 };
