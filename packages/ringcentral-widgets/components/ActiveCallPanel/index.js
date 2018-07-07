@@ -14,6 +14,7 @@ import callCtrlLayout from '../../lib/callCtrlLayout';
 import dynamicsFont from '../../assets/DynamicsFont/DynamicsFont.scss';
 import styles from './styles.scss';
 import MergeInfo from './MergeInfo';
+
 class ActiveCallPanel extends React.Component {
   constructor(props) {
     super(props);
@@ -27,7 +28,7 @@ class ActiveCallPanel extends React.Component {
         nameMatches: this.props.nameMatches,
         fallBackName: this.props.fallBackName
       },
-       lastTo: null
+      lastTo: null
     };
   }
 
@@ -139,6 +140,7 @@ class ActiveCallPanel extends React.Component {
       mergeDisabled,
       isOnConference,
       hasConference,
+      conferencePartiesAvatarUrls,
     } = this.props;
     const timeCounter =
       (
@@ -177,11 +179,11 @@ class ActiveCallPanel extends React.Component {
               :
             layout === callCtrlLayout.mergeCtrl
               ? (<MergeInfo
-                   calls={this.props.calls}
-                   timeCounter={timeCounter}
-                   lastTo={this.props.lastTo}
-                   currentCall={this.state.currentCall}
-                   avatar={avatarUrl}
+                calls={this.props.calls}
+                timeCounter={timeCounter}
+                lastTo={this.props.lastTo}
+                currentCall={this.state.currentCall}
+                avatar={avatarUrl}
                  />)
                :
               (<CallInfo
@@ -236,6 +238,7 @@ class ActiveCallPanel extends React.Component {
                 show={!!this.state.isModalOpen}
                 onMerge={() => this.confirmMergeCall()}
                 onCancel={() => this.hideConfirmMergeModal()}
+                avatarUrls={conferencePartiesAvatarUrls}
               /> :
              null
           }
@@ -289,6 +292,7 @@ ActiveCallPanel.propTypes = {
   getPartyProfiles: PropTypes.func,
   hasConference: PropTypes.bool,
   isOnConference: PropTypes.bool,
+  conferencePartiesAvatarUrls: PropTypes.arrayOf(PropTypes.string),
 };
 
 ActiveCallPanel.defaultProps = {
@@ -314,6 +318,7 @@ ActiveCallPanel.defaultProps = {
   getPartyProfiles: i => i,
   hasConference: false,
   isOnConference: false,
+  conferencePartiesAvatarUrls: []
 };
 
 export default ActiveCallPanel;
