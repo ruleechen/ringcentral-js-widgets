@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import callDirections from 'ringcentral-integration/enums/callDirections';
 import styles from './styles.scss';
 
 class CallIcon extends Component {
@@ -152,23 +151,13 @@ class CallIcon extends Component {
 
 
 CallIcon.propTypes = {
-  direction: PropTypes.string,
-  ringing: PropTypes.bool,
   isOnConferenceCall: PropTypes.bool,
-  inboundTitle: PropTypes.string,
-  outboundTitle: PropTypes.string,
-  showAvatar: PropTypes.bool,
   avatarUrl: PropTypes.string,
   extraNum: PropTypes.number,
 };
 
 CallIcon.defaultProps = {
-  direction: callDirections.outbound,
-  ringing: false,
   isOnConferenceCall: false,
-  inboundTitle: undefined,
-  outboundTitle: undefined,
-  showAvatar: false,
   avatarUrl: null,
   extraNum: 0,
 };
