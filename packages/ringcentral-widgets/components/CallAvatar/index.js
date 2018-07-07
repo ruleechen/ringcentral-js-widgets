@@ -47,7 +47,10 @@ class CallAvatar extends Component {
 
     if (isOnConferenceCall && extraNum > 0) {
       res = (
-        <svg width={initialSize} height={initialSize} xmlns="http://www.w3.org/2000/svg">
+        <svg
+          viewBox={`0 0 ${initialSize} ${initialSize}`}
+          preserveAspectRatio="xMidYmid meet"
+          xmlns="http://www.w3.org/2000/svg">
           <defs>
             <g id="text">
               <text
@@ -117,7 +120,7 @@ class CallAvatar extends Component {
       res = (
         <svg width={initialSize} height={initialSize} xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <g>
+            <g id="text">
               <text
                 x="0"
                 y="0"

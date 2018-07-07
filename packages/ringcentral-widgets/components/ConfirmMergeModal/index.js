@@ -40,10 +40,12 @@ export default function ConfirmMergeModal({
       </div>
       <div className={styles.content}>
         <div className={styles.contentText}>
-          <CallAvatar
-            avatarUrl={avatarUrls[0]}
-            isOnConferenceCall
-            extraNum={avatarUrls.length - 1} />
+          <div className={styles.avatar}>
+            <CallAvatar
+              avatarUrl={avatarUrls[0]}
+              isOnConferenceCall
+              extraNum={avatarUrls.length - 1} />
+          </div>
           <span>{i18n.getString('conferenceCall', currentLocale)}</span>
         </div>
         <span title={i18n.getString('mergeToConference', currentLocale)} className={styles.webphoneButton}>
