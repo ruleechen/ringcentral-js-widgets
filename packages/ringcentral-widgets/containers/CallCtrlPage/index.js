@@ -172,7 +172,8 @@ class CallCtrlPage extends Component {
       mergeDisabled,
       getPartyProfiles,
       hasConference,
-      isOnConference
+      isOnConference,
+      conferencePartiesAvatarUrls
     } = this.props;
     if (!session.id) {
       return null;
@@ -245,6 +246,7 @@ class CallCtrlPage extends Component {
         hasConference={hasConference}
         isOnConference={isOnConference}
         lastTo={this.state.lastTo}
+        conferencePartiesAvatarUrls={conferencePartiesAvatarUrls}
       >
         {this.props.children}
       </CallCtrlPanel>
@@ -307,7 +309,8 @@ CallCtrlPage.propTypes = {
   gotoNormalCallCtrl: PropTypes.func,
   hasConference: PropTypes.bool,
   isOnConference: PropTypes.bool,
-  conferenceCall: PropTypes.object
+  conferenceCall: PropTypes.object,
+  conferencePartiesAvatarUrls: PropTypes.arrayOf(PropTypes.string),
 };
 
 CallCtrlPage.defaultProps = {
@@ -325,7 +328,8 @@ CallCtrlPage.defaultProps = {
   getPartyProfiles: i => i,
   gotoNormalCallCtrl: i => i,
   hasConference: false,
-  isOnConference: false
+  isOnConference: false,
+  conferencePartiesAvatarUrls: [],
 };
 
 function mapToProps(_, {
@@ -397,7 +401,10 @@ function mapToProps(_, {
     mergeDisabled,
     hasConference: !!conferenceData,
     isOnConference,
-    conferenceCall
+    conferenceCall,
+    conferencePartiesAvatarUrls: (conferenceData
+      && conferenceData.profiles.map(profile => profile.avatarUrl))
+      || []
   };
 }
 

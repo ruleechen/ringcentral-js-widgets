@@ -73,7 +73,7 @@ $fixed-avatar-width:35px;
 
 .contactDisplay {
   line-height: 25px;
-  max-width: $tmpWidth;
+  // max-width: $tmpWidth;
   margin-bottom: 5px;
   button {
     font-size: 13px;
@@ -154,7 +154,7 @@ $fixed-avatar-width:35px;
   font-size: 12px;
   top: 30px;
   left: 45px;
-  max-width: $tmpWidth;
+  // max-width: $tmpWidth;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

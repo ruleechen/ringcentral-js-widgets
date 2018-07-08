@@ -133,6 +133,7 @@ class CallCtrlPanel extends Component {
         hasConference={this.props.hasConference}
         isOnConference={this.props.isOnConference}
         lastTo={this.props.lastTo}
+        conferencePartiesAvatarUrls={this.props.conferencePartiesAvatarUrls}
       >
         {this.props.children}
         {this.props.showSpinner ? <SpinnerOverlay /> : null}
@@ -195,6 +196,7 @@ CallCtrlPanel.propTypes = {
   getPartyProfiles: PropTypes.func,
   hasConference: PropTypes.bool,
   isOnConference: PropTypes.bool,
+  conferencePartiesAvatarUrls: PropTypes.arrayOf(PropTypes.string),
 };
 
 CallCtrlPanel.defaultProps = {
@@ -226,6 +228,7 @@ CallCtrlPanel.defaultProps = {
   getPartyProfiles: i => i,
   hasConference: false,
   isOnConference: false,
+  conferencePartiesAvatarUrls: []
 };
 
 export default CallCtrlPanel;
