@@ -14,6 +14,7 @@ import callCtrlLayout from '../../lib/callCtrlLayout';
 import dynamicsFont from '../../assets/DynamicsFont/DynamicsFont.scss';
 import styles from './styles.scss';
 import MergeInfo from './MergeInfo';
+
 class ActiveCallPanel extends React.Component {
   constructor(props) {
     super(props);
@@ -23,11 +24,9 @@ class ActiveCallPanel extends React.Component {
       isPartiesModalOpen: false, // todo: for rendering the parties modal when conferecing
       resizeFunc: throttle(() => this.handleResize(this.props)),
       currentCall: {
-        avatarUrl: this.props.avatarUrl,
         nameMatches: this.props.nameMatches,
         fallBackName: this.props.fallBackName
-      },
-       lastTo: null
+      }
     };
   }
 
@@ -140,6 +139,8 @@ class ActiveCallPanel extends React.Component {
       mergeDisabled,
       isOnConference,
       hasConference,
+      calls,
+      lastTo
     } = this.props;
     const timeCounter =
       (
@@ -160,7 +161,30 @@ class ActiveCallPanel extends React.Component {
         </span>
         )}
       />);
-
+    const isMergeCtrl = layout === callCtrlLayout.mergeCtrl
+      ? (<MergeInfo
+        calls={calls}
+        timeCounter={timeCounter}
+        lastTo={lastTo}
+        currentCall={this.state.currentCall}
+        avatar={avatarUrl}
+      />)
+      : (<CallInfo
+        currentLocale={currentLocale}
+        nameMatches={nameMatches}
+        fallBackName={fallBackName}
+        phoneNumber={phoneNumber}
+        formatPhone={formatPhone}
+        startTime={startTime}
+        areaCode={areaCode}
+        countryCode={countryCode}
+        selectedMatcherIndex={selectedMatcherIndex}
+        onSelectMatcherName={onSelectMatcherName}
+        avatarUrl={avatarUrl}
+        brand={brand}
+        showContactDisplayPlaceholder={showContactDisplayPlaceholder}
+        sourceIcons={sourceIcons}
+      />);
     return (
       <div className={styles.root}>
         {backHeader}
@@ -175,32 +199,7 @@ class ActiveCallPanel extends React.Component {
                   onClick={() => this.openPartiesModal()}
                 />
               )
-              :
-            layout === callCtrlLayout.mergeCtrl
-              ? (<MergeInfo
-                   calls={this.props.calls}
-                   timeCounter={timeCounter}
-                   lastTo={this.props.lastTo}
-                   currentCall={this.state.currentCall}
-                   avatar={avatarUrl}
-                 />)
-               :
-              (<CallInfo
-                currentLocale={currentLocale}
-                nameMatches={nameMatches}
-                fallBackName={fallBackName}
-                phoneNumber={phoneNumber}
-                formatPhone={formatPhone}
-                startTime={startTime}
-                areaCode={areaCode}
-                countryCode={countryCode}
-                selectedMatcherIndex={selectedMatcherIndex}
-                onSelectMatcherName={onSelectMatcherName}
-                avatarUrl={avatarUrl}
-                brand={brand}
-                showContactDisplayPlaceholder={showContactDisplayPlaceholder}
-                sourceIcons={sourceIcons}
-              />)
+              : isMergeCtrl
           }
           <ActiveCallPad
             className={styles.callPad}
@@ -290,6 +289,7 @@ ActiveCallPanel.propTypes = {
   getPartyProfiles: PropTypes.func,
   hasConference: PropTypes.bool,
   isOnConference: PropTypes.bool,
+  lastTo: PropTypes.object
 };
 
 ActiveCallPanel.defaultProps = {

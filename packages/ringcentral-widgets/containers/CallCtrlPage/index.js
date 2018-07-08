@@ -115,10 +115,16 @@ class CallCtrlPage extends Component {
     }
   }
   getLastTo() {
-    const { calls, conferenceCall } = this.props
-    if (Object.keys(conferenceCall.state.mergingPair).length && conferenceCall.state.mergingPair.from) {
+    const { calls, conferenceCall } = this.props;
+    const mergingPair = conferenceCall.state.mergingPair;
+    if (
+      Object.keys(mergingPair).length
+      && mergingPair.from
+    ) {
       if (calls.length) {
-        const lastCall = calls.filter(item => (item.webphoneSession ? item.webphoneSession.id === conferenceCall.state.mergingPair.from.id : null))[0];
+        const lastCall = calls.filter(
+          item => (item.webphoneSession ? item.webphoneSession.id === mergingPair.from.id : null)
+        )[0];
         if (lastCall && lastCall.toMatches[0]) {
           const lastTo = {
             avatarUrl: lastCall.toMatches[0].profileImageUrl,
@@ -141,12 +147,11 @@ class CallCtrlPage extends Component {
             });
           }
         } else {
-          this.setState(prev => ({
+          this.setState({
             lastTo: {
-              ...prev.lastTo,
               calleeType: 'unknow'
             }
-          }))
+          });
         }
       }
     } else {
@@ -302,6 +307,7 @@ CallCtrlPage.propTypes = {
   gotoNormalCallCtrl: PropTypes.func,
   hasConference: PropTypes.bool,
   isOnConference: PropTypes.bool,
+  conferenceCall: PropTypes.object
 };
 
 CallCtrlPage.defaultProps = {
@@ -391,7 +397,7 @@ function mapToProps(_, {
     mergeDisabled,
     hasConference: !!conferenceData,
     isOnConference,
-    conferenceCall: conferenceCall
+    conferenceCall
   };
 }
 
