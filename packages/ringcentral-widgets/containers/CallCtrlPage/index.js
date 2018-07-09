@@ -62,9 +62,8 @@ class CallCtrlPage extends Component {
       this.props.onTransfer(value, this.props.session.id);
     this.onPark = () =>
       this.props.onPark(this.props.session.id);
-    this.onAdd = () => {
+    this.onAdd = () =>
       this.props.onAdd(this.props.session.id);
-    };
     this.onMerge = () =>
       this.props.onMerge(this.props.session.id);
   }
@@ -366,13 +365,13 @@ function mapToProps(_, {
    */
   const isWebRTC = callingSettings.callingMode === callingModes.webphone;
   let mergeDisabled = !(currentSession.data && Object.keys(currentSession.data).length)
-  || !isWebRTC;
+    || !isWebRTC;
   let addDisabled = !isWebRTC;
 
   if (conferenceData && isWebRTC) {
     const newVal = conferenceCall.isOverload(conferenceData.conference.id)
-    // in case webphone.activeSession has not been updated yet
-    || !(currentSession.data && Object.keys(currentSession.data).length);
+      // in case webphone.activeSession has not been updated yet
+      || !(currentSession.data && Object.keys(currentSession.data).length);
     // update
     mergeDisabled = newVal || !(currentSession.data && Object.keys(currentSession.data).length);
     addDisabled = newVal;
