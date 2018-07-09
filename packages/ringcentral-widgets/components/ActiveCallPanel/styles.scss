@@ -1,6 +1,7 @@
 @import '../../lib/commonStyles/full-size';
 @import '../../lib/commonStyles/colors.scss';
 @import '../../lib/commonStyles/fonts.scss';
+@import '../../lib/commonStyles/layout';
 
 $userInfoHeight: 140px;
 $conferenceAvatarSize: 51px;;
@@ -18,6 +19,7 @@ $conferenceAvatarSize: 51px;;
 
 .panel {
   position: relative;
+  height: calc(100% - #{$header-height});
 }
 
 .backButton {
@@ -110,7 +112,7 @@ $conferenceAvatarSize: 51px;;
 
 .callPad {
   box-sizing: border-box;
-  height: calc(100% - #{$userInfoHeight});
+  height: calc(100% - #{$userInfoHeight} - 10px);
   padding-bottom: 50px;
 }
 

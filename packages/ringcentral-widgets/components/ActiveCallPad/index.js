@@ -65,13 +65,15 @@ class ActiveCallPad extends Component {
     const onRecordClicked = this.props.recordStatus === recordStatus.recording ?
       this.props.onStopRecord :
       this.props.onRecord;
-    const disabledFlip = this.props.flipNumbers.length === 0;
+    const disabledFlip = this.props.flipNumbers.length === 0
+    || this.props.isOnHold
+    || this.props.isOnConference;
+    const disabledTransfer = this.props.isOnConference;
     const recordTitle = this.props.recordStatus === recordStatus.recording ?
       i18n.getString('stopRecord', this.props.currentLocale) :
       i18n.getString('record', this.props.currentLocale);
     const isRecordButtonActive = this.props.recordStatus === recordStatus.recording;
     const isRecordDisabled = this.props.recordStatus === recordStatus.pending;
-
     const btnClassName = styles.callButton;
     const muteButton = this.props.isOnMute ?
       (
@@ -165,6 +167,7 @@ class ActiveCallPad extends Component {
           title={i18n.getString('more', this.props.currentLocale)}
           active={this.state.expandMore}
           className={classnames(styles.moreButton, btnClassName)}
+          disabled={(disabledFlip || this.props.isOnHold) && this.props.isOnConference}
           icon={MoreIcon} />
         <DropDown fixed={false} open={this.state.expandMore} direction="top" triggerElm={this.state.moreButton}>
           <div className={styles.buttonPopup}>
@@ -173,11 +176,12 @@ class ActiveCallPad extends Component {
               icon: <TransferIcon />,
               name: i18n.getString('transfer', this.props.currentLocale),
               onClick: this.props.onToggleTransferPanel,
+              disabled: disabledTransfer,
             }, {
               icon: <FlipIcon />,
               name: i18n.getString('flip', this.props.currentLocale),
               onClick: this.props.onShowFlipPanel,
-              disabled: disabledFlip || this.props.isOnHold
+              disabled: disabledFlip
             }].map(({
                 name, icon, disabled, onClick
                 }) => (
@@ -185,7 +189,9 @@ class ActiveCallPad extends Component {
                     key={name}
                     className={styles.buttonItem}
                     onClick={disabled ? i => i : onClick}>
-                    <div className={classnames(styles.buttonIcon, disabled ? styles.buttonDisabled : styles.buttonActive)}>
+                    <div className={
+                      classnames(styles.buttonIcon,
+                       disabled ? styles.buttonDisabled : styles.buttonActive)}>
                       {icon}
                     </div>
                     <div className={styles.buttonName}>
