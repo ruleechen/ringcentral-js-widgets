@@ -52,16 +52,17 @@ class ActiveCallPanel extends React.Component {
     }
   }
 
-  onAdd() {
-    if (this.props.hasConference
-      && !this.props.isOnConference
-      && this.props.layout === callCtrlLayout.normalCtrl) {
+  onMerge() {
+    if (
+      this.props.hasConference &&
+      this.props.layout === callCtrlLayout.normalCtrl
+    ) {
       this.setState(prevState => ({
         ...prevState,
         isModalOpen: true,
       }));
     } else {
-      this.props.onAdd();
+      this.props.onMerge();
     }
   }
 
@@ -73,9 +74,10 @@ class ActiveCallPanel extends React.Component {
   hideConfirmMergeModal() {
     this.setState(prevState => ({
       ...prevState,
-      isModalOpen: false
+      isModalOpen: false,
     }));
   }
+
   componentDidMount() {
     this.handleResize(this.props);
     window.addEventListener('resize', this.state.resizeFunc);
@@ -125,7 +127,7 @@ class ActiveCallPanel extends React.Component {
       onHangup,
       onPark,
       onAdd,
-      onMerge,
+      // onMerge,
       onShowFlipPanel,
       onToggleTransferPanel,
       children,
@@ -137,7 +139,6 @@ class ActiveCallPanel extends React.Component {
       direction,
       addDisabled,
       mergeDisabled,
-      isOnConference,
       hasConference,
       calls,
       lastTo,
@@ -148,8 +149,8 @@ class ActiveCallPanel extends React.Component {
         <div className={styles.timeCounter}>
           {
             startTime
-            ? <DurationCounter startTime={startTime} offset={startTimeOffset} />
-            : <span aria-hidden="true">&nbsp;</span>
+              ? <DurationCounter startTime={startTime} offset={startTimeOffset} />
+              : <span aria-hidden="true">&nbsp;</span>
           }
         </div>
       );
@@ -160,8 +161,8 @@ class ActiveCallPanel extends React.Component {
           <i className={classnames(dynamicsFont.arrow, styles.backIcon)} />
           <span className={styles.backLabel}>{backButtonLabel}</span>
         </span>
-        )}
-      />);
+      )}
+    />);
     const mergeCtrlCom = layout === callCtrlLayout.mergeCtrl
       ? (<MergeInfo
         calls={calls}
@@ -190,7 +191,7 @@ class ActiveCallPanel extends React.Component {
       <div className={styles.root}>
         {backHeader}
         <Panel className={styles.panel}>
-          { layout !== callCtrlLayout.mergeCtrl ? timeCounter : null }
+          {layout !== callCtrlLayout.mergeCtrl ? timeCounter : null}
           {
             layout === callCtrlLayout.conferenceCtrl
               ? (
@@ -216,8 +217,8 @@ class ActiveCallPanel extends React.Component {
             onStopRecord={onStopRecord}
             onShowKeyPad={onShowKeyPad}
             onHangup={onHangup}
-            onAdd={() => this.onAdd()}
-            onMerge={onMerge}
+            onAdd={onAdd}
+            onMerge={() => this.onMerge()}
             onShowFlipPanel={onShowFlipPanel}
             onToggleTransferPanel={onToggleTransferPanel}
             flipNumbers={flipNumbers}
@@ -226,7 +227,6 @@ class ActiveCallPanel extends React.Component {
             direction={direction}
             addDisabled={addDisabled}
             mergeDisabled={mergeDisabled}
-            isOnConference={isOnConference}
             hasConference={hasConference}
           />
           {children}
@@ -239,7 +239,7 @@ class ActiveCallPanel extends React.Component {
                 onCancel={() => this.hideConfirmMergeModal()}
                 avatarUrls={conferencePartiesAvatarUrls}
               /> :
-             null
+              null
           }
         </Panel>
       </div>
@@ -290,7 +290,6 @@ ActiveCallPanel.propTypes = {
   mergeDisabled: PropTypes.bool,
   getPartyProfiles: PropTypes.func,
   hasConference: PropTypes.bool,
-  isOnConference: PropTypes.bool,
   lastTo: PropTypes.object,
   conferencePartiesAvatarUrls: PropTypes.arrayOf(PropTypes.string),
 };
@@ -317,7 +316,7 @@ ActiveCallPanel.defaultProps = {
   mergeDisabled: false,
   getPartyProfiles: i => i,
   hasConference: false,
-  isOnConference: false,
+  lastTo: null,
   conferencePartiesAvatarUrls: []
 };
 

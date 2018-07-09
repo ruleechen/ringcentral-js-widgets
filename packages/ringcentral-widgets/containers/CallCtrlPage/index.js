@@ -169,9 +169,8 @@ class CallCtrlPage extends Component {
       showSpinner,
       addDisabled,
       mergeDisabled,
-      getPartyProfiles,
       hasConference,
-      isOnConference,
+      getPartyProfiles,
       conferencePartiesAvatarUrls
     } = this.props;
     if (!session.id) {
@@ -241,9 +240,8 @@ class CallCtrlPage extends Component {
         direction={session.direction}
         addDisabled={addDisabled}
         mergeDisabled={mergeDisabled}
-        getPartyProfiles={getPartyProfiles}
         hasConference={hasConference}
-        isOnConference={isOnConference}
+        getPartyProfiles={getPartyProfiles}
         lastTo={this.state.lastTo}
         conferencePartiesAvatarUrls={conferencePartiesAvatarUrls}
       >
@@ -307,10 +305,9 @@ CallCtrlPage.propTypes = {
   getPartyProfiles: PropTypes.func,
   gotoNormalCallCtrl: PropTypes.func,
   hasConference: PropTypes.bool,
-  isOnConference: PropTypes.bool,
+  lastTo: PropTypes.object,
   conferenceCall: PropTypes.object,
   conferencePartiesAvatarUrls: PropTypes.arrayOf(PropTypes.string),
-  lastTo: PropTypes.object
 };
 
 CallCtrlPage.defaultProps = {
@@ -325,14 +322,12 @@ CallCtrlPage.defaultProps = {
   showSpinner: false,
   addDisabled: false,
   mergeDisabled: false,
+  hasConference: false,
+  lastTo: { calleeType: calleeTypes.unknow },
+  conferenceCall: null,
   getPartyProfiles: i => i,
   gotoNormalCallCtrl: i => i,
-  hasConference: false,
-  isOnConference: false,
   conferencePartiesAvatarUrls: [],
-  lastTo: {
-    calleeType: calleeTypes.unknow
-  }
 };
 
 function mapToProps(_, {
@@ -403,7 +398,6 @@ function mapToProps(_, {
     addDisabled,
     mergeDisabled,
     hasConference: !!conferenceData,
-    isOnConference,
     conferenceCall,
     conferencePartiesAvatarUrls: (conferenceData
       && conferenceData.profiles.map(profile => profile.avatarUrl))
