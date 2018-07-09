@@ -17,7 +17,7 @@ class CallCtrlPage extends Component {
     this.state = {
       selectedMatcherIndex: 0,
       avatarUrl: null,
-      lastTo: null
+      lastTo: this.props.lastTo || null
     };
     this.onSelectMatcherName = (option) => {
       const nameMatches = this.props.nameMatches || [];
@@ -311,6 +311,7 @@ CallCtrlPage.propTypes = {
   isOnConference: PropTypes.bool,
   conferenceCall: PropTypes.object,
   conferencePartiesAvatarUrls: PropTypes.arrayOf(PropTypes.string),
+  lastTo: PropTypes.object
 };
 
 CallCtrlPage.defaultProps = {
@@ -330,6 +331,9 @@ CallCtrlPage.defaultProps = {
   hasConference: false,
   isOnConference: false,
   conferencePartiesAvatarUrls: [],
+  lastTo: {
+    calleeType: 'unknow'
+  }
 };
 
 function mapToProps(_, {
