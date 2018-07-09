@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styles from './styles.scss';
 import DefaultAvatar from '../../assets/images/DefaultAvatar.svg';
 import i18n from './i18n';
+import CallAvatar from '../CallAvatar';
 
 function MergeInfo({
   calls, timeCounter, currentCall, avatar, currentLocale, lastTo
