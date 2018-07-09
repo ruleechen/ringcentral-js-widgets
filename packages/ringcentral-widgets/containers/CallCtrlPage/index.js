@@ -5,10 +5,10 @@ import PropTypes from 'prop-types';
 import formatNumber from 'ringcentral-integration/lib/formatNumber';
 import callDirections from 'ringcentral-integration/enums/callDirections';
 import callingModes from 'ringcentral-integration/modules/CallingSettings/callingModes';
+import calleeTypes from 'ringcentral-integration/enums/calleeTypes';
 import withPhone from '../../lib/withPhone';
 import callCtrlLayout from '../../lib/callCtrlLayout';
 import CallCtrlPanel from '../../components/CallCtrlPanel';
-
 import i18n from './i18n';
 
 class CallCtrlPage extends Component {
@@ -17,7 +17,7 @@ class CallCtrlPage extends Component {
     this.state = {
       selectedMatcherIndex: 0,
       avatarUrl: null,
-      lastTo: null
+      lastTo: this.props.lastTo || null
     };
     this.onSelectMatcherName = (option) => {
       const nameMatches = this.props.nameMatches || [];
@@ -115,15 +115,22 @@ class CallCtrlPage extends Component {
     }
   }
   getLastTo() {
-    if (Object.keys(this.props.phone.conferenceCall.state.mergingPair).length && this.props.phone.conferenceCall.state.mergingPair.from) {
-      if (this.props.phone.callMonitor.calls.length) {
-        const lastCall = this.props.phone.callMonitor.calls.filter(item => (item.webphoneSession ? item.webphoneSession.id === this.props.phone.conferenceCall.state.mergingPair.from.id : null))[0];
+    const { calls, conferenceCall } = this.props;
+    const mergingPair = conferenceCall.state.mergingPair ? conferenceCall.state.mergingPair : {};
+    if (
+      Object.keys(mergingPair).length
+      && mergingPair.from
+    ) {
+      if (calls.length) {
+        const lastCall = calls.filter(
+          item => (item.webphoneSession ? item.webphoneSession.id === mergingPair.from.id : null)
+        )[0];
         if (lastCall && lastCall.toMatches[0]) {
           const lastTo = {
             avatarUrl: lastCall.toMatches[0].profileImageUrl,
             name: lastCall.toName,
             status: lastCall.telephonyStatus,
-            isOnConference: false
+            calleeType: calleeTypes.contacts
           };
           this.setState({
             lastTo
@@ -139,12 +146,18 @@ class CallCtrlPage extends Component {
               }));
             });
           }
+        } else {
+          this.setState({
+            lastTo: {
+              calleeType: calleeTypes.unknow
+            }
+          });
         }
       }
     } else {
       this.setState({
         lastTo: {
-          isOnConference: true
+          calleeType: calleeTypes.conference
         }
       });
     }
@@ -296,7 +309,9 @@ CallCtrlPage.propTypes = {
   gotoNormalCallCtrl: PropTypes.func,
   hasConference: PropTypes.bool,
   isOnConference: PropTypes.bool,
+  conferenceCall: PropTypes.object,
   conferencePartiesAvatarUrls: PropTypes.arrayOf(PropTypes.string),
+  lastTo: PropTypes.object
 };
 
 CallCtrlPage.defaultProps = {
@@ -316,6 +331,9 @@ CallCtrlPage.defaultProps = {
   hasConference: false,
   isOnConference: false,
   conferencePartiesAvatarUrls: [],
+  lastTo: {
+    calleeType: calleeTypes.unknow
+  }
 };
 
 function mapToProps(_, {
@@ -387,6 +405,7 @@ function mapToProps(_, {
     mergeDisabled,
     hasConference: !!conferenceData,
     isOnConference,
+    conferenceCall,
     conferencePartiesAvatarUrls: (conferenceData
       && conferenceData.profiles.map(profile => profile.avatarUrl))
       || []

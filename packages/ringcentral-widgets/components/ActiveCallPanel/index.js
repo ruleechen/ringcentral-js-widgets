@@ -24,13 +24,12 @@ class ActiveCallPanel extends React.Component {
       isPartiesModalOpen: false, // todo: for rendering the parties modal when conferecing
       resizeFunc: throttle(() => this.handleResize(this.props)),
       currentCall: {
-        avatarUrl: this.props.avatarUrl,
         nameMatches: this.props.nameMatches,
         fallBackName: this.props.fallBackName
-      },
-      lastTo: null
+      }
     };
   }
+
 
   handleResize(props) {
     const MAXIMUM_AVATARS = 4;
@@ -140,6 +139,8 @@ class ActiveCallPanel extends React.Component {
       mergeDisabled,
       isOnConference,
       hasConference,
+      calls,
+      lastTo,
       conferencePartiesAvatarUrls,
     } = this.props;
     const timeCounter =
@@ -161,7 +162,30 @@ class ActiveCallPanel extends React.Component {
         </span>
         )}
       />);
-
+    const mergeCtrlCom = layout === callCtrlLayout.mergeCtrl
+      ? (<MergeInfo
+        calls={calls}
+        timeCounter={timeCounter}
+        lastTo={lastTo}
+        currentCall={this.state.currentCall}
+        avatar={avatarUrl}
+      />)
+      : (<CallInfo
+        currentLocale={currentLocale}
+        nameMatches={nameMatches}
+        fallBackName={fallBackName}
+        phoneNumber={phoneNumber}
+        formatPhone={formatPhone}
+        startTime={startTime}
+        areaCode={areaCode}
+        countryCode={countryCode}
+        selectedMatcherIndex={selectedMatcherIndex}
+        onSelectMatcherName={onSelectMatcherName}
+        avatarUrl={avatarUrl}
+        brand={brand}
+        showContactDisplayPlaceholder={showContactDisplayPlaceholder}
+        sourceIcons={sourceIcons}
+      />);
     return (
       <div className={styles.root}>
         {backHeader}
@@ -176,32 +200,7 @@ class ActiveCallPanel extends React.Component {
                   onClick={() => this.openPartiesModal()}
                 />
               )
-              :
-            layout === callCtrlLayout.mergeCtrl
-              ? (<MergeInfo
-                calls={this.props.calls}
-                timeCounter={timeCounter}
-                lastTo={this.props.lastTo}
-                currentCall={this.state.currentCall}
-                avatar={avatarUrl}
-                 />)
-               :
-              (<CallInfo
-                currentLocale={currentLocale}
-                nameMatches={nameMatches}
-                fallBackName={fallBackName}
-                phoneNumber={phoneNumber}
-                formatPhone={formatPhone}
-                startTime={startTime}
-                areaCode={areaCode}
-                countryCode={countryCode}
-                selectedMatcherIndex={selectedMatcherIndex}
-                onSelectMatcherName={onSelectMatcherName}
-                avatarUrl={avatarUrl}
-                brand={brand}
-                showContactDisplayPlaceholder={showContactDisplayPlaceholder}
-                sourceIcons={sourceIcons}
-              />)
+              : mergeCtrlCom
           }
           <ActiveCallPad
             className={styles.callPad}
@@ -292,6 +291,7 @@ ActiveCallPanel.propTypes = {
   getPartyProfiles: PropTypes.func,
   hasConference: PropTypes.bool,
   isOnConference: PropTypes.bool,
+  lastTo: PropTypes.object,
   conferencePartiesAvatarUrls: PropTypes.arrayOf(PropTypes.string),
 };
 
