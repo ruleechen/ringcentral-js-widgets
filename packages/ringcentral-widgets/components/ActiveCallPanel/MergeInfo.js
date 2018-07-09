@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import calleeTypes from 'ringcentral-integration/enums/calleeTypes';
 import styles from './styles.scss';
 import DefaultAvatar from '../../assets/images/DefaultAvatar.svg';
 import i18n from './i18n';
@@ -7,15 +8,18 @@ import i18n from './i18n';
 function MergeInfo({
   calls, timeCounter, currentCall, avatar, currentLocale, lastTo
 }) {
-  const isConference = lastTo && lastTo.calleeType === 'conference' ? i18n.getString('conference', currentLocale) : i18n.getString('unknow', currentLocale);
+  const isConference = lastTo && lastTo.calleeType === calleeTypes.conference ? i18n.getString('conference', currentLocale) : i18n.getString('unknow', currentLocale);
   return lastTo ? (
     <div className={styles.mergeInfo}>
       <div className={styles.merge_item}>
-        <div className={styles.callee_avatar} style={lastTo.calleeType === 'know' ? { backgroundImage: `url(${lastTo.avatarUrl})` } : { background: '#fff' }}>
-          { lastTo.calleeType !== 'know' || !lastTo.avatarUrl ? <DefaultAvatar className={styles.defaut_avatar} /> : null}
+        <div className={styles.callee_avatar} style={lastTo.calleeType === calleeTypes.know ? { backgroundImage: `url(${lastTo.avatarUrl})` } : { background: '#fff' }}>
+          { lastTo.calleeType !== calleeTypes.know || !lastTo.avatarUrl
+            ? <DefaultAvatar className={styles.defaut_avatar} />
+            : null
+          }
         </div>
         <div className={styles.callee_name}>
-          { lastTo.calleeType === 'know' ? lastTo.name : isConference }
+          { lastTo.calleeType === calleeTypes.know ? lastTo.name : isConference }
         </div>
         <div className={styles.callee_status}>
           {i18n.getString('onHold', currentLocale)}
