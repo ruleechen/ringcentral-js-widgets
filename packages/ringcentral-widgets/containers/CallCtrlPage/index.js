@@ -130,7 +130,7 @@ class CallCtrlPage extends Component {
             avatarUrl: lastCall.toMatches[0].profileImageUrl,
             name: lastCall.toName,
             status: lastCall.telephonyStatus,
-            calleeType: calleeTypes.know
+            calleeType: calleeTypes.contacts
           };
           this.setState({
             lastTo

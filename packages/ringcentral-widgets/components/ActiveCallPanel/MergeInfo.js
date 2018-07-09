@@ -12,14 +12,14 @@ function MergeInfo({
   return lastTo ? (
     <div className={styles.mergeInfo}>
       <div className={styles.merge_item}>
-        <div className={styles.callee_avatar} style={lastTo.calleeType === calleeTypes.know ? { backgroundImage: `url(${lastTo.avatarUrl})` } : { background: '#fff' }}>
-          { lastTo.calleeType !== calleeTypes.know || !lastTo.avatarUrl
+        <div className={styles.callee_avatar} style={lastTo.calleeType === calleeTypes.contacts ? { backgroundImage: `url(${lastTo.avatarUrl})` } : { background: '#fff' }}>
+          { lastTo.calleeType !== calleeTypes.contacts || !lastTo.avatarUrl
             ? <DefaultAvatar className={styles.defaut_avatar} />
             : null
           }
         </div>
         <div className={styles.callee_name}>
-          { lastTo.calleeType === calleeTypes.know ? lastTo.name : isConference }
+          { lastTo.calleeType === calleeTypes.contacts ? lastTo.name : isConference }
         </div>
         <div className={styles.callee_status}>
           {i18n.getString('onHold', currentLocale)}
