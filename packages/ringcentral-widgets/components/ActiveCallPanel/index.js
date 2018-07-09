@@ -162,7 +162,7 @@ class ActiveCallPanel extends React.Component {
         </span>
         )}
       />);
-    const isMergeCtrl = layout === callCtrlLayout.mergeCtrl
+    const mergeCtrlCom = layout === callCtrlLayout.mergeCtrl
       ? (<MergeInfo
         calls={calls}
         timeCounter={timeCounter}
@@ -200,7 +200,7 @@ class ActiveCallPanel extends React.Component {
                   onClick={() => this.openPartiesModal()}
                 />
               )
-              : isMergeCtrl
+              : mergeCtrlCom
           }
           <ActiveCallPad
             className={styles.callPad}

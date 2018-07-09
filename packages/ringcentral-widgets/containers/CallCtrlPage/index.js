@@ -116,7 +116,7 @@ class CallCtrlPage extends Component {
   }
   getLastTo() {
     const { calls, conferenceCall } = this.props;
-    const mergingPair = conferenceCall.state.mergingPair;
+    const mergingPair = conferenceCall.state.mergingPair ? conferenceCall.state.mergingPair : {};
     if (
       Object.keys(mergingPair).length
       && mergingPair.from
