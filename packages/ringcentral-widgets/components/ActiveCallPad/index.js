@@ -67,8 +67,8 @@ class ActiveCallPad extends Component {
       this.props.onRecord;
     const disabledFlip = this.props.flipNumbers.length === 0
     || this.props.isOnHold
-    || this.props.isOnConference;
-    const disabledTransfer = this.props.isOnConference;
+    || this.props.layout === callCtrlLayout.mergeCtrl;
+    const disabledTransfer = this.props.layout === callCtrlLayout.mergeCtrl;
     const recordTitle = this.props.recordStatus === recordStatus.recording ?
       i18n.getString('stopRecord', this.props.currentLocale) :
       i18n.getString('record', this.props.currentLocale);
@@ -167,7 +167,7 @@ class ActiveCallPad extends Component {
           title={i18n.getString('more', this.props.currentLocale)}
           active={this.state.expandMore}
           className={classnames(styles.moreButton, btnClassName)}
-          disabled={(disabledFlip || this.props.isOnHold) && this.props.isOnConference}
+          disabled={disabledFlip}
           icon={MoreIcon} />
         <DropDown fixed={false} open={this.state.expandMore} direction="top" triggerElm={this.state.moreButton}>
           <div className={styles.buttonPopup}>
