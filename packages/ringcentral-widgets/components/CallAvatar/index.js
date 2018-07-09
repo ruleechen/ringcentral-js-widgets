@@ -18,6 +18,10 @@ class CallAvatar extends Component {
         ...prevState,
         avatarUrl: props.avatarUrl,
       }));
+      $img.onerror = () => this.setState(prevState => ({
+        ...prevState,
+        avatarUrl: null,
+      }));
     }
   }
 
