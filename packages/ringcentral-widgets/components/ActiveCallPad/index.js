@@ -165,6 +165,7 @@ class ActiveCallPad extends Component {
           title={i18n.getString('more', this.props.currentLocale)}
           active={this.state.expandMore}
           className={classnames(styles.moreButton, btnClassName)}
+          disabled={(disabledFlip || this.props.isOnHold) && this.props.isOnConference}
           icon={MoreIcon} />
         <DropDown fixed={false} open={this.state.expandMore} direction="top" triggerElm={this.state.moreButton}>
           <div className={styles.buttonPopup}>
@@ -173,6 +174,7 @@ class ActiveCallPad extends Component {
               icon: <TransferIcon />,
               name: i18n.getString('transfer', this.props.currentLocale),
               onClick: this.props.onToggleTransferPanel,
+              disabled: this.props.isOnConference
             }, {
               icon: <FlipIcon />,
               name: i18n.getString('flip', this.props.currentLocale),
