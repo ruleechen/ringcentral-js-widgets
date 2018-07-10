@@ -66,14 +66,15 @@ $keypadHeight:53%;
 
 .stopButtonGroup {
   height: 100% - $keypadHeight;
-  display: inline-block;
+  display: block;
   box-sizing: border-box;
   padding-bottom: $recent-activity-height;
 
   .button{
     display: inline-block;
     box-sizing: border-box;
-    width: 23%;
+    width: 45/196*100%;
+    max-width: 140px;
   }
 
   .stopButton {
