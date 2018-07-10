@@ -159,7 +159,12 @@ class CallAvatar extends Component {
           </g>
           {
             avatarUrl ?
-              <image clipPath="url(#circleClip)" height="100%" width="100%" xlinkHref={avatarUrl} /> :
+              <image
+                clipPath="url(#circleClip)"
+                height="100%"
+                width="100%"
+                xlinkHref={avatarUrl}
+                preserveAspectRatio="xMinYMin slice" /> :
               <use xlinkHref="#text" clipPath="url(#circleClip)" />
           }
         </svg>
