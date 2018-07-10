@@ -6,7 +6,6 @@ import throttle from 'ringcentral-integration/lib/throttle';
 import CallInfo from './CallInfo';
 import ConferenceInfo from './ConferenceInfo';
 import BackHeader from '../BackHeader';
-import ConfirmMergeModal from '../ConfirmMergeModal';
 import Panel from '../Panel';
 import DurationCounter from '../DurationCounter';
 import ActiveCallPad from '../ActiveCallPad';
@@ -24,8 +23,9 @@ class ActiveCallPanel extends React.Component {
       isPartiesModalOpen: false, // todo: for rendering the parties modal when conferecing
       resizeFunc: throttle(() => this.handleResize(this.props)),
     };
-  }
 
+    this.throttleResize = throttle(() => this.handleResize(this.props));
+  }
 
   handleResize(props) {
     const MAXIMUM_AVATARS = 4;
@@ -48,50 +48,17 @@ class ActiveCallPanel extends React.Component {
     }
   }
 
-  onMerge() {
-    if (
-      this.props.hasConference &&
-      this.props.layout === callCtrlLayout.normalCtrl
-    ) {
-      this.setState(prevState => ({
-        ...prevState,
-        isModalOpen: true,
-      }));
-    } else {
-      this.props.onMerge();
-    }
-  }
-
-  confirmMergeCall() {
-    this.props.onMerge();
-    this.hideConfirmMergeModal();
-  }
-
-  hideConfirmMergeModal() {
-    this.setState(prevState => ({
-      ...prevState,
-      isModalOpen: false,
-    }));
-  }
-
   componentDidMount() {
     this.handleResize(this.props);
-    window.addEventListener('resize', this.state.resizeFunc);
+    window.addEventListener('resize', this.throttleResize);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize', this.state.resizeFunc);
+    window.removeEventListener('resize', this.throttleResize);
   }
 
   componentWillReceiveProps(nextProps) {
     this.handleResize(nextProps);
-    if (!nextProps.hasConference && this.state.isModalOpen) {
-      this.hideConfirmMergeModal();
-    }
-  }
-
-  openPartiesModal() {
-    // todo;
   }
 
   render() {
@@ -123,9 +90,10 @@ class ActiveCallPanel extends React.Component {
       onHangup,
       onPark,
       onAdd,
-      // onMerge,
+      onMerge,
       onShowFlipPanel,
       onToggleTransferPanel,
+      onOpenPartiesModal,
       children,
       showContactDisplayPlaceholder,
       brand,
@@ -138,7 +106,6 @@ class ActiveCallPanel extends React.Component {
       hasConference,
       calls,
       lastTo,
-      conferencePartiesAvatarUrls,
     } = this.props;
     const currentCall = {
       avatarUrl,
@@ -197,7 +164,7 @@ class ActiveCallPanel extends React.Component {
                 <ConferenceInfo
                   displayedProfiles={this.state.displayedProfiles}
                   remains={this.state.remains}
-                  onClick={() => this.openPartiesModal()}
+                  onClick={onOpenPartiesModal}
                 />
               )
               : mergeCtrlCom
@@ -217,7 +184,7 @@ class ActiveCallPanel extends React.Component {
             onShowKeyPad={onShowKeyPad}
             onHangup={onHangup}
             onAdd={onAdd}
-            onMerge={() => this.onMerge()}
+            onMerge={onMerge}
             onShowFlipPanel={onShowFlipPanel}
             onToggleTransferPanel={onToggleTransferPanel}
             flipNumbers={flipNumbers}
@@ -229,17 +196,6 @@ class ActiveCallPanel extends React.Component {
             hasConference={hasConference}
           />
           {children}
-          {
-            layout === callCtrlLayout.normalCtrl ?
-              <ConfirmMergeModal
-                currentLocale={currentLocale}
-                show={!!this.state.isModalOpen}
-                onMerge={() => this.confirmMergeCall()}
-                onCancel={() => this.hideConfirmMergeModal()}
-                avatarUrls={conferencePartiesAvatarUrls}
-              /> :
-              null
-          }
         </Panel>
       </div>
     );
@@ -282,6 +238,7 @@ ActiveCallPanel.propTypes = {
   flipNumbers: PropTypes.array,
   calls: PropTypes.array.isRequired,
   onToggleTransferPanel: PropTypes.func,
+  onOpenPartiesModal: PropTypes.func,
   sourceIcons: PropTypes.object,
   layout: PropTypes.string.isRequired,
   direction: PropTypes.string,
@@ -290,7 +247,6 @@ ActiveCallPanel.propTypes = {
   getPartyProfiles: PropTypes.func,
   hasConference: PropTypes.bool,
   lastTo: PropTypes.object,
-  conferencePartiesAvatarUrls: PropTypes.arrayOf(PropTypes.string),
 };
 
 ActiveCallPanel.defaultProps = {
@@ -309,6 +265,7 @@ ActiveCallPanel.defaultProps = {
   onMerge: i => i,
   onShowFlipPanel: () => null,
   onToggleTransferPanel: () => null,
+  onOpenPartiesModal: () => null,
   sourceIcons: undefined,
   direction: null,
   addDisabled: false,
@@ -316,7 +273,6 @@ ActiveCallPanel.defaultProps = {
   getPartyProfiles: i => i,
   hasConference: false,
   lastTo: null,
-  conferencePartiesAvatarUrls: []
 };
 
 export default ActiveCallPanel;
