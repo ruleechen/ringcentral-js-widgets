@@ -8,7 +8,7 @@ import CallAvatar from '../CallAvatar';
 function MergeInfo({
   timeCounter, currentCall, currentLocale, lastTo
 }) {
-  const isConference = lastTo && lastTo.calleeType === calleeTypes.conference ? i18n.getString('ConferenceCall', currentLocale) : i18n.getString('unknow', currentLocale);
+  const isConference = lastTo && lastTo.calleeType === calleeTypes.conference ? i18n.getString('conferenceCall', currentLocale) : i18n.getString('unknow', currentLocale);
   return lastTo ? (
     <div className={styles.mergeInfo}>
       <div className={styles.merge_item}>
