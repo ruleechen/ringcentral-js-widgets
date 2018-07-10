@@ -198,18 +198,26 @@ class ActiveCallPad extends Component {
           triggerElm={this.state.moreButton}>
           <div className={styles.buttonPopup}>
             {
-              [{
-                icon: <TransferIcon />,
-                name: i18n.getString('transfer', this.props.currentLocale),
-                onClick: this.props.onToggleTransferPanel,
-                disabled: disabledTransfer,
-              }, {
-                icon: <FlipIcon />,
-                name: i18n.getString('flip', this.props.currentLocale),
-                onClick: this.props.onShowFlipPanel,
-                disabled: disabledFlip,
-              }]
-                .map(({ name, ...opts }) => <MoreActionItem key={name}{...opts} />)
+              [
+                {
+                  icon: <TransferIcon />,
+                  name: i18n.getString('transfer', this.props.currentLocale),
+                  onClick: this.props.onToggleTransferPanel,
+                  disabled: disabledTransfer,
+                },
+                {
+                  icon: <FlipIcon />,
+                  name: i18n.getString('flip', this.props.currentLocale),
+                  onClick: this.props.onShowFlipPanel,
+                  disabled: disabledFlip,
+                },
+              ].map(({ name, ...opts }) => (
+                <MoreActionItem
+                  key={name}
+                  name={name}
+                  {...opts}
+                />
+              ))
             }
           </div>
         </DropDown>
