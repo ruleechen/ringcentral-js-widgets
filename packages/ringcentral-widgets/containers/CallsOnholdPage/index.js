@@ -9,7 +9,6 @@ import {
   mapToFunctions as mapToBaseFunctions,
 } from '../ActiveCallsPage';
 
-
 function mapToProps(_, {
   phone,
   phone: {
@@ -30,6 +29,7 @@ function mapToProps(_, {
     contactMapping,
   };
 }
+
 function mapToFunctions(_, {
   params,
   phone,
@@ -72,7 +72,7 @@ function mapToFunctions(_, {
     onAdd() {
       routerInteraction.push(`/conferenceCall/dialer/${params.fromNumber}`);
     },
-    getAvatarUrl
+    getAvatarUrl,
   };
 }
 

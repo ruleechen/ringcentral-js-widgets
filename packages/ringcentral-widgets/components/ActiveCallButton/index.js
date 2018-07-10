@@ -18,6 +18,8 @@ export default function ActiveCallButton(props) {
       {line}
     </tspan>
   ));
+  const buttonSize = 394;
+
   return (
     <svg
       className={className}
@@ -28,9 +30,9 @@ export default function ActiveCallButton(props) {
       y={props.y}
     >
       <CircleButton
-        width="380"
-        height="380"
-        x={60}
+        width={buttonSize.toString()}
+        height={buttonSize.toString()}
+        x={500 / 2 - buttonSize / 2}
         y={0}
         className={buttonClassName}
         onClick={props.disabled ? () => {} : props.onClick}
