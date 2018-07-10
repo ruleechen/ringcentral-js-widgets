@@ -30,8 +30,8 @@ export default function ActiveCallButton(props) {
       y={props.y}
     >
       <CircleButton
-        width={buttonSize}
-        height={buttonSize}
+        width={buttonSize.toString()}
+        height={buttonSize.toString()}
         x={500 / 2 - buttonSize / 2}
         y={0}
         className={buttonClassName}
