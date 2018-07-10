@@ -4,7 +4,9 @@
 @import '../../lib/commonStyles/layout';
 
 $userInfoHeight: 140px;
-$conferenceAvatarSize: 51px;;
+$conferenceAvatarSize: 51px;
+$timeCounterMarginTop:10px;
+$timeCounterHeight: 14px;
 
 .root {
   @include full-size;
@@ -107,7 +109,7 @@ $conferenceAvatarSize: 51px;;
   font-weight: 300;
   text-align: right;
   padding: 0 24px;
-  margin-top: 10px;
+  margin-top: $timeCounterMarginTop;
 }
 
 .callPad {
@@ -184,6 +186,7 @@ $conferenceAvatarSize: 51px;;
 .mergeInfo {
   min-height: 115px;
   overflow: hidden;
+  height: $timeCounterHeight + $timeCounterMarginTop + $userInfoHeight;
   .merge_item {
     height: 30px;
     opacity: 0.8;
