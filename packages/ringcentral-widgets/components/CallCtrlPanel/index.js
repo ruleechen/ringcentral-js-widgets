@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
+import callCtrlLayout from '../../lib/callCtrlLayout';
 import ActiveCallDialPad from '../ActiveCallDialPad';
 import ActiveCallPanel from '../ActiveCallPanel';
 import FlipPanel from '../FlipPanel';
 import TransferPanel from '../TransferPanel';
+import ConfirmMergeModal from '../ConfirmMergeModal';
 import SpinnerOverlay from '../SpinnerOverlay';
 
 class CallCtrlPanel extends Component {
@@ -13,6 +15,7 @@ class CallCtrlPanel extends Component {
     this.state = {
       isShowKeyPad: false,
       isShowFlipPanel: false,
+      isShowMergeConfirm: false,
     };
 
     this.hiddenKeyPad = () => {
@@ -29,13 +32,13 @@ class CallCtrlPanel extends Component {
 
     this.showFlipPanel = () => {
       this.setState({
-        isShowFlipPanel: true
+        isShowFlipPanel: true,
       });
     };
 
     this.hideFlipPanel = () => {
       this.setState({
-        isShowFlipPanel: false
+        isShowFlipPanel: false,
       });
     };
 
@@ -44,6 +47,44 @@ class CallCtrlPanel extends Component {
         isShowTransferPanel: !prevState.isShowTransferPanel
       }));
     };
+
+    this.showMergeConfirm = () => {
+      this.setState({
+        isShowMergeConfirm: true,
+      });
+    };
+
+    this.hideMergeConfirm = () => {
+      this.setState({
+        isShowMergeConfirm: false,
+      });
+    };
+
+    this.confirmMerge = () => {
+      this.props.onMerge();
+      this.hideMergeConfirm();
+    };
+
+    this.onOpenPartiesModal = () => {
+      // TODO:
+    };
+  }
+
+  onMerge() {
+    if (
+      this.props.hasConference &&
+      this.props.layout === callCtrlLayout.normalCtrl
+    ) {
+      this.showMergeConfirm();
+    } else {
+      this.props.onMerge();
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (!nextProps.hasConference && this.state.isShowMergeConfirm) {
+      this.hideMergeConfirm();
+    }
   }
 
   render() {
@@ -110,7 +151,7 @@ class CallCtrlPanel extends Component {
         onHangup={this.props.onHangup}
         onPark={this.props.onPark}
         onAdd={this.props.onAdd}
-        onMerge={this.props.onMerge}
+        onMerge={() => this.onMerge()}
         nameMatches={this.props.nameMatches}
         fallBackName={this.props.fallBackName}
         areaCode={this.props.areaCode}
@@ -122,6 +163,7 @@ class CallCtrlPanel extends Component {
         showContactDisplayPlaceholder={this.props.showContactDisplayPlaceholder}
         onShowFlipPanel={this.showFlipPanel}
         onToggleTransferPanel={this.toggleTransferPanel}
+        onOpenPartiesModal={this.onOpenPartiesModal}
         flipNumbers={this.props.flipNumbers}
         calls={this.props.calls}
         sourceIcons={this.props.sourceIcons}
@@ -132,10 +174,19 @@ class CallCtrlPanel extends Component {
         hasConference={this.props.hasConference}
         getPartyProfiles={this.props.getPartyProfiles}
         lastTo={this.props.lastTo}
-        conferencePartiesAvatarUrls={this.props.conferencePartiesAvatarUrls}
       >
         {this.props.children}
         {this.props.showSpinner ? <SpinnerOverlay /> : null}
+        {this.props.layout === callCtrlLayout.normalCtrl
+          ? <ConfirmMergeModal
+            currentLocale={this.props.currentLocale}
+            show={this.state.isShowMergeConfirm}
+            onMerge={this.confirmMerge}
+            onCancel={this.hideMergeConfirm}
+            avatarUrls={this.props.conferencePartiesAvatarUrls}
+          />
+          : null
+        }
       </ActiveCallPanel>
     );
   }
