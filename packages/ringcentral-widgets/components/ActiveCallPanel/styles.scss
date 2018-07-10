@@ -191,13 +191,12 @@ $timeCounterHeight: 14px;
     height: 30px;
     opacity: 0.8;
     .callee_avatar {
-      width: 26px;
-      height: 26px;
+      width: 30px;
+      height: 30px;
       border: solid 2px #ffffff;
-      border-radius: 15px;
-      background-size: 100% 100%;
       float: left;
       margin-right: 35px;
+      border-radius: 100%;
       @media only screen and (min-width: 150px) and (max-width: 265px) {
         margin-right: 11%;
       }
@@ -234,11 +233,10 @@ $timeCounterHeight: 14px;
   .merge_item_active {
     height: 45px;
     .callee_avatar_active {
-      width: 42px;
-      height: 42px;
+      width: 45px;
+      height: 45px;
       border: solid 1.5px #ffffff;
       border-radius: 100%;
-      background-size: 100% 100%;
       float: left;
       margin-right: 20px;
       @media only screen and (min-width: 150px) and (max-width: 265px) {

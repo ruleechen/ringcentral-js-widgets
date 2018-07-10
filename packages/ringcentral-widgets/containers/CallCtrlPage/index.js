@@ -149,15 +149,19 @@ class CallCtrlPage extends Component {
         } else {
           this.setState({
             lastTo: {
-              calleeType: calleeTypes.unknow
+              calleeType: calleeTypes.unknow,
+              avatarUrl: null
             }
           });
         }
       }
     } else {
+      const { conferencePartiesAvatarUrls } = this.props;
       this.setState({
         lastTo: {
-          calleeType: calleeTypes.conference
+          calleeType: calleeTypes.conference,
+          avatarUrl: conferencePartiesAvatarUrls[0],
+          extraNum: conferencePartiesAvatarUrls.length - 1
         }
       });
     }

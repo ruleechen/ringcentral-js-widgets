@@ -12,9 +12,9 @@ import prefix from './prefix';
 const phone = createPhone({
   apiConfig, brandConfig, prefix, version
 });
-
-const store = createStore(phone.reducer);
-
+/* eslint-disable no-underscore-dangle */
+const store = createStore(phone.reducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+/* eslint-disable no-underscore-dangle */
 phone.setStore(store);
 
 window.phone = phone;
