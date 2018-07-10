@@ -1,5 +1,4 @@
 import { connect } from 'react-redux';
-import sleep from 'ringcentral-integration/lib/sleep';
 
 import withPhone from '../../lib/withPhone';
 import callCtrlLayout from '../../lib/callCtrlLayout';
@@ -35,11 +34,6 @@ function mapToProps(_, {
 
 function mapToFunctions(_, {
   phone,
-  phone: {
-    webphone,
-    conferenceCall,
-    routerInteraction,
-  },
   ...props
 }) {
   const baseProps = mapToBaseFunctions(_, {

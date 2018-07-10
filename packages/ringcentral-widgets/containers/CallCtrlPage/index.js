@@ -62,9 +62,8 @@ class CallCtrlPage extends Component {
       this.props.onTransfer(value, this.props.session.id);
     this.onPark = () =>
       this.props.onPark(this.props.session.id);
-    this.onAdd = () => {
+    this.onAdd = () =>
       this.props.onAdd(this.props.session.id);
-    };
     this.onMerge = () =>
       this.props.onMerge(this.props.session.id);
   }
@@ -170,9 +169,8 @@ class CallCtrlPage extends Component {
       showSpinner,
       addDisabled,
       mergeDisabled,
-      getPartyProfiles,
       hasConference,
-      isOnConference,
+      getPartyProfiles,
       conferencePartiesAvatarUrls
     } = this.props;
     if (!session.id) {
@@ -242,9 +240,8 @@ class CallCtrlPage extends Component {
         direction={session.direction}
         addDisabled={addDisabled}
         mergeDisabled={mergeDisabled}
-        getPartyProfiles={getPartyProfiles}
         hasConference={hasConference}
-        isOnConference={isOnConference}
+        getPartyProfiles={getPartyProfiles}
         lastTo={this.state.lastTo}
         conferencePartiesAvatarUrls={conferencePartiesAvatarUrls}
       >
@@ -308,10 +305,9 @@ CallCtrlPage.propTypes = {
   getPartyProfiles: PropTypes.func,
   gotoNormalCallCtrl: PropTypes.func,
   hasConference: PropTypes.bool,
-  isOnConference: PropTypes.bool,
+  lastTo: PropTypes.object,
   conferenceCall: PropTypes.object,
   conferencePartiesAvatarUrls: PropTypes.arrayOf(PropTypes.string),
-  lastTo: PropTypes.object
 };
 
 CallCtrlPage.defaultProps = {
@@ -326,14 +322,12 @@ CallCtrlPage.defaultProps = {
   showSpinner: false,
   addDisabled: false,
   mergeDisabled: false,
+  hasConference: false,
+  lastTo: { calleeType: calleeTypes.unknow },
+  conferenceCall: null,
   getPartyProfiles: i => i,
   gotoNormalCallCtrl: i => i,
-  hasConference: false,
-  isOnConference: false,
   conferencePartiesAvatarUrls: [],
-  lastTo: {
-    calleeType: calleeTypes.unknow
-  }
 };
 
 function mapToProps(_, {
@@ -366,13 +360,13 @@ function mapToProps(_, {
    */
   const isWebRTC = callingSettings.callingMode === callingModes.webphone;
   let mergeDisabled = !(currentSession.data && Object.keys(currentSession.data).length)
-  || !isWebRTC;
+    || !isWebRTC;
   let addDisabled = !isWebRTC;
 
   if (conferenceData && isWebRTC) {
     const newVal = conferenceCall.isOverload(conferenceData.conference.id)
-    // in case webphone.activeSession has not been updated yet
-    || !(currentSession.data && Object.keys(currentSession.data).length);
+      // in case webphone.activeSession has not been updated yet
+      || !(currentSession.data && Object.keys(currentSession.data).length);
     // update
     mergeDisabled = newVal || !(currentSession.data && Object.keys(currentSession.data).length);
     addDisabled = newVal;
@@ -404,7 +398,6 @@ function mapToProps(_, {
     addDisabled,
     mergeDisabled,
     hasConference: !!conferenceData,
-    isOnConference,
     conferenceCall,
     conferencePartiesAvatarUrls: (conferenceData
       && conferenceData.profiles.map(profile => profile.avatarUrl))

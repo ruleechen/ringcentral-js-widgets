@@ -129,9 +129,8 @@ class CallCtrlPanel extends Component {
         direction={this.props.direction}
         addDisabled={this.props.addDisabled}
         mergeDisabled={this.props.mergeDisabled}
-        getPartyProfiles={this.props.getPartyProfiles}
         hasConference={this.props.hasConference}
-        isOnConference={this.props.isOnConference}
+        getPartyProfiles={this.props.getPartyProfiles}
         lastTo={this.props.lastTo}
         conferencePartiesAvatarUrls={this.props.conferencePartiesAvatarUrls}
       >
@@ -193,9 +192,9 @@ CallCtrlPanel.propTypes = {
   direction: PropTypes.string,
   addDisabled: PropTypes.bool,
   mergeDisabled: PropTypes.bool,
-  getPartyProfiles: PropTypes.func,
   hasConference: PropTypes.bool,
-  isOnConference: PropTypes.bool,
+  lastTo: PropTypes.object,
+  getPartyProfiles: PropTypes.func,
   conferencePartiesAvatarUrls: PropTypes.arrayOf(PropTypes.string),
 };
 
@@ -225,9 +224,9 @@ CallCtrlPanel.defaultProps = {
   direction: null,
   addDisabled: false,
   mergeDisabled: false,
-  getPartyProfiles: i => i,
   hasConference: false,
-  isOnConference: false,
+  lastTo: null,
+  getPartyProfiles: i => i,
   conferencePartiesAvatarUrls: []
 };
 
