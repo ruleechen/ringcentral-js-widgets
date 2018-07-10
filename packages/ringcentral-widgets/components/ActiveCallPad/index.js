@@ -2,7 +2,6 @@ import React, { Component, createRef } from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import recordStatus from 'ringcentral-integration/modules/Webphone/recordStatus';
-import callDirections from 'ringcentral-integration/enums/callDirections';
 import CircleButton from '../CircleButton';
 import DropDown from '../DropDown';
 import ActiveCallButton from '../ActiveCallButton';
@@ -72,21 +71,17 @@ class ActiveCallPad extends Component {
   }
 
   componentDidMount() {
-    this.setState(prevState => (
-      {
-        ...prevState,
-        moreButton: this.moreButton && this.moreButton.current
-      }
-    ));
+    this.setState(prevState => ({
+      ...prevState,
+      moreButton: this.moreButton && this.moreButton.current
+    }));
   }
 
   componentWillReceiveProps() {
-    this.setState(prevState => (
-      {
-        ...prevState,
-        moreButton: this.moreButton && this.moreButton.current
-      }
-    ));
+    this.setState(prevState => ({
+      ...prevState,
+      moreButton: this.moreButton && this.moreButton.current
+    }));
   }
 
   render() {
@@ -198,26 +193,25 @@ class ActiveCallPad extends Component {
           triggerElm={this.state.moreButton}>
           <div className={styles.buttonPopup}>
             {
-              [
-                {
-                  icon: <TransferIcon />,
-                  name: i18n.getString('transfer', this.props.currentLocale),
-                  onClick: this.props.onToggleTransferPanel,
-                  disabled: disabledTransfer,
-                },
-                {
-                  icon: <FlipIcon />,
-                  name: i18n.getString('flip', this.props.currentLocale),
-                  onClick: this.props.onShowFlipPanel,
-                  disabled: disabledFlip,
-                },
-              ].map(({ name, ...opts }) => (
-                <MoreActionItem
-                  key={name}
-                  name={name}
-                  {...opts}
-                />
-              ))
+              [{
+                icon: <TransferIcon />,
+                name: i18n.getString('transfer', this.props.currentLocale),
+                onClick: this.props.onToggleTransferPanel,
+                disabled: disabledTransfer,
+              },
+              {
+                icon: <FlipIcon />,
+                name: i18n.getString('flip', this.props.currentLocale),
+                onClick: this.props.onShowFlipPanel,
+                disabled: disabledFlip,
+              }].map(({
+                name,
+                ...opts
+              }) => (<MoreActionItem
+                key={name}
+                name={name}
+                {...opts}
+              />))
             }
           </div>
         </DropDown>
