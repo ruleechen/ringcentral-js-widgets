@@ -2,6 +2,8 @@ import React, { Component, createRef } from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import recordStatus from 'ringcentral-integration/modules/Webphone/recordStatus';
+import { isObject } from 'ringcentral-integration/lib/di/utils/is_type';
+
 import CircleButton from '../CircleButton';
 import DropDown from '../DropDown';
 import ActiveCallButton from '../ActiveCallButton';
@@ -57,9 +59,26 @@ class ActiveCallPad extends Component {
   constructor(props) {
     super(props);
     this.moreButton = createRef();
+    this.dropdown = createRef();
     this.state = {
       expandMore: props.expandMore,
       moreButton: this.moreButton && this.moreButton.current,
+      onClick: (e) => {
+        if (isObject(this.dropdown) && isObject(this.dropdown.current)) {
+          const { dom: { current } } = this.dropdown.current;
+
+          if (
+            !current.contains(e.target)
+            && !this.moreButton.current.contains(e.target)
+            && this.state.expandMore
+          ) {
+            this.setState(prevState => ({
+              ...prevState,
+              expandMore: false,
+            }));
+          }
+        }
+      },
     };
   }
 
@@ -71,6 +90,7 @@ class ActiveCallPad extends Component {
   }
 
   componentDidMount() {
+    document.body.addEventListener('click', this.state.onClick);
     this.setState(prevState => ({
       ...prevState,
       moreButton: this.moreButton && this.moreButton.current
@@ -82,6 +102,10 @@ class ActiveCallPad extends Component {
       ...prevState,
       moreButton: this.moreButton && this.moreButton.current
     }));
+  }
+
+  componentWillUnmount() {
+    document.body.removeEventListener('click', this.state.onClick);
   }
 
   render() {
@@ -190,6 +214,7 @@ class ActiveCallPad extends Component {
           fixed={false}
           open={this.state.expandMore}
           direction="top"
+          ref={this.dropdown}
           triggerElm={this.state.moreButton}>
           <div className={styles.buttonPopup}>
             {
