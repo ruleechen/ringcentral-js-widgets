@@ -11,6 +11,7 @@ import {
   mapToFunctions as mapToBaseFunctions,
 } from '../DialerPage';
 import i18n from './i18n';
+import styles from './styles.scss';
 
 function ConferenceCallDialerPanel({
   onBack,
@@ -18,6 +19,7 @@ function ConferenceCallDialerPanel({
 }) {
   return [
     <BackHeader
+      className={styles.header}
       key="header"
       onBackClick={onBack}>
       {i18n.getString('activeCall')}
