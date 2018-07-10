@@ -66,14 +66,15 @@ class ActiveCallPad extends Component {
       this.props.onStopRecord :
       this.props.onRecord;
     const disabledFlip = this.props.flipNumbers.length === 0
-    || this.props.isOnHold
-    || this.props.layout === callCtrlLayout.mergeCtrl;
+      || this.props.isOnHold
+      || this.props.layout === callCtrlLayout.mergeCtrl;
     const disabledTransfer = this.props.layout === callCtrlLayout.mergeCtrl;
     const recordTitle = this.props.recordStatus === recordStatus.recording ?
       i18n.getString('stopRecord', this.props.currentLocale) :
       i18n.getString('record', this.props.currentLocale);
     const isRecordButtonActive = this.props.recordStatus === recordStatus.recording;
-    const isRecordDisabled = this.props.recordStatus === recordStatus.pending;
+    const isRecordDisabled = this.props.recordStatus === recordStatus.pending
+      || this.props.layout === callCtrlLayout.mergeCtrl;
     const btnClassName = styles.callButton;
     const muteButton = this.props.isOnMute ?
       (
