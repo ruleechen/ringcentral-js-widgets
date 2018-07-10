@@ -1,13 +1,21 @@
 @import '../../lib/commonStyles/colors.scss';
 
-$avatarWidth: 29px;
+$avatarWidth: 38px;
 $avatarMargin: 10px;
 
 .confirmMergeModal {
   min-width: 190px;
+  top:0;
+  bottom:0;
+  left:0;
+  right:0;
+  margin: auto;
 
   .header{
     text-align: center;
+    background-color: $egg;
+    font-size: 13px;
+    padding: 8px 0;
   }
 
   .contentText {
@@ -28,7 +36,7 @@ $avatarMargin: 10px;
 
   .closeBtn {
     position: absolute;
-    top: 15px;
+    top: 8px;
     right: 11px;
   }
 

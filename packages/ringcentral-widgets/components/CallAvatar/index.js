@@ -107,14 +107,13 @@ class CallAvatar extends Component {
           <text
             x={initialSize - extraNumCircleRadius}
             y={extraNumCircleRadius}
-            dx={extraNumCircleBorder}
             dy="3px"
             textAnchor="middle"
             style={{
               fontSize: '9px',
               stroke: 'none',
               fill: $blue,
-              fontWeight: 'bold',
+              fontWeight: 'bolder',
               opacity: '.5'
             }}>
             {`+${extraNum}`}
