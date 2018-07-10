@@ -20,12 +20,13 @@ class ActiveCallPanel extends React.Component {
     this.state = {
       displayedProfiles: [],
       remains: 0,
-      resizeFunc: throttle(() => this.handleResize(this.props)),
       currentCall: {
         nameMatches: this.props.nameMatches,
-        fallBackName: this.props.fallBackName
-      }
+        fallBackName: this.props.fallBackName,
+      },
     };
+
+    this.throttleResize = throttle(() => this.handleResize(this.props));
   }
 
   handleResize(props) {
@@ -51,11 +52,11 @@ class ActiveCallPanel extends React.Component {
 
   componentDidMount() {
     this.handleResize(this.props);
-    window.addEventListener('resize', this.state.resizeFunc);
+    window.addEventListener('resize', this.throttleResize);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize', this.state.resizeFunc);
+    window.removeEventListener('resize', this.throttleResize);
   }
 
   componentWillReceiveProps(nextProps) {
