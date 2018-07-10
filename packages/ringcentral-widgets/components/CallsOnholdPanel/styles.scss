@@ -62,8 +62,20 @@ $panelHeight:100% - $btnContainerHeight;
     display: inline-block;
     width: 45/300*100%;
     height: 100%;
-  
+    .webphoneButton{
+      display: block;
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
     .addBtnIcon {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      margin: auto;
+
       g, path {
         fill: #ffffff;
       }

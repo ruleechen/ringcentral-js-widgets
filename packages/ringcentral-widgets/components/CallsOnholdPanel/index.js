@@ -244,13 +244,14 @@ export default function CallsOnholdContainer({
       </div>
       <div className={styles.addBtnContainer}>
         <div className={styles.addBtn}>
-          <CircleButton
-            title={i18n.getString('add', currentLocale)}
-            className={styles.addBtnIcon}
-            icon={CombineIcon}
-            showBorder={false}
-            onClick={onAdd}
+          <span title={i18n.getString('add', currentLocale)} className={styles.webphoneButton}>
+            <CircleButton
+              className={styles.addBtnIcon}
+              icon={CombineIcon}
+              showBorder={false}
+              onClick={onAdd}
             />
+          </span>
         </div>
       </div>
     </div>
