@@ -184,7 +184,7 @@ class ActiveCallPad extends Component {
           title={i18n.getString('more', this.props.currentLocale)}
           active={this.state.expandMore}
           className={classnames(styles.moreButton, btnClassName)}
-          disabled={disabledFlip}
+          disabled={disabledFlip && disabledTransfer}
           icon={MoreIcon} />
         <DropDown
           fixed={false}
