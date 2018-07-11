@@ -25,9 +25,6 @@ class CallItem extends React.Component {
       contact = nameMatches && nameMatches[0];
     }
     getAvatarUrl(contact).then((avatarUrl) => {
-      if (!this._mounted) {
-        return;
-      }
       this.setState({ avatarUrl });
     });
   }
