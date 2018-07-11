@@ -119,17 +119,15 @@ class ActiveCallPanel extends React.Component {
           }
         </div>
       );
-    const backHeader = calls.length > 1 ? (
-      <BackHeader
-        onBackClick={onBackButtonClick}
-        backButton={(
-          <span className={styles.backButton}>
-            <i className={classnames(dynamicsFont.arrow, styles.backIcon)} />
-            <span className={styles.backLabel}>{backButtonLabel}</span>
-          </span>
-        )}
-      />
-    ) : <BackHeader className={styles.hidden} />;
+    const backHeader = (<BackHeader
+      onBackClick={onBackButtonClick}
+      backButton={(
+        <span className={styles.backButton}>
+          <i className={classnames(dynamicsFont.arrow, styles.backIcon)} />
+          <span className={styles.backLabel}>{backButtonLabel}</span>
+        </span>
+    )}
+  />);
     const mergeCtrlCom = layout === callCtrlLayout.mergeCtrl
       ? (<MergeInfo
         calls={calls}
