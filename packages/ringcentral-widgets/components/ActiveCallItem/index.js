@@ -40,7 +40,6 @@ function CallIcon({
   const title = (direction === callDirections.inbound) ? inboundTitle : outboundTitle;
   let symbol;
   if (showAvatar) {
-    console.log(avatarUrl);
     symbol = (
       <div className={classnames(styles.callIcon, styles.avatar)}>
         <CallAvatar
