@@ -4,10 +4,11 @@
 $callBtnWidth: 1/3*100%;
 $conferenceCallBtnWidth: 50%;
 $conferenceCallBtnPaddingLeft: ($conferenceCallBtnWidth - $callBtnWidth)/2;
-$keypadHeight: 53%;
+$keypadHeight: 52.3%;
 $buttonAreaWidth:222;
 $totalWidth:300;
 $buttonWidth:45;
+$stopButtonIconRatio:0.98;
 
 .root {
   // max-width: 550px;
@@ -71,13 +72,13 @@ $buttonWidth:45;
   height: 100% - $keypadHeight;
   display: block;
   box-sizing: border-box;
-  padding-top: 10px;
+  padding-top: 2px;
   // padding-bottom: $recent-activity-height;
 
   .button{
     display: inline-block;
     box-sizing: border-box;
-    width: $buttonWidth/$buttonAreaWidth*100%;
+    width: $buttonWidth/$buttonAreaWidth/$stopButtonIconRatio*100%;
     max-width: 140px;
   }
 
