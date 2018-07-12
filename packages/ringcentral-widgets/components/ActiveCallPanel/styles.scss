@@ -7,7 +7,8 @@ $userInfoHeight: 133px;
 $conferenceAvatarSize: 51px;
 $timeCounterMarginTop:10px;
 $timeCounterHeight: 14px;
-
+$calleeAvatarSize: 30px;
+$calleeAvatarActiveSize: 45px;
 .root {
   @include full-size;
   box-sizing: border-box;
@@ -191,8 +192,8 @@ $timeCounterHeight: 14px;
     height: 30px;
     opacity: 0.8;
     .callee_avatar {
-      width: 30px;
-      height: 30px;
+      width: $calleeAvatarSize;
+      height: $calleeAvatarSize;
       border: solid 2px #ffffff;
       float: left;
       margin-right: 35px;
@@ -233,8 +234,8 @@ $timeCounterHeight: 14px;
   .merge_item_active {
     height: 45px;
     .callee_avatar_active {
-      width: 45px;
-      height: 45px;
+      width: $calleeAvatarActiveSize;
+      height: $calleeAvatarActiveSize;
       border: solid 1.5px #ffffff;
       border-radius: 100%;
       float: left;

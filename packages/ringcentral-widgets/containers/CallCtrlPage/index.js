@@ -131,9 +131,9 @@ class CallCtrlPage extends Component {
             status: lastCall.telephonyStatus,
             calleeType: calleeTypes.contacts
           };
-          this.setState({
+          this.setState(prev => ({
             lastTo
-          });
+          }));
           // to fetch avatarurl again if the profileimageurl is null
           if (!lastCall.toMatches[0].profileImageUrl) {
             this.props.getAvatarUrl(lastCall.toMatches[0]).then((avatarUrl) => {
@@ -146,26 +146,25 @@ class CallCtrlPage extends Component {
             });
           }
         } else {
-          this.setState({
+          this.setState(prev => ({
             lastTo: {
               calleeType: calleeTypes.unknow,
               avatarUrl: null
             }
-          });
+          }));
         }
       }
     } else {
       const { conferencePartiesAvatarUrls } = this.props;
-      this.setState({
+      this.setState(prev => ({
         lastTo: {
           calleeType: calleeTypes.conference,
           avatarUrl: conferencePartiesAvatarUrls[0],
           extraNum: conferencePartiesAvatarUrls.length - 1
         }
-      });
+      }));
     }
   }
-
   render() {
     const {
       session,

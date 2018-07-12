@@ -31,7 +31,10 @@ function MergeInfo({
       </div>
       <div className={styles.merge_item_active}>
         <div className={styles.callee_avatar_active} >
-          { currentCall.fallBackName === 'Unknow' || !currentCall.avatarUrl ? <CallAvatar avatarUrl={null} /> : <CallAvatar avatarUrl={currentCall.avatarUrl} /> }
+          { !currentCall.nameMatches.length || !currentCall.avatarUrl
+            ? <CallAvatar avatarUrl={null} />
+            : <CallAvatar avatarUrl={currentCall.avatarUrl} />
+          }
         </div>
         <div className={styles.callee_name_active}>
           { currentCall.nameMatches.length

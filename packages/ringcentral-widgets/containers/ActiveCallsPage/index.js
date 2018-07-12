@@ -23,7 +23,6 @@ function mapToProps(_, {
   let disableMerge;
   const isWebRTC = callingSettings.callingMode === callingModes.webphone;
   const conferenceData = Object.values(conferenceCall.conferences)[0];
-
   if (conference) {
     disableMerge = conferenceCall.isOverload(conference.conference.id);
   } else {
