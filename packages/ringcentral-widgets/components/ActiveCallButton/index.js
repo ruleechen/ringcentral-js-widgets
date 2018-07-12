@@ -18,7 +18,7 @@ export default function ActiveCallButton(props) {
       {line}
     </tspan>
   ));
-  const buttonSize = 385.3;
+  const buttonSize = 383.8;
 
   return (
     <svg
