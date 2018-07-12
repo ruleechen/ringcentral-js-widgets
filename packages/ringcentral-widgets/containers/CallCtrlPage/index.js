@@ -467,7 +467,7 @@ function mapToFunctions(_, {
       }
     },
     async onMerge(sessionId) {
-      routerInteraction.replace(`${routerInteraction.currentPath}/\${sessionId}`);
+      routerInteraction.replace(`${routerInteraction.currentPath}/${sessionId}`);
       const session = webphone._sessions.get(sessionId);
       conferenceCall.setMergeParty({ to: session });
       const sessionToMergeWith = conferenceCall.state.mergingPair.from;
