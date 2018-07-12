@@ -178,7 +178,6 @@ export default function CallsOnholdContainer({
   sourceIcons,
   disableMerge,
   onBackButtonClick,
-  backButtonLabel,
   onMerge,
   onAdd,
   contactMapping,
@@ -190,7 +189,7 @@ export default function CallsOnholdContainer({
     backButton={(
       <span className={styles.backButton}>
         <i className={classnames(dynamicsFont.arrow, styles.backIcon)} />
-        <span className={styles.backLabel}>{backButtonLabel}</span>
+        <span className={styles.backLabel}>{i18n.getString('activeCall', currentLocale)}</span>
       </span>
       )}
     />);
@@ -280,7 +279,6 @@ CallsOnholdContainer.propTypes = {
   autoLog: PropTypes.bool,
   sourceIcons: PropTypes.object,
   onBackButtonClick: PropTypes.func,
-  backButtonLabel: PropTypes.string,
   onClickToSms: PropTypes.func,
   onCreateContact: PropTypes.func,
   disableMerge: PropTypes.bool,
@@ -306,7 +304,6 @@ CallsOnholdContainer.defaultProps = {
   onViewContact: undefined,
   webphoneToVoicemail: undefined,
   sourceIcons: undefined,
-  backButtonLabel: 'Active Call',
   onBackButtonClick: undefined,
   onMerge: undefined,
   onClickToSms: undefined,
