@@ -364,7 +364,7 @@ function mapToProps(_, {
   const isWebRTC = callingSettings.callingMode === callingModes.webphone;
   let mergeDisabled = !(currentSession.data && Object.keys(currentSession.data).length)
     || !isWebRTC;
-  let addDisabled = !isWebRTC;
+  let addDisabled = !isWebRTC || currentSession.direction === callDirections.inbound;
 
   if (conferenceData && isWebRTC) {
     const newVal = conferenceCall.isOverload(conferenceData.conference.id)

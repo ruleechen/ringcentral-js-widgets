@@ -8,6 +8,7 @@ import parseNumber from 'ringcentral-integration/lib/parseNumber';
 
 import dynamicsFont from '../../assets/DynamicsFont/DynamicsFont.scss';
 import DurationCounter from '../DurationCounter';
+import CallAvatar from '../CallAvatar';
 import ContactDisplay from '../ContactDisplay';
 import ActionMenu from '../ActionMenu';
 import CircleButton from '../CircleButton';
@@ -34,30 +35,19 @@ function CallIcon({
   isOnConferenceCall,
   showAvatar,
   avatarUrl,
-  // extraNum
+  extraNum = 0
 }) {
   const title = (direction === callDirections.inbound) ? inboundTitle : outboundTitle;
   let symbol;
   if (showAvatar) {
-    if (isOnConferenceCall) {
-      // todo: use participant's avatar
-      symbol = <ConferenceCallIcon />;
-    } else {
-      symbol = (
-        <div
-          className={classnames(styles.callIcon, styles.avatar)}
-          style={avatarUrl
-          ? { backgroundImage: `url(${avatarUrl})` }
-          : { backgroundColor: '#fff' }}
-        >
-          {
-          avatarUrl
-          ? null
-          : <i className={classnames(dynamicsFont.portrait, styles.icon)} />
-          }
-        </div>
-      );
-    }
+    symbol = (
+      <div className={classnames(styles.callIcon, styles.avatar)}>
+        <CallAvatar
+          isOnConferenceCall={isOnConferenceCall}
+          avatarUrl={avatarUrl}
+          extraNum={extraNum} />
+      </div>
+    );
   } else {
     symbol = (
       <div className={styles.callIcon}>

@@ -62,7 +62,8 @@ export default function App({
                   defaultOffsetY={45}
                   hidden={(
                     routerProps.location.pathname === '/calls/active' ||
-                    routerProps.location.pathname === '/conferenceCall/mergeCtrl'
+                    routerProps.location.pathname === '/conferenceCall/mergeCtrl' ||
+                    routerProps.location.pathname.indexOf('/conferenceCall/callsOnhold') === 0
                   )}
                   goToCallCtrl={() => {
                     phone.routerInteraction.push('/calls/active');

@@ -129,8 +129,8 @@ class ActiveCallPanel extends React.Component {
           <i className={classnames(dynamicsFont.arrow, styles.backIcon)} />
           <span className={styles.backLabel}>{backButtonLabel}</span>
         </span>
-      )}
-    />);
+    )}
+  />);
     const mergeCtrlCom = layout === callCtrlLayout.mergeCtrl
       ? (<MergeInfo
         timeCounter={timeCounter}
