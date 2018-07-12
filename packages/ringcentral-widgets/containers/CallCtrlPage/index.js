@@ -132,12 +132,14 @@ class CallCtrlPage extends Component {
             calleeType: calleeTypes.contacts
           };
           this.setState(prev => ({
+            ...prev,
             lastTo
           }));
           // to fetch avatarurl again if the profileimageurl is null
           if (!lastCall.toMatches[0].profileImageUrl) {
             this.props.getAvatarUrl(lastCall.toMatches[0]).then((avatarUrl) => {
               this.setState(prev => ({
+                ...prev,
                 lastTo: {
                   ...prev.lastTo,
                   avatarUrl
@@ -147,6 +149,7 @@ class CallCtrlPage extends Component {
           }
         } else {
           this.setState(prev => ({
+            ...prev,
             lastTo: {
               calleeType: calleeTypes.unknow,
               avatarUrl: null
@@ -157,6 +160,7 @@ class CallCtrlPage extends Component {
     } else {
       const { conferencePartiesAvatarUrls } = this.props;
       this.setState(prev => ({
+        ...prev,
         lastTo: {
           calleeType: calleeTypes.conference,
           avatarUrl: conferencePartiesAvatarUrls[0],
