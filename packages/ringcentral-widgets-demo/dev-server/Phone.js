@@ -141,15 +141,14 @@ import LocalForageStorage from 'ringcentral-integration/lib/LocalForageStorage';
     { provide: 'DialerUI', useClass: DialerUI },
     { provide: 'Feedback', useClass: Feedback },
     { provide: 'UserGuide', useClass: UserGuide },
-    // IndexedDB
-    // {
-    //   provide: 'StorageOptions',
-    //   useValue: {
-    //     StorageProvider: LocalForageStorage,
-    //     disableAllowInactiveTabsWrite: false,
-    //   },
-    //   spread: true
-    // },
+    {
+      provide: 'StorageOptions',
+      useValue: {
+        // StorageProvider: LocalForageStorage, // IndexedDB
+        disableAllowInactiveTabsWrite: true,
+      },
+      spread: true
+    },
     { provide: 'ConferenceCall', useClass: ConferenceCall },
     // {
     //   provide: 'ConferenceCallOptions',
