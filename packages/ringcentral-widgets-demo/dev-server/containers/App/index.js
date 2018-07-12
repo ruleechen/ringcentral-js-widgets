@@ -63,7 +63,8 @@ export default function App({
                   hidden={(
                     routerProps.location.pathname === '/calls/active' ||
                     routerProps.location.pathname === '/conferenceCall/mergeCtrl' ||
-                    routerProps.location.pathname.indexOf('/conferenceCall/callsOnhold') === 0
+                    routerProps.location.pathname.indexOf('/conferenceCall/callsOnhold') === 0 ||
+                    routerProps.location.pathname.indexOf('/conferenceCall/dialer') === 0
                   )}
                   goToCallCtrl={() => {
                     phone.routerInteraction.push('/calls/active');
