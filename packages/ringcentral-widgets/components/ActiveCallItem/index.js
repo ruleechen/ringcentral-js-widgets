@@ -319,7 +319,11 @@ export default class ActiveCallItem extends Component {
                 i18n.getString('from', currentLocale)
             }:
           </span>
-          {formatPhone(myPhoneNumber)}
+          {
+            myPhoneNumber
+            ? formatPhone(myPhoneNumber)
+            : i18n.getString('anonymous', currentLocale)
+          }
         </div>
       );
     }
