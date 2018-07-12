@@ -15,6 +15,7 @@ function mapToProps(_, {
     rolesAndPermissions,
     conferenceCall,
     callingSettings,
+    webphone
   },
   showContactDisplayPlaceholder = false,
 }) {
@@ -146,7 +147,11 @@ function mapToFunctions(_, {
           redirect,
         });
       })),
-    onCallsEmpty,
+    onCallsEmpty() {
+      if (!webphone.sessions.length) {
+        routerInteraction.push('/dialer');
+      }
+    },
     /**
      * if there is a existing conference, merge into it
      * else make one and merge into it;
