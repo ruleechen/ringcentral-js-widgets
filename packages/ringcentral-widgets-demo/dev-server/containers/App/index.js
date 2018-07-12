@@ -263,7 +263,7 @@ export default function App({
                     }} />
                 )} />
               <Route
-                path="/conferenceCall/mergeCtrl"
+                path="/conferenceCall/mergeCtrl(/:sessionId)"
                 component={() => (
                   <ConferenceCallMergeCtrlPage
                     showContactDisplayPlaceholder={false}

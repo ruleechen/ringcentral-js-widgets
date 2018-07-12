@@ -24,4 +24,5 @@ export default {
   hangup: 'Hangup',
   accept: 'Accept',
   toVoicemail: 'Send to Voicemail',
+  anonymous: 'Anonymous',
 };
