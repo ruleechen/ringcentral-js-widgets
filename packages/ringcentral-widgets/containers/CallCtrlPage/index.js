@@ -455,7 +455,9 @@ function mapToFunctions(_, {
           const session = webphone._sessions.get(sessionId);
           conferenceCall.setMergeParty({ from: session });
         }
-        if (callMonitor.activeOnHoldCalls.length) {
+        const outBoundOnholdCalls = callMonitor.activeOnHoldCalls
+          .filter(call => call.direction === callDirections.outbound);
+        if (outBoundOnholdCalls.length) {
           // goto 'calls on hold' page
           routerInteraction
             .push(`/conferenceCall/callsOnhold/${sessionData.fromNumber}/${sessionData.id}`);
