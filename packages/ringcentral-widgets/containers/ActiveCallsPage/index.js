@@ -146,7 +146,9 @@ function mapToFunctions(_, {
           redirect,
         });
       })),
-    onCallsEmpty,
+    onCallsEmpty() {
+      routerInteraction.push('/dialer');
+    },
     /**
      * if there is a existing conference, merge into it
      * else make one and merge into it;
