@@ -296,20 +296,23 @@ export default class Call extends RcModule {
     ) {
       waitingValidateNumbers.push(theFromNumber);
     }
-    const validatedResult = await this._numberValidate.validateNumbers(waitingValidateNumbers);
-    if (!validatedResult.result) {
-      validatedResult.errors.forEach((error) => {
-        // this._alert.warning({
-        //   message: callErrors[error.type],
-        //   payload: {
-        //     phoneNumber: error.phoneNumber
-        //   }
-        // });
-        throw error;
-      });
-      return null;
+    let parsedNumbers = [];
+    if (waitingValidateNumbers.length) {
+      const validatedResult = await this._numberValidate.validateNumbers(waitingValidateNumbers);
+      if (!validatedResult.result) {
+        validatedResult.errors.forEach((error) => {
+          // this._alert.warning({
+          //   message: callErrors[error.type],
+          //   payload: {
+          //     phoneNumber: error.phoneNumber
+          //   }
+          // });
+          throw error;
+        });
+        return null;
+      }
+      parsedNumbers = validatedResult.numbers;
     }
-    const parsedNumbers = validatedResult.numbers;
 
     if (isConference) {
       let parsedFromNumber =
