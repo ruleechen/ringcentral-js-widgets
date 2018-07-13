@@ -67,6 +67,7 @@ function mapToFunctions(_, {
     regionSettings,
     routerInteraction,
     webphone,
+    callingSettings,
     conferenceCall,
   },
   composeTextRoute = '/composeText',
@@ -78,6 +79,7 @@ function mapToFunctions(_, {
   onViewContact,
   showViewContact = true,
 }) {
+  const isWebRTC = callingSettings.callingMode === callingModes.webphone;
   return {
     formatPhone(phoneNumber) {
       return formatNumber({
@@ -147,11 +149,11 @@ function mapToFunctions(_, {
           redirect,
         });
       })),
-    onCallsEmpty() {
-      if (!webphone.sessions.length) {
+    onCallsEmpty: onCallsEmpty || (() => {
+      if (isWebRTC && !webphone.sessions.length) {
         routerInteraction.push('/dialer');
       }
-    },
+    }),
     /**
      * if there is a existing conference, merge into it
      * else make one and merge into it;
