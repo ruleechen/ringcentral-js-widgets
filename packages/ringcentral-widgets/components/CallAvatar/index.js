@@ -14,12 +14,10 @@ class CallAvatar extends Component {
     if (props.avatarUrl) {
       const $img = document.createElement('img');
       $img.src = props.avatarUrl;
-      $img.onload = () => this.setState(prevState => ({
-        ...prevState,
+      $img.onload = () => this.setState(() => ({
         avatarUrl: props.avatarUrl,
       }));
-      $img.onerror = () => this.setState(prevState => ({
-        ...prevState,
+      $img.onerror = () => this.setState(() => ({
         avatarUrl: null,
       }));
     }
