@@ -60,25 +60,28 @@ class ActiveCallPad extends Component {
     super(props);
     this.moreButton = createRef();
     this.dropdown = createRef();
+    this.onClick = this::this.onClick;
+    this.toggleMore = this::this.toggleMore;
     this.state = {
       expandMore: props.expandMore,
       moreButton: this.moreButton && this.moreButton.current,
-      onClick: (e) => {
-        if (isObject(this.dropdown) && isObject(this.dropdown.current)) {
-          const { dom: { current } } = this.dropdown.current;
-
-          if (
-            !current.contains(e.target)
-            && !this.moreButton.current.contains(e.target)
-            && this.state.expandMore
-          ) {
-            this.setState(() => ({
-              expandMore: false,
-            }));
-          }
-        }
-      },
     };
+  }
+
+  onClick(e) {
+    if (isObject(this.dropdown) && isObject(this.dropdown.current)) {
+      const { dom: { current } } = this.dropdown.current;
+
+      if (
+        !current.contains(e.target)
+        && !this.moreButton.current.contains(e.target)
+        && this.state.expandMore
+      ) {
+        this.setState(() => ({
+          expandMore: false,
+        }));
+      }
+    }
   }
 
   toggleMore() {
@@ -88,7 +91,7 @@ class ActiveCallPad extends Component {
   }
 
   componentDidMount() {
-    document.body.addEventListener('click', this.state.onClick);
+    document.body.addEventListener('click', this.onClick);
     this.setState(() => ({
       moreButton: this.moreButton && this.moreButton.current
     }));
@@ -101,7 +104,7 @@ class ActiveCallPad extends Component {
   }
 
   componentWillUnmount() {
-    document.body.removeEventListener('click', this.state.onClick);
+    document.body.removeEventListener('click', this.onClick);
   }
 
   render() {
@@ -200,7 +203,7 @@ class ActiveCallPad extends Component {
         ref={this.moreButton}
       >
         <ActiveCallButton
-          onClick={() => this.toggleMore()}
+          onClick={this.toggleMore}
           title={i18n.getString('more', this.props.currentLocale)}
           active={this.state.expandMore}
           className={classnames(styles.moreButton, btnClassName)}

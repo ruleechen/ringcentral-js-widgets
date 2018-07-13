@@ -86,20 +86,25 @@ const getRelativeOffset = (el) => {
   return res;
 };
 
+const TRANSITION_END_EVT_NAME = transitionEnd();
+
 class DropDown extends Component {
   constructor(props) {
     super(props);
+    this.onResize = this::this.checkPosition;
+    this.onTransitionEnd = this::this.onTransitionEnd;
 
     this.state = {
       cachedPositioning: null,
       visibility: null,
       position: null,
-      transitionEndEvtName: transitionEnd(),
-      onResize: () => this.checkPosition(),
-      onTransitionEnd: () => (!this.props.open ? this.setInVisible() : null),
     };
 
     this.dom = React.createRef();
+  }
+
+  onTransitionEnd() {
+    return !this.props.open ? this.setInVisible() : null;
   }
 
   setVisibility(props = this.props) {
@@ -195,10 +200,10 @@ class DropDown extends Component {
     this.changeTriggerElmPosition();
     this.checkPosition();
     this.setVisibility();
-    window.addEventListener('resize', this.state.onResize);
-    if (this.state.transitionEndEvtName) {
-      this.dom.current.addEventListener(this.state.transitionEndEvtName,
-        this.state.onTransitionEnd);
+    window.addEventListener('resize', this.onResize);
+    if (TRANSITION_END_EVT_NAME) {
+      this.dom.current.addEventListener(TRANSITION_END_EVT_NAME,
+        this.onTransitionEnd);
     }
   }
 
@@ -239,10 +244,10 @@ class DropDown extends Component {
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize', this.state.onResize);
-    if (this.state.transitionEndEvtName) {
-      this.dom.current.removeEventListener(this.state.transitionEndEvtName,
-        this.state.onTransitionEnd);
+    window.removeEventListener('resize', this.onResize);
+    if (TRANSITION_END_EVT_NAME) {
+      this.dom.current.removeEventListener(TRANSITION_END_EVT_NAME,
+        this.onTransitionEnd);
     }
     this.restorePositioning();
   }
