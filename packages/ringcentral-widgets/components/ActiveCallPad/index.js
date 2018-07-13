@@ -72,8 +72,7 @@ class ActiveCallPad extends Component {
             && !this.moreButton.current.contains(e.target)
             && this.state.expandMore
           ) {
-            this.setState(prevState => ({
-              ...prevState,
+            this.setState(() => ({
               expandMore: false,
             }));
           }
@@ -84,22 +83,19 @@ class ActiveCallPad extends Component {
 
   toggleMore() {
     this.setState(prevState => ({
-      ...prevState,
       expandMore: !prevState.expandMore
     }));
   }
 
   componentDidMount() {
     document.body.addEventListener('click', this.state.onClick);
-    this.setState(prevState => ({
-      ...prevState,
+    this.setState(() => ({
       moreButton: this.moreButton && this.moreButton.current
     }));
   }
 
   componentWillReceiveProps() {
-    this.setState(prevState => ({
-      ...prevState,
+    this.setState(() => ({
       moreButton: this.moreButton && this.moreButton.current
     }));
   }

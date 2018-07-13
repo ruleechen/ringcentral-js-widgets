@@ -146,8 +146,7 @@ class DropDown extends Component {
         elm: triggerElm,
         position: window.getComputedStyle(triggerElm).position
       };
-      this.setState(prevState => ({
-        ...prevState,
+      this.setState(() => ({
         cachedPositioning,
       }));
     }
