@@ -450,7 +450,7 @@ export default class Webphone extends RcModule {
         errorCode,
         statusCode,
       });
-      if (cause === 'Request Timeout') {
+      if (['Request Timeout', 'Connection Error'].indexOf(cause) !== -1) {
         needToReconnect = true;
       }
       if (needToReconnect) {
