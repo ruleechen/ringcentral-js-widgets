@@ -8,9 +8,13 @@ class CallAvatar extends Component {
     this.state = {
       avatarUrl: null,
     };
+    this._mounted = false;
   }
 
   loadImg(props = this.props) {
+    if (!this._mounted) {
+      return;
+    }
     if (props.avatarUrl) {
       const $img = document.createElement('img');
       $img.src = props.avatarUrl;
@@ -24,6 +28,7 @@ class CallAvatar extends Component {
   }
 
   componentDidMount() {
+    this._mounted = true;
     this.loadImg();
   }
 
