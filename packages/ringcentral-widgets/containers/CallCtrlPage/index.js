@@ -113,6 +113,7 @@ class CallCtrlPage extends Component {
       });
     }
   }
+
   getLastTo() {
     const { calls, conferenceCall } = this.props;
     const mergingPair = conferenceCall.state.mergingPair ? conferenceCall.state.mergingPair : {};
@@ -165,6 +166,7 @@ class CallCtrlPage extends Component {
       }));
     }
   }
+
   render() {
     const {
       session,
@@ -320,8 +322,8 @@ CallCtrlPage.defaultProps = {
   phoneTypeRenderer: undefined,
   recipientsContactInfoRenderer: undefined,
   recipientsContactPhoneRenderer: undefined,
-  onAdd: i => i,
-  onMerge: i => i,
+  onAdd: undefined,
+  onMerge: undefined,
   showSpinner: false,
   addDisabled: false,
   mergeDisabled: false,
@@ -402,9 +404,10 @@ function mapToProps(_, {
     mergeDisabled,
     hasConference: !!conferenceData,
     conferenceCall,
-    conferencePartiesAvatarUrls: (conferenceData
-      && conferenceData.profiles.map(profile => profile.avatarUrl))
-      || []
+    conferencePartiesAvatarUrls: (
+      conferenceData
+      && conferenceData.profiles.map(profile => profile.avatarUrl)
+    ) || [],
   };
 }
 
@@ -437,8 +440,9 @@ function mapToFunctions(_, {
     onRecord: sessionId => webphone.startRecord(sessionId),
     onStopRecord: sessionId => webphone.stopRecord(sessionId),
     sendDTMF: (value, sessionId) => webphone.sendDTMF(value, sessionId),
-    updateSessionMatchedContact: (sessionId, contact) =>
-      webphone.updateSessionMatchedContact(sessionId, contact),
+    updateSessionMatchedContact: (sessionId, contact) => (
+      webphone.updateSessionMatchedContact(sessionId, contact)
+    ),
     getAvatarUrl,
     onBackButtonClick,
     onFlip: (flipNumber, sessionId) => webphone.flip(flipNumber, sessionId),
@@ -508,7 +512,7 @@ function mapToFunctions(_, {
         return conferenceCall.getOnlinePartyProfiles(conferenceData.conference.id);
       }
       return null;
-    }
+    },
   };
 }
 

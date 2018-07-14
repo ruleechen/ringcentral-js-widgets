@@ -24,7 +24,7 @@ function CircleButton(props) {
     styles.circle,
     props.showBorder ? null : styles.noBorder
   );
-  const onClick = props.disabled ? () => {} : props.onClick;
+  const onClick = props.disabled ? null : props.onClick;
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -76,7 +76,7 @@ CircleButton.defaultProps = {
   showBorder: true,
   iconClassName: undefined,
   disabled: false,
-  onClick: () => null,
+  onClick: null,
   width: '100%',
   height: '100%',
   x: 0,
