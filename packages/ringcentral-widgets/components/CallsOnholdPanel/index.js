@@ -1,13 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classnames from 'classnames';
 import ActiveCallItem from '../ActiveCallItem';
 import CircleButton from '../CircleButton';
+import BackButton from '../BackButton';
 import BackHeader from '../BackHeader';
 import styles from './styles.scss';
 import i18n from './i18n';
 import CombineIcon from '../../assets/images/Combine.svg';
-import dynamicsFont from '../../assets/DynamicsFont/DynamicsFont.scss';
 
 class CallItem extends React.Component {
   constructor(props) {
@@ -185,12 +184,7 @@ export default function CallsOnholdContainer({
   const backHeader = (<BackHeader
     className={styles.header}
     onBackClick={onBackButtonClick}
-    backButton={(
-      <span className={styles.backButton}>
-        <i className={classnames(dynamicsFont.arrow, styles.backIcon)} />
-        <span className={styles.backLabel}>{i18n.getString('activeCall', currentLocale)}</span>
-      </span>
-    )}
+    backButton={<BackButton label={i18n.getString('activeCall', currentLocale)} />}
   />);
 
   return (
