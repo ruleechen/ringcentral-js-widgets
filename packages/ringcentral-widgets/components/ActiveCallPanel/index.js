@@ -20,8 +20,6 @@ class ActiveCallPanel extends React.Component {
     this.state = {
       displayedProfiles: [],
       remains: 0,
-      isPartiesModalOpen: false, // todo: for rendering the parties modal when conferecing
-      resizeFunc: throttle(() => this.handleResize(this.props)),
     };
 
     this.throttleResize = throttle(() => this.handleResize(this.props));
@@ -109,7 +107,7 @@ class ActiveCallPanel extends React.Component {
     const currentCall = {
       avatarUrl,
       nameMatches,
-      fallBackName
+      fallBackName,
     };
     const timeCounter =
       (
@@ -121,15 +119,17 @@ class ActiveCallPanel extends React.Component {
           }
         </div>
       );
-    const backHeader = (<BackHeader
-      onBackClick={onBackButtonClick}
-      backButton={(
-        <span className={styles.backButton}>
-          <i className={classnames(dynamicsFont.arrow, styles.backIcon)} />
-          <span className={styles.backLabel}>{backButtonLabel}</span>
-        </span>
-    )}
-  />);
+    const backHeader = (
+      <BackHeader
+        onBackClick={onBackButtonClick}
+        backButton={(
+          <span className={styles.backButton}>
+            <i className={classnames(dynamicsFont.arrow, styles.backIcon)} />
+            <span className={styles.backLabel}>{backButtonLabel}</span>
+          </span>
+        )}
+      />
+    );
     const mergeCtrlCom = layout === callCtrlLayout.mergeCtrl
       ? (<MergeInfo
         timeCounter={timeCounter}
