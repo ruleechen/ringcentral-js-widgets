@@ -1,16 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classnames from 'classnames';
 import throttle from 'ringcentral-integration/lib/throttle';
 
 import CallInfo from './CallInfo';
 import ConferenceInfo from './ConferenceInfo';
+import BackButton from '../BackButton';
 import BackHeader from '../BackHeader';
 import Panel from '../Panel';
 import DurationCounter from '../DurationCounter';
 import ActiveCallPad from '../ActiveCallPad';
 import callCtrlLayout from '../../lib/callCtrlLayout';
-import dynamicsFont from '../../assets/DynamicsFont/DynamicsFont.scss';
 import styles from './styles.scss';
 import MergeInfo from './MergeInfo';
 
@@ -122,12 +121,7 @@ class ActiveCallPanel extends React.Component {
     const backHeader = (
       <BackHeader
         onBackClick={onBackButtonClick}
-        backButton={(
-          <span className={styles.backButton}>
-            <i className={classnames(dynamicsFont.arrow, styles.backIcon)} />
-            <span className={styles.backLabel}>{backButtonLabel}</span>
-          </span>
-        )}
+        backButton={<BackButton label={backButtonLabel} />}
       />
     );
     const mergeCtrlCom = layout === callCtrlLayout.mergeCtrl
