@@ -37,7 +37,7 @@ function MoreActionItem({
   return (
     <div
       className={styles.buttonItem}
-      onClick={disabled ? i => i : onClick}>
+      onClick={disabled ? null : onClick}>
       <div className={iconClassName}>
         {icon}
       </div>
@@ -173,18 +173,14 @@ class ActiveCallPad extends Component {
         (this.props.layout === callCtrlLayout.normalCtrl && this.props.hasConference)
       )
         ? <ActiveCallButton
-          onClick={this.props.mergeDisabled ? i => i : () => {
-            this.props.onMerge();
-          }}
+          onClick={this.props.onMerge}
           title={i18n.getString('mergeToConference', this.props.currentLocale)}
           className={btnClassName}
           icon={MergeIcon}
           disabled={this.props.mergeDisabled}
         />
         : <ActiveCallButton
-          onClick={this.props.addDisabled ? i => i : () => {
-            this.props.onAdd();
-          }}
+          onClick={this.props.onAdd}
           title={i18n.getString('add', this.props.currentLocale)}
           className={btnClassName}
           icon={CombineIcon}
@@ -299,10 +295,10 @@ ActiveCallPad.defaultProps = {
   isOnMute: false,
   isOnHold: false,
   addDisabled: false,
-  mergeDisabled: null,
+  mergeDisabled: false,
   hasConference: false,
-  onAdd: i => i,
-  onMerge: i => i,
+  onAdd: undefined,
+  onMerge: undefined,
 };
 
 export default ActiveCallPad;

@@ -416,6 +416,7 @@ export default class ActiveCallItem extends Component {
       }
     }
   }
+
   logCall = this.logCall.bind(this)
 
   render() {
@@ -508,7 +509,6 @@ export default class ActiveCallItem extends Component {
               isOnConferenceCall
                 ? classnames(styles.conferenceContactDisplay)
                 : classnames(styles.contactDisplay, contactDisplayStyle)
-
             }
               contactMatches={contactMatches}
               selected={this.state.selected}

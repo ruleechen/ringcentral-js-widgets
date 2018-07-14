@@ -17,38 +17,37 @@ export default function ConferenceInfo({
     >
       {
         Array.isArray(displayedProfiles) && displayedProfiles.length
-        ? (
-          <div className={styles.avatarContainer}>
-            {
-              displayedProfiles.map(
-              ({ avatarUrl, toUserName }, idx) => (
-                <div
-                  key={`${toUserName}_${idx}`}
-                  className={styles.avatar}
-                  style={avatarUrl
-                    ? { backgroundImage: `url(${avatarUrl})` }
-                    : { backgroundColor: '#fff' }
-                  }>
-                  {avatarUrl
-                    ? null
-                    : <i className={classnames(dynamicsFont.portrait, styles.icon)} /> }
-                </div>
-              )
-            )
-          }{
-            remains
-              ? (<div className={classnames(styles.avatar, styles.remains)}>{`+${remains}`}</div>)
-              : null
-          }
-          </div>
-        )
-        : (
-          <div className={styles.avatarContainer}>
-            <div className={styles.avatar} style={{ backgroundColor: '#fff' }}>
-              <i className={classnames(dynamicsFont.portrait, styles.icon)} />
+          ? (
+            <div className={styles.avatarContainer}>
+              {
+                displayedProfiles.map(({ avatarUrl, toUserName }, idx) => (
+                  <div
+                    key={`${toUserName}_${idx}`}
+                    className={styles.avatar}
+                    style={avatarUrl
+                      ? { backgroundImage: `url(${avatarUrl})` }
+                      : { backgroundColor: '#fff' }
+                    }>
+                    {avatarUrl
+                      ? null
+                      : <i className={classnames(dynamicsFont.portrait, styles.icon)} />}
+                  </div>
+                )
+                )
+              }{
+                remains
+                  ? (<div className={classnames(styles.avatar, styles.remains)}>{`+${remains}`}</div>)
+                  : null
+              }
             </div>
-          </div>
-        )
+          )
+          : (
+            <div className={styles.avatarContainer}>
+              <div className={styles.avatar} style={{ backgroundColor: '#fff' }}>
+                <i className={classnames(dynamicsFont.portrait, styles.icon)} />
+              </div>
+            </div>
+          )
       }
       <p className={styles.info}>
         {i18n.getString('conferenceCall')}
