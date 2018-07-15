@@ -57,7 +57,7 @@ class CallAvatar extends Component {
         <svg
           className={styles.callAvatar}
           viewBox={`0 0 ${initialSize} ${initialSize}`}
-          preserveAspectRatio="xMid Ymid meet"
+          preserveAspectRatio="xMidYMid meet"
           xmlns="http://www.w3.org/2000/svg">
           <defs>
             <g id="text">
