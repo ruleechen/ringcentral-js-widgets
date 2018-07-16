@@ -38,8 +38,7 @@ import NumberValidate from 'ringcentral-integration/modules/NumberValidate';
 import MessageSender from 'ringcentral-integration/modules/MessageSender';
 import ComposeText from 'ringcentral-integration/modules/ComposeText';
 import MessageStore from 'ringcentral-integration/modules/MessageStore';
-import Messages from 'ringcentral-integration/modules/Messages';
-import Conversation from 'ringcentral-integration/modules/Conversation';
+import Conversations from 'ringcentral-integration/modules/Conversations';
 import ContactSearch from 'ringcentral-integration/modules/ContactSearch';
 import DateTimeFormat from 'ringcentral-integration/modules/DateTimeFormat';
 import Conference from 'ringcentral-integration/modules/Conference';
@@ -112,7 +111,7 @@ import LocalForageStorage from 'ringcentral-integration/lib/LocalForageStorage';
     { provide: 'MessageSender', useClass: MessageSender },
     { provide: 'ComposeText', useClass: ComposeText },
     { provide: 'MessageStore', useClass: MessageStore },
-    { provide: 'Conversation', useClass: Conversation },
+    { provide: 'Conversations', useClass: Conversations },
     { provide: 'Conference', useClass: Conference },
     { provide: 'RouterInteraction', useClass: RouterInteraction },
     { provide: 'CallLog', useClass: CallLog },
@@ -131,7 +130,6 @@ import LocalForageStorage from 'ringcentral-integration/lib/LocalForageStorage';
     },
     { provide: 'ContactDetails', useClass: ContactDetails },
     { provide: 'ContactMatcher', useClass: ContactMatcher },
-    { provide: 'Messages', useClass: Messages },
     { provide: 'RecentMessages', useClass: RecentMessages },
     { provide: 'RecentCalls', useClass: RecentCalls },
     { provide: 'Meeting', useClass: Meeting },
@@ -146,6 +144,22 @@ import LocalForageStorage from 'ringcentral-integration/lib/LocalForageStorage';
       useValue: {
         // StorageProvider: LocalForageStorage, // IndexedDB
         disableAllowInactiveTabsWrite: true,
+      },
+      spread: true
+    },
+    {
+      provide: 'MessageStoreOptions',
+      useValue: {
+        daySpan: 90,
+        conversationsLoadLength: 10,
+        conversationLoadLength: 15,
+      },
+      spread: true
+    },
+    {
+      provide: 'ConversationsOptions',
+      useValue: {
+        enableLoadOldMessages: true,
       },
       spread: true
     },
