@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import callCtrlLayout from '../../lib/callCtrlLayout';
+import callCtrlLayouts from '../../enums/callCtrlLayouts';
 import ActiveCallDialPad from '../ActiveCallDialPad';
 import ActiveCallPanel from '../ActiveCallPanel';
 import FlipPanel from '../FlipPanel';
@@ -51,7 +51,7 @@ class CallCtrlPanel extends Component {
     this.onMerge = () => {
       if (
         this.props.hasConference &&
-        this.props.layout === callCtrlLayout.normalCtrl
+        this.props.layout === callCtrlLayouts.normalCtrl
       ) {
         this.showMergeConfirm();
       } else if (this.props.onMerge) {
@@ -179,7 +179,7 @@ class CallCtrlPanel extends Component {
       >
         {this.props.children}
         {this.props.showSpinner ? <SpinnerOverlay /> : null}
-        {this.props.layout === callCtrlLayout.normalCtrl
+        {this.props.layout === callCtrlLayouts.normalCtrl
           ? <ConfirmMergeModal
             currentLocale={this.props.currentLocale}
             show={this.state.isShowMergeConfirm}
