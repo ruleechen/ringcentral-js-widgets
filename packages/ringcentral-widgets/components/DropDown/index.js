@@ -11,6 +11,7 @@ const POSITION = new Enum([
   'left',
 ]);
 
+const TAIL_HEIGHT = Math.sqrt(10 ** 2 * 2);
 
 const getDimensions = (element) => {
   const PROPERTIES = {
@@ -180,8 +181,8 @@ class DropDown extends Component {
       }
 
       const top = props.direction === POSITION.top
-        ? offset && offset.top - currentDemension.height
-        : offset && (offset.top + demensionOfTrigger.height);
+        ? offset && offset.top - currentDemension.height - TAIL_HEIGHT / 2
+        : offset && (offset.top + demensionOfTrigger.height) + TAIL_HEIGHT / 2;
       const left = offset
       && (offset.left + demensionOfTrigger.width / 2 - currentDemension.width / 2);
 
