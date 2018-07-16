@@ -280,12 +280,7 @@ export default class Call extends RcModule {
       return null;
     }
 
-    let waitingValidateNumbers;
-    if (isConference) {
-      waitingValidateNumbers = [];
-    } else {
-      waitingValidateNumbers = [toNumber];
-    }
+    const waitingValidateNumbers = [];
 
     if (
       theFromNumber &&
@@ -294,6 +289,11 @@ export default class Call extends RcModule {
     ) {
       waitingValidateNumbers.push(theFromNumber);
     }
+
+    if (!isConference) {
+      waitingValidateNumbers.push(toNumber);
+    }
+
     let parsedNumbers = [];
     if (waitingValidateNumbers.length) {
       const validatedResult = await this._numberValidate.validateNumbers(waitingValidateNumbers);
@@ -312,26 +312,22 @@ export default class Call extends RcModule {
       parsedNumbers = validatedResult.numbers;
     }
 
-    if (isConference) {
-      let parsedFromNumber =
-        parsedNumbers[0] ? parsedNumbers[0].e164 : '';
-      // add ext back if any
-      if (parsedFromNumber !== '') {
-        parsedFromNumber = (parsedNumbers[0].subAddress) ?
-          [parsedNumbers[0].e164, parsedNumbers[0].subAddress].join('*') :
-          parsedNumbers[0].e164;
-      }
-      if (isWebphone && theFromNumber === 'anonymous') {
-        parsedFromNumber = 'anonymous';
-      }
-      return {
-        fromNumber: parsedFromNumber,
-        toNumber,
-      };
+    // using e164 in response to call
+    let parsedFromNumber =
+      parsedNumbers[0] ? parsedNumbers[0].e164 : '';
+    // add ext back if any
+    if (parsedFromNumber) {
+      parsedFromNumber = (parsedNumbers[0].subAddress) ?
+        [parsedNumbers[0].e164, parsedNumbers[0].subAddress].join('*') :
+        parsedNumbers[0].e164;
+    }
+    if (isWebphone && theFromNumber === 'anonymous') {
+      parsedFromNumber = 'anonymous';
     }
 
-    const parsedToNumber = parsedNumbers[0];
+    const parsedToNumber = parsedNumbers[1];
     if (
+      parsedToNumber &&
       parsedToNumber.international &&
       !this._rolesAndPermissions.permissions.InternationalCalls
     ) {
@@ -341,21 +337,10 @@ export default class Call extends RcModule {
       };
       throw error;
     }
-    // using e164 in response to call
-    let parsedFromNumber =
-      parsedNumbers[1] ? parsedNumbers[1].e164 : '';
-    // add ext back if any
-    if (parsedFromNumber !== '') {
-      parsedFromNumber = (parsedNumbers[1].subAddress) ?
-        [parsedNumbers[1].e164, parsedNumbers[1].subAddress].join('*') :
-        parsedNumbers[1].e164;
-    }
-    if (isWebphone && theFromNumber === 'anonymous') {
-      parsedFromNumber = 'anonymous';
-    }
+
     return {
-      toNumber: parsedToNumber.e164,
       fromNumber: parsedFromNumber,
+      toNumber: parsedToNumber ? parsedToNumber.e164 : toNumber,
     };
   }
 
