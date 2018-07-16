@@ -193,7 +193,7 @@ export default class Call extends RcModule {
     phoneNumber,
     recipient,
     fromNumber,
-    isConference = false
+    isConference = false,
   }) {
     let session = null;
     if (this.isIdle) {
@@ -203,15 +203,13 @@ export default class Call extends RcModule {
           message: callErrors.noToNumber,
         });
       } else {
-        // don't record the conference token as last call
-        if (!isConference) {
-          this.store.dispatch({
-            type: this.actionTypes.connect,
-            phoneNumber,
-            recipient,
-            callSettingMode: this._callSettingMode, // for Track
-          });
-        }
+        this.store.dispatch({
+          type: this.actionTypes.connect,
+          isConference,
+          phoneNumber,
+          recipient,
+          callSettingMode: this._callSettingMode, // for Track
+        });
         try {
           const validatedNumbers = await this._getValidatedNumbers({
             toNumber,
