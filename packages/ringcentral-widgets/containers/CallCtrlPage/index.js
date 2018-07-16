@@ -6,6 +6,7 @@ import formatNumber from 'ringcentral-integration/lib/formatNumber';
 import callDirections from 'ringcentral-integration/enums/callDirections';
 import callingModes from 'ringcentral-integration/modules/CallingSettings/callingModes';
 import calleeTypes from 'ringcentral-integration/enums/calleeTypes';
+import sessionStatus from 'ringcentral-integration/modules/Webphone/sessionStatus';
 import withPhone from '../../lib/withPhone';
 import callCtrlLayout from '../../lib/callCtrlLayout';
 import CallCtrlPanel from '../../components/CallCtrlPanel';
@@ -84,6 +85,20 @@ class CallCtrlPage extends Component {
     if (this.props.session.id !== nextProps.session.id) {
       this._updateAvatarAndMatchIndex(nextProps);
     }
+    const lastEndedSessions = nextProps.lastEndedSessions;
+    if (lastEndedSessions.length) {
+      const lastEndedSession = lastEndedSessions[0];
+      const lastTo = this.state.lastTo;
+      if (lastEndedSession.id === lastTo.sessionId) {
+        this.setState(prev => ({
+          lastTo: {
+            ...prev.lastTo,
+            status: lastEndedSession.callStatus
+          }
+        })
+        )
+      }
+    }
   }
 
   componentWillUnmount() {
@@ -124,49 +139,61 @@ class CallCtrlPage extends Component {
         const lastCall = calls.filter(
           item => (item.webphoneSession ? item.webphoneSession.id === mergingPair.from.id : null)
         )[0];
-        if (lastCall && lastCall.toMatches[0]) {
-          const lastTo = {
-            avatarUrl: lastCall.toMatches[0].profileImageUrl,
-            name: lastCall.toName,
-            status: lastCall.telephonyStatus,
-            calleeType: calleeTypes.contacts
-          };
-          this.setState(prev => ({
-            ...prev,
-            lastTo
-          }));
-          // to fetch avatarurl again if the profileimageurl is null
-          if (!lastCall.toMatches[0].profileImageUrl) {
-            this.props.getAvatarUrl(lastCall.toMatches[0]).then((avatarUrl) => {
-              this.setState(prev => ({
-                ...prev,
-                lastTo: {
-                  ...prev.lastTo,
-                  avatarUrl
-                }
-              }));
-            });
-          }
-        } else {
-          this.setState(prev => ({
-            ...prev,
-            lastTo: {
-              calleeType: calleeTypes.unknow,
-              avatarUrl: null
+        if (lastCall) {
+          if (lastCall.toMatches[0]) {
+            const lastTo = {
+              avatarUrl: lastCall.toMatches[0].profileImageUrl,
+              name: lastCall.toName,
+              status: lastCall.webphoneSession.callStatus,
+              calleeType: calleeTypes.contacts,
+              sessionId: lastCall.webphoneSession.id
+            };
+            this.setState(prev => ({
+              ...prev,
+              lastTo
+            }));
+            // to fetch avatarurl again if the profileimageurl is null
+            if (!lastCall.toMatches[0].profileImageUrl) {
+              this.props.getAvatarUrl(lastCall.toMatches[0]).then((avatarUrl) => {
+                this.setState(prev => ({
+                  ...prev,
+                  lastTo: {
+                    ...prev.lastTo,
+                    avatarUrl
+                  }
+                }));
+              });
             }
-          }));
+          } else {
+            this.setState(prev => ({
+              ...prev,
+              lastTo: {
+                calleeType: calleeTypes.unknow,
+                avatarUrl: null,
+                sessionId: lastCall.webphoneSession ? lastCall.webphoneSession.id : null,
+                status: lastCall.webphoneSession ? lastCall.webphoneSession.callStatus : null
+              }
+            }));
+          }
         }
       }
     } else {
-      const { conferencePartiesAvatarUrls } = this.props;
-      this.setState(prev => ({
-        ...prev,
-        lastTo: {
-          calleeType: calleeTypes.conference,
-          avatarUrl: conferencePartiesAvatarUrls[0],
-          extraNum: conferencePartiesAvatarUrls.length - 1
-        }
-      }));
+      const { conferencePartiesAvatarUrls, conferenceCall } = this.props;
+      if (Object.values(conferenceCall.conferences).length) {
+        const conferenceSession = Object.values(conferenceCall.conferences)[0].session;
+        const conferenceSessionId = conferenceSession.id;
+        const conferenceStatus = conferenceSession.callStatus;
+        this.setState(prev => ({
+          ...prev,
+          lastTo: {
+            calleeType: calleeTypes.conference,
+            avatarUrl: conferencePartiesAvatarUrls[0],
+            extraNum: conferencePartiesAvatarUrls.length - 1,
+            sessionId: conferenceSessionId,
+            status: conferenceStatus
+          }
+        }));
+      }
     }
   }
   render() {
@@ -178,7 +205,7 @@ class CallCtrlPage extends Component {
       mergeDisabled,
       hasConference,
       getPartyProfiles,
-      conferencePartiesAvatarUrls
+      conferencePartiesAvatarUrls,
     } = this.props;
     if (!session.id) {
       return null;
@@ -315,6 +342,7 @@ CallCtrlPage.propTypes = {
   lastTo: PropTypes.object,
   conferenceCall: PropTypes.object,
   conferencePartiesAvatarUrls: PropTypes.arrayOf(PropTypes.string),
+  lastEndedSessions: PropTypes.array
 };
 
 CallCtrlPage.defaultProps = {
@@ -335,6 +363,7 @@ CallCtrlPage.defaultProps = {
   getPartyProfiles: i => i,
   gotoNormalCallCtrl: i => i,
   conferencePartiesAvatarUrls: [],
+  lastEndedSessions: []
 };
 
 function mapToProps(_, {
@@ -389,7 +418,6 @@ function mapToProps(_, {
     && conferenceCall.isMerging;
 
   layout = isOnConference ? callCtrlLayout.conferenceCtrl : layout;
-
   return {
     brand: brand.fullName,
     nameMatches,
@@ -408,7 +436,8 @@ function mapToProps(_, {
     conferenceCall,
     conferencePartiesAvatarUrls: (conferenceData
       && conferenceData.profiles.map(profile => profile.avatarUrl))
-      || []
+      || [],
+    lastEndedSessions: webphone.lastEndedSessions
   };
 }
 
@@ -506,7 +535,7 @@ function mapToFunctions(_, {
         return conferenceCall.getOnlinePartyProfiles(conferenceData.conference.id);
       }
       return null;
-    }
+    },
   };
 }
 
