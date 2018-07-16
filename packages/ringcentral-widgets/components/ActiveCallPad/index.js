@@ -20,7 +20,7 @@ import FlipIcon from '../../assets/images/Flip.svg';
 import EndIcon from '../../assets/images/End.svg';
 import CombineIcon from '../../assets/images/Combine.svg';
 import MergeIcon from '../../assets/images/MergeIntoConferenceIcon.svg';
-import callCtrlLayout from '../../enums/callCtrlLayout';
+import callCtrlLayouts from '../../enums/callCtrlLayouts';
 import styles from './styles.scss';
 import i18n from './i18n';
 
@@ -116,14 +116,14 @@ class ActiveCallPad extends Component {
       this.props.onRecord;
     const disabledFlip = this.props.flipNumbers.length === 0
       || this.props.isOnHold
-      || this.props.layout === callCtrlLayout.mergeCtrl;
-    const disabledTransfer = this.props.layout === callCtrlLayout.mergeCtrl;
+      || this.props.layout === callCtrlLayouts.mergeCtrl;
+    const disabledTransfer = this.props.layout === callCtrlLayouts.mergeCtrl;
     const recordTitle = this.props.recordStatus === recordStatus.recording ?
       i18n.getString('stopRecord', this.props.currentLocale) :
       i18n.getString('record', this.props.currentLocale);
     const isRecordButtonActive = this.props.recordStatus === recordStatus.recording;
     const isRecordDisabled = this.props.recordStatus === recordStatus.pending
-      || this.props.layout === callCtrlLayout.mergeCtrl;
+      || this.props.layout === callCtrlLayouts.mergeCtrl;
     const btnClassName = styles.callButton;
     const muteButton = this.props.isOnMute ?
       (
@@ -169,8 +169,8 @@ class ActiveCallPad extends Component {
         iconY={165}
       />,
       (
-        this.props.layout === callCtrlLayout.mergeCtrl ||
-        (this.props.layout === callCtrlLayout.normalCtrl && this.props.hasConference)
+        this.props.layout === callCtrlLayouts.mergeCtrl ||
+        (this.props.layout === callCtrlLayouts.normalCtrl && this.props.hasConference)
       )
         ? <ActiveCallButton
           onClick={this.props.onMerge}

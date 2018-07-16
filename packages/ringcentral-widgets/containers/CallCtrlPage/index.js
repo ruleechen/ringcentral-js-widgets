@@ -7,7 +7,7 @@ import callDirections from 'ringcentral-integration/enums/callDirections';
 import callingModes from 'ringcentral-integration/modules/CallingSettings/callingModes';
 import calleeTypes from '../../enums/calleeTypes';
 import withPhone from '../../lib/withPhone';
-import callCtrlLayout from '../../enums/callCtrlLayout';
+import callCtrlLayouts from '../../enums/callCtrlLayouts';
 import CallCtrlPanel from '../../components/CallCtrlPanel';
 import i18n from './i18n';
 
@@ -76,7 +76,7 @@ class CallCtrlPage extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (
-      nextProps.layout === callCtrlLayout.mergeCtrl &&
+      nextProps.layout === callCtrlLayouts.mergeCtrl &&
       nextProps.session.direction === callDirections.inbound
     ) {
       nextProps.gotoNormalCallCtrl();
@@ -348,7 +348,7 @@ function mapToProps(_, {
     conferenceCall,
     callingSettings,
   },
-  layout = callCtrlLayout.normalCtrl,
+  layout = callCtrlLayouts.normalCtrl,
 }) {
   const currentSession = webphone.activeSession || {};
   const contactMapping = contactMatcher && contactMatcher.dataMapping;
@@ -386,7 +386,7 @@ function mapToProps(_, {
   )
     && conferenceCall.isMerging;
 
-  layout = isOnConference ? callCtrlLayout.conferenceCtrl : layout;
+  layout = isOnConference ? callCtrlLayouts.conferenceCtrl : layout;
 
   return {
     brand: brand.fullName,

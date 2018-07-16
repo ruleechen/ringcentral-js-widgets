@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 
 import withPhone from '../../lib/withPhone';
-import callCtrlLayout from '../../enums/callCtrlLayout';
+import callCtrlLayouts from '../../enums/callCtrlLayouts';
 
 import {
   CallCtrlPage,
@@ -24,7 +24,7 @@ function mapToProps(_, {
 
   const currentSession = webphone.activeSession || {};
   const isOnConference = conferenceCall.isConferenceSession(currentSession.id);
-  const layout = isOnConference ? callCtrlLayout.conferenceCtrl : callCtrlLayout.mergeCtrl;
+  const layout = isOnConference ? callCtrlLayouts.conferenceCtrl : callCtrlLayouts.mergeCtrl;
 
   return {
     ...baseProps,

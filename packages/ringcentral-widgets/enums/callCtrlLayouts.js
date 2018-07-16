@@ -4,4 +4,4 @@ export default new Enum([
   'normalCtrl',
   'mergeCtrl',
   'conferenceCtrl',
-], 'callCtrlLayout');
+], 'callCtrlLayouts');
