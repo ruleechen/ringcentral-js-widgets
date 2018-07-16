@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import callCtrlLayout from '../../lib/callCtrlLayout';
+import callCtrlLayout from '../../enums/callCtrlLayout';
 import ActiveCallDialPad from '../ActiveCallDialPad';
 import ActiveCallPanel from '../ActiveCallPanel';
 import FlipPanel from '../FlipPanel';

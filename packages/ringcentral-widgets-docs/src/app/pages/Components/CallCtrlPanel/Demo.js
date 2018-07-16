@@ -1,7 +1,7 @@
 import React from 'react';
 // eslint-disable-next-line
 import CallCtrlPanel from 'ringcentral-widgets/components/CallCtrlPanel';
-import callCtrlLayout from 'ringcentral-widgets/lib/callCtrlLayout';
+import callCtrlLayout from 'ringcentral-widgets/enums/callCtrlLayout';
 
 const props = {};
 props.nameMatches = [];

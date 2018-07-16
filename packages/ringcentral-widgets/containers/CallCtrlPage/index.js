@@ -7,7 +7,7 @@ import callDirections from 'ringcentral-integration/enums/callDirections';
 import callingModes from 'ringcentral-integration/modules/CallingSettings/callingModes';
 import calleeTypes from 'ringcentral-integration/enums/calleeTypes';
 import withPhone from '../../lib/withPhone';
-import callCtrlLayout from '../../lib/callCtrlLayout';
+import callCtrlLayout from '../../enums/callCtrlLayout';
 import CallCtrlPanel from '../../components/CallCtrlPanel';
 import i18n from './i18n';
 

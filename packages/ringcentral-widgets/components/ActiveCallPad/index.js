@@ -20,7 +20,7 @@ import FlipIcon from '../../assets/images/Flip.svg';
 import EndIcon from '../../assets/images/End.svg';
 import CombineIcon from '../../assets/images/Combine.svg';
 import MergeIcon from '../../assets/images/MergeIntoConferenceIcon.svg';
-import callCtrlLayout from '../../lib/callCtrlLayout';
+import callCtrlLayout from '../../enums/callCtrlLayout';
 import styles from './styles.scss';
 import i18n from './i18n';
 

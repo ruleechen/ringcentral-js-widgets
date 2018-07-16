@@ -1,7 +1,7 @@
 import React from 'react';
 // eslint-disable-next-line
 import ActiveCallPad from 'ringcentral-widgets/components/ActiveCallPad';
-import callCtrlLayout from 'ringcentral-widgets/lib/callCtrlLayout';
+import callCtrlLayout from 'ringcentral-widgets/enums/callCtrlLayout';
 
 const props = {};
 props.onMute = () => null;

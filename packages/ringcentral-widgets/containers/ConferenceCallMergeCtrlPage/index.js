@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 
 import withPhone from '../../lib/withPhone';
-import callCtrlLayout from '../../lib/callCtrlLayout';
+import callCtrlLayout from '../../enums/callCtrlLayout';
 
 import {
   CallCtrlPage,

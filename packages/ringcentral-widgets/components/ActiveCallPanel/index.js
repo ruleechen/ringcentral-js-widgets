@@ -9,7 +9,7 @@ import BackHeader from '../BackHeader';
 import Panel from '../Panel';
 import DurationCounter from '../DurationCounter';
 import ActiveCallPad from '../ActiveCallPad';
-import callCtrlLayout from '../../lib/callCtrlLayout';
+import callCtrlLayout from '../../enums/callCtrlLayout';
 import styles from './styles.scss';
 import MergeInfo from './MergeInfo';
 
