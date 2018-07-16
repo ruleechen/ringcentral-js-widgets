@@ -88,6 +88,7 @@ class CallItem extends React.Component {
         hasActionMenu={false}
         showAnswer={false}
         showAvatar
+        showCallDetail={false}
         avatarUrl={this.state.avatarUrl}
       />
     );
