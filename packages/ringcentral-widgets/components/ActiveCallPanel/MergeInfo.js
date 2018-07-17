@@ -25,7 +25,7 @@ function MergeInfo({
             ? <CallAvatar
               avatarUrl={lastTo.avatarUrl}
               extraNum={lastTo.extraNum}
-              isOnConferenceCall={true} />
+              isOnConferenceCall />
             : <CallAvatar avatarUrl={lastTo.avatarUrl} />
           }
         </div>

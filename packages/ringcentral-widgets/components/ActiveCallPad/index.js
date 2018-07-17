@@ -37,7 +37,7 @@ function MoreActionItem({
   return (
     <div
       className={styles.buttonItem}
-      onClick={disabled ? i => i : onClick}>
+      onClick={disabled ? null : onClick}>
       <div className={iconClassName}>
         {icon}
       </div>
@@ -60,52 +60,51 @@ class ActiveCallPad extends Component {
     super(props);
     this.moreButton = createRef();
     this.dropdown = createRef();
+    this.onClick = this::this.onClick;
+    this.toggleMore = this::this.toggleMore;
     this.state = {
       expandMore: props.expandMore,
       moreButton: this.moreButton && this.moreButton.current,
-      onClick: (e) => {
-        if (isObject(this.dropdown) && isObject(this.dropdown.current)) {
-          const { dom: { current } } = this.dropdown.current;
-
-          if (
-            !current.contains(e.target)
-            && !this.moreButton.current.contains(e.target)
-            && this.state.expandMore
-          ) {
-            this.setState(prevState => ({
-              ...prevState,
-              expandMore: false,
-            }));
-          }
-        }
-      },
     };
+  }
+
+  onClick(e) {
+    if (isObject(this.dropdown) && isObject(this.dropdown.current)) {
+      const { dom: { current } } = this.dropdown.current;
+
+      if (
+        !current.contains(e.target)
+        && !this.moreButton.current.contains(e.target)
+        && this.state.expandMore
+      ) {
+        this.setState(() => ({
+          expandMore: false,
+        }));
+      }
+    }
   }
 
   toggleMore() {
     this.setState(prevState => ({
-      ...prevState,
       expandMore: !prevState.expandMore
     }));
   }
 
   componentDidMount() {
-    document.body.addEventListener('click', this.state.onClick);
-    this.setState(prevState => ({
-      ...prevState,
+    document.body.addEventListener('click', this.onClick);
+    this.setState(() => ({
       moreButton: this.moreButton && this.moreButton.current
     }));
   }
 
   componentWillReceiveProps() {
-    this.setState(prevState => ({
-      ...prevState,
+    this.setState(() => ({
       moreButton: this.moreButton && this.moreButton.current
     }));
   }
 
   componentWillUnmount() {
-    document.body.removeEventListener('click', this.state.onClick);
+    document.body.removeEventListener('click', this.onClick);
   }
 
   render() {
@@ -174,18 +173,14 @@ class ActiveCallPad extends Component {
         (this.props.layout === callCtrlLayouts.normalCtrl && this.props.hasConference)
       )
         ? <ActiveCallButton
-          onClick={this.props.mergeDisabled ? i => i : () => {
-            this.props.onMerge();
-          }}
+          onClick={this.props.onMerge}
           title={i18n.getString('mergeToConference', this.props.currentLocale)}
           className={btnClassName}
           icon={MergeIcon}
           disabled={this.props.mergeDisabled}
         />
         : <ActiveCallButton
-          onClick={this.props.addDisabled ? i => i : () => {
-            this.props.onAdd();
-          }}
+          onClick={this.props.onAdd}
           title={i18n.getString('add', this.props.currentLocale)}
           className={btnClassName}
           icon={CombineIcon}
@@ -204,7 +199,7 @@ class ActiveCallPad extends Component {
         ref={this.moreButton}
       >
         <ActiveCallButton
-          onClick={() => this.toggleMore()}
+          onClick={this.toggleMore}
           title={i18n.getString('more', this.props.currentLocale)}
           active={this.state.expandMore}
           className={classnames(styles.moreButton, btnClassName)}
@@ -300,10 +295,10 @@ ActiveCallPad.defaultProps = {
   isOnMute: false,
   isOnHold: false,
   addDisabled: false,
-  mergeDisabled: null,
+  mergeDisabled: false,
   hasConference: false,
-  onAdd: i => i,
-  onMerge: i => i,
+  onAdd: undefined,
+  onMerge: undefined,
 };
 
 export default ActiveCallPad;

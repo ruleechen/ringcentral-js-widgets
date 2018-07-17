@@ -35,7 +35,7 @@ export default function ActiveCallButton(props) {
         x={500 / 2 - buttonSize / 2}
         y={0}
         className={buttonClassName}
-        onClick={props.disabled ? () => {} : props.onClick}
+        onClick={props.onClick}
         icon={props.icon}
         disabled={props.disabled}
         showBorder={props.showBorder}
@@ -60,7 +60,7 @@ export default function ActiveCallButton(props) {
 ActiveCallButton.propTypes = {
   className: PropTypes.string,
   buttonClassName: PropTypes.string,
-  onClick: PropTypes.func.isRequired,
+  onClick: PropTypes.func,
   disabled: PropTypes.bool,
   active: PropTypes.bool,
   title: PropTypes.string.isRequired,
@@ -79,6 +79,7 @@ ActiveCallButton.propTypes = {
 ActiveCallButton.defaultProps = {
   className: undefined,
   buttonClassName: undefined,
+  onClick: undefined,
   disabled: false,
   active: false,
   icon: undefined,

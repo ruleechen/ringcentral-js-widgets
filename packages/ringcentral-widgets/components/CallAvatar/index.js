@@ -8,24 +8,27 @@ class CallAvatar extends Component {
     this.state = {
       avatarUrl: null,
     };
+    this._mounted = false;
   }
 
   loadImg(props = this.props) {
+    if (!this._mounted) {
+      return;
+    }
     if (props.avatarUrl) {
       const $img = document.createElement('img');
       $img.src = props.avatarUrl;
-      $img.onload = () => this.setState(prevState => ({
-        ...prevState,
+      $img.onload = () => this.setState(() => ({
         avatarUrl: props.avatarUrl,
       }));
-      $img.onerror = () => this.setState(prevState => ({
-        ...prevState,
+      $img.onerror = () => this.setState(() => ({
         avatarUrl: null,
       }));
     }
   }
 
   componentDidMount() {
+    this._mounted = true;
     this.loadImg();
   }
 
@@ -54,7 +57,7 @@ class CallAvatar extends Component {
         <svg
           className={styles.callAvatar}
           viewBox={`0 0 ${initialSize} ${initialSize}`}
-          preserveAspectRatio="xMidYmid meet"
+          preserveAspectRatio="xMidYMid meet"
           xmlns="http://www.w3.org/2000/svg">
           <defs>
             <g id="text">

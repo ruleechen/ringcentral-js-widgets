@@ -1,22 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classnames from 'classnames';
 import ActiveCallItem from '../ActiveCallItem';
 import CircleButton from '../CircleButton';
+import BackButton from '../BackButton';
 import BackHeader from '../BackHeader';
 import styles from './styles.scss';
 import i18n from './i18n';
 import CombineIcon from '../../assets/images/Combine.svg';
-import dynamicsFont from '../../assets/DynamicsFont/DynamicsFont.scss';
-
 
 class CallItem extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      avatarUrl: null
+      avatarUrl: null,
     };
   }
+
   componentDidMount() {
     const { getAvatarUrl, contactMapping, call } = this.props;
     const nameMatches = (contactMapping && contactMapping[call.webphoneSession.to]) || [];
@@ -89,6 +88,7 @@ class CallItem extends React.Component {
         hasActionMenu={false}
         showAnswer={false}
         showAvatar
+        showCallDetail={false}
         avatarUrl={this.state.avatarUrl}
       />
     );
@@ -151,7 +151,6 @@ CallItem.defaultProps = {
   call: {},
 };
 
-
 export default function CallsOnholdContainer({
   calls,
   currentLocale,
@@ -178,7 +177,6 @@ export default function CallsOnholdContainer({
   sourceIcons,
   disableMerge,
   onBackButtonClick,
-  backButtonLabel,
   onMerge,
   onAdd,
   contactMapping,
@@ -187,57 +185,52 @@ export default function CallsOnholdContainer({
   const backHeader = (<BackHeader
     className={styles.header}
     onBackClick={onBackButtonClick}
-    backButton={(
-      <span className={styles.backButton}>
-        <i className={classnames(dynamicsFont.arrow, styles.backIcon)} />
-        <span className={styles.backLabel}>{backButtonLabel}</span>
-      </span>
-      )}
-    />);
+    backButton={<BackButton label={i18n.getString('activeCall', currentLocale)} />}
+  />);
 
   return (
     <div className={styles.root}>
       {backHeader}
       <div className={styles.callList}>
         {
-        calls.length
-        ? calls.map(call => (
-          <CallItem
-            call={call}
-            key={call.id}
-            showMergeCall
-            currentLocale={currentLocale}
-            areaCode={areaCode}
-            countryCode={countryCode}
-            brand={brand}
-            showContactDisplayPlaceholder={showContactDisplayPlaceholder}
-            formatPhone={formatPhone}
-            onClickToSms={onClickToSms}
-            internalSmsPermission={internalSmsPermission}
-            outboundSmsPermission={outboundSmsPermission}
-            isLoggedContact={isLoggedContact}
-            onLogCall={onLogCall}
-            onViewContact={onViewContact}
-            onCreateContact={onCreateContact}
-            onMergeCall={() => onMerge(call.webphoneSession.id)}
-            loggingMap={loggingMap}
-            webphoneAnswer={webphoneAnswer}
-            webphoneReject={webphoneReject}
-            webphoneHangup={webphoneHangup}
-            webphoneResume={webphoneResume}
-            webphoneToVoicemail={webphoneToVoicemail}
-            enableContactFallback={enableContactFallback}
-            autoLog={autoLog}
-            sourceIcons={sourceIcons}
-            disableMerge={disableMerge}
-            hasActionMenu={false}
-            showAnswer={false}
-            getAvatarUrl={getAvatarUrl}
-            contactMapping={contactMapping}
-          />
-          ))
-        : <div className={styles.noCalls}>{i18n.getString('noCallsOnhold', currentLocale)}</div>
-      }
+          calls.length
+            ? calls.map(call => (
+              <CallItem
+                call={call}
+                key={call.id}
+                showMergeCall
+                currentLocale={currentLocale}
+                areaCode={areaCode}
+                countryCode={countryCode}
+                brand={brand}
+                showContactDisplayPlaceholder={showContactDisplayPlaceholder}
+                formatPhone={formatPhone}
+                onClickToSms={onClickToSms}
+                internalSmsPermission={internalSmsPermission}
+                outboundSmsPermission={outboundSmsPermission}
+                isLoggedContact={isLoggedContact}
+                onLogCall={onLogCall}
+                onViewContact={onViewContact}
+                onCreateContact={onCreateContact}
+                onMergeCall={() => onMerge(call.webphoneSession.id)}
+                loggingMap={loggingMap}
+                webphoneAnswer={webphoneAnswer}
+                webphoneReject={webphoneReject}
+                webphoneHangup={webphoneHangup}
+                webphoneResume={webphoneResume}
+                webphoneToVoicemail={webphoneToVoicemail}
+                enableContactFallback={enableContactFallback}
+                autoLog={autoLog}
+                sourceIcons={sourceIcons}
+                disableMerge={disableMerge}
+                hasActionMenu={false}
+                showAnswer={false}
+                getAvatarUrl={getAvatarUrl}
+                contactMapping={contactMapping}
+              />
+            ))
+            : <div className={styles.noCalls}>{i18n.getString('noCallsOnhold', currentLocale)}</div>
+        }
       </div>
       <div className={styles.addBtnContainer}>
         <div className={styles.addBtn}>
@@ -280,7 +273,6 @@ CallsOnholdContainer.propTypes = {
   autoLog: PropTypes.bool,
   sourceIcons: PropTypes.object,
   onBackButtonClick: PropTypes.func,
-  backButtonLabel: PropTypes.string,
   onClickToSms: PropTypes.func,
   onCreateContact: PropTypes.func,
   disableMerge: PropTypes.bool,
@@ -306,13 +298,12 @@ CallsOnholdContainer.defaultProps = {
   onViewContact: undefined,
   webphoneToVoicemail: undefined,
   sourceIcons: undefined,
-  backButtonLabel: 'Active Call',
   onBackButtonClick: undefined,
+  onAdd: undefined,
   onMerge: undefined,
   onClickToSms: undefined,
   onCreateContact: undefined,
   disableMerge: false,
-  onAdd: i => i,
   getAvatarUrl: i => i,
   contactMapping: {},
 };

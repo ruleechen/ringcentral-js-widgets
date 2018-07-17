@@ -52,6 +52,7 @@ function ascendSortParties(parties) {
       dep: 'Webphone',
       optional: true
     },
+    { dep: 'ConnectivityMonitor', optional: true },
     {
       dep: 'ConferenceCallOptions',
       optional: true
@@ -75,6 +76,7 @@ export default class ConferenceCall extends RcModule {
     contacts,
     contactMatcher,
     webphone,
+    connectivityMonitor,
     pulling = true,
     capacity = MAXIMUM_CAPACITY,
     timeout = DEFAULT_TIMEOUT,
@@ -91,6 +93,7 @@ export default class ConferenceCall extends RcModule {
       contacts,
       contactMatcher,
       webphone,
+      connectivityMonitor,
       ...options,
       actionTypes,
     });
@@ -102,6 +105,7 @@ export default class ConferenceCall extends RcModule {
     // in order to run the integeration test, we need it to be optional
     this._webphone = webphone;
     this._contacts = contacts;
+    this._connectivityMonitor = connectivityMonitor;
     this._contactMatcher = contactMatcher;
     this._rolesAndPermissions = this::ensureExist(rolesAndPermissions, 'rolesAndPermissions');
     // we need the constructed actions
@@ -231,10 +235,16 @@ export default class ConferenceCall extends RcModule {
     const conferenceState = this.state.conferences[id];
     if (
       !conferenceState
+      || !this.ready
       || !webphoneSession
       || webphoneSession.direction !== callDirections.outbound
       || this.isOverload(id)
+      || !this._connectivityMonitor.connectivity
     ) {
+      this._alert.danger({
+        message: conferenceErrors.modeError,
+        ttl: 0,
+      });
       return null;
     }
     const { conference, session } = conferenceState;
@@ -309,7 +319,11 @@ export default class ConferenceCall extends RcModule {
    */
   @proxify
   async makeConference(propagate = false) {
-    if (!this.ready) {
+    if (!this.ready || !this._connectivityMonitor.connectivity) {
+      this._alert.danger({
+        message: conferenceErrors.modeError,
+        ttl: 0,
+      });
       return null;
     }
     if (!this._checkPermission()) {
@@ -569,6 +583,7 @@ export default class ConferenceCall extends RcModule {
       this._callingSettings.ready &&
       this._call.ready &&
       this._rolesAndPermissions.ready &&
+      this._connectivityMonitor.ready &&
       this.pending
     );
   }
@@ -581,6 +596,7 @@ export default class ConferenceCall extends RcModule {
         || !this._callingSettings.ready
         || !this._call.ready
         || !this._rolesAndPermissions.ready
+        || !this._connectivityMonitor.ready
       ) &&
       this.ready
     );

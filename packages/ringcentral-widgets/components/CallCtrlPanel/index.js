@@ -70,24 +70,15 @@ class CallCtrlPanel extends Component {
     };
 
     this.confirmMerge = () => {
-      this.props.onMerge();
       this.hideMergeConfirm();
+      if (this.props.onMerge) {
+        this.props.onMerge();
+      }
     };
 
     this.onOpenPartiesModal = () => {
       // TODO:
     };
-  }
-
-  onMerge() {
-    if (
-      this.props.hasConference &&
-      this.props.layout === callCtrlLayout.normalCtrl
-    ) {
-      this.showMergeConfirm();
-    } else {
-      this.props.onMerge();
-    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -160,7 +151,7 @@ class CallCtrlPanel extends Component {
         onHangup={this.props.onHangup}
         onPark={this.props.onPark}
         onAdd={this.props.onAdd}
-        onMerge={() => this.onMerge()}
+        onMerge={this.onMerge}
         nameMatches={this.props.nameMatches}
         fallBackName={this.props.fallBackName}
         areaCode={this.props.areaCode}
@@ -278,8 +269,8 @@ CallCtrlPanel.defaultProps = {
   phoneTypeRenderer: undefined,
   recipientsContactInfoRenderer: undefined,
   recipientsContactPhoneRenderer: undefined,
-  onAdd: i => i,
-  onMerge: i => i,
+  onAdd: undefined,
+  onMerge: undefined,
   showSpinner: false,
   direction: null,
   addDisabled: false,

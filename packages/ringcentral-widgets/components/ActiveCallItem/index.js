@@ -307,8 +307,14 @@ export default class ActiveCallItem extends Component {
       disableLinks,
       currentLocale,
       formatPhone,
+      showCallDetail,
     } = this.props;
+
+    if (!showCallDetail) {
+      return null;
+    }
     const myPhoneNumber = this.getMyPhoneNumber();
+
     if (webphoneSession) {
       return (
         <div className={styles.callDetail}>
@@ -416,6 +422,7 @@ export default class ActiveCallItem extends Component {
       }
     }
   }
+
   logCall = this.logCall.bind(this)
 
   render() {
@@ -508,8 +515,7 @@ export default class ActiveCallItem extends Component {
               isOnConferenceCall
                 ? classnames(styles.conferenceContactDisplay)
                 : classnames(styles.contactDisplay, contactDisplayStyle)
-
-            }
+              }
               contactMatches={contactMatches}
               selected={this.state.selected}
               onSelectContact={this.onSelectContact}
@@ -634,6 +640,7 @@ ActiveCallItem.propTypes = {
   showAnswer: PropTypes.bool,
   avatarUrl: PropTypes.string,
   showAvatar: PropTypes.bool,
+  showCallDetail: PropTypes.bool,
   readTextPermission: PropTypes.bool,
 };
 
@@ -669,5 +676,6 @@ ActiveCallItem.defaultProps = {
   showAnswer: true,
   avatarUrl: null,
   showAvatar: false,
+  showCallDetail: true,
   readTextPermission: true,
 };

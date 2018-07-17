@@ -1,16 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classnames from 'classnames';
 import throttle from 'ringcentral-integration/lib/throttle';
 
 import CallInfo from './CallInfo';
 import ConferenceInfo from './ConferenceInfo';
+import BackButton from '../BackButton';
 import BackHeader from '../BackHeader';
 import Panel from '../Panel';
 import DurationCounter from '../DurationCounter';
 import ActiveCallPad from '../ActiveCallPad';
-import callCtrlLayout from '../../lib/callCtrlLayout';
-import dynamicsFont from '../../assets/DynamicsFont/DynamicsFont.scss';
+import callCtrlLayouts from '../../enums/callCtrlLayouts';
 import styles from './styles.scss';
 import MergeInfo from './MergeInfo';
 
@@ -20,8 +19,6 @@ class ActiveCallPanel extends React.Component {
     this.state = {
       displayedProfiles: [],
       remains: 0,
-      isPartiesModalOpen: false, // todo: for rendering the parties modal when conferecing
-      resizeFunc: throttle(() => this.handleResize(this.props)),
     };
 
     this.throttleResize = throttle(() => this.handleResize(this.props));
@@ -39,8 +36,7 @@ class ActiveCallPanel extends React.Component {
           : profiles)
           .map(({ avatarUrl, toUserName, id }) => ({ avatarUrl, toUserName, id }));
         const remains = profiles.length <= MAXIMUM_AVATARS ? 0 : profiles.length - MAXIMUM_AVATARS;
-        this.setState(prev => ({
-          ...prev,
+        this.setState(() => ({
           displayedProfiles,
           remains,
         }));
@@ -110,7 +106,7 @@ class ActiveCallPanel extends React.Component {
     const currentCall = {
       avatarUrl,
       nameMatches,
-      fallBackName
+      fallBackName,
     };
     const timeCounter =
       (
@@ -122,16 +118,13 @@ class ActiveCallPanel extends React.Component {
           }
         </div>
       );
-    const backHeader = (<BackHeader
-      onBackClick={onBackButtonClick}
-      backButton={(
-        <span className={styles.backButton}>
-          <i className={classnames(dynamicsFont.arrow, styles.backIcon)} />
-          <span className={styles.backLabel}>{backButtonLabel}</span>
-        </span>
-    )}
-  />);
-    const mergeCtrlCom = layout === callCtrlLayout.mergeCtrl
+    const backHeader = (
+      <BackHeader
+        onBackClick={onBackButtonClick}
+        backButton={<BackButton label={backButtonLabel} />}
+      />
+    );
+    const mergeCtrlCom = layout === callCtrlLayouts.mergeCtrl
       ? (<MergeInfo
         timeCounter={timeCounter}
         lastTo={lastTo}
@@ -262,8 +255,8 @@ ActiveCallPanel.defaultProps = {
   brand: 'RingCentral',
   showContactDisplayPlaceholder: true,
   flipNumbers: [],
-  onAdd: i => i,
-  onMerge: i => i,
+  onAdd: undefined,
+  onMerge: undefined,
   onShowFlipPanel: () => null,
   onToggleTransferPanel: () => null,
   onOpenPartiesModal: () => null,

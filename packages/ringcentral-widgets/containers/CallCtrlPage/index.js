@@ -128,6 +128,7 @@ class CallCtrlPage extends Component {
       });
     }
   }
+
   getLastTo() {
     const { calls, conferenceCall } = this.props;
     const mergingPair = conferenceCall.state.mergingPair ? conferenceCall.state.mergingPair : {};
@@ -178,24 +179,17 @@ class CallCtrlPage extends Component {
         }
       }
     } else {
-      const { conferencePartiesAvatarUrls, conferenceCall } = this.props;
-      if (Object.values(conferenceCall.conferences).length) {
-        const conferenceSession = Object.values(conferenceCall.conferences)[0].session;
-        const conferenceSessionId = conferenceSession.id;
-        const conferenceStatus = conferenceSession.callStatus;
-        this.setState(prev => ({
-          ...prev,
-          lastTo: {
-            calleeType: calleeTypes.conference,
-            avatarUrl: conferencePartiesAvatarUrls[0],
-            extraNum: conferencePartiesAvatarUrls.length - 1,
-            sessionId: conferenceSessionId,
-            status: conferenceStatus
-          }
-        }));
-      }
+      const { conferencePartiesAvatarUrls } = this.props;
+      this.setState(() => ({
+        lastTo: {
+          calleeType: calleeTypes.conference,
+          avatarUrl: conferencePartiesAvatarUrls[0],
+          extraNum: conferencePartiesAvatarUrls.length - 1
+        }
+      }));
     }
   }
+
   render() {
     const {
       session,
@@ -352,8 +346,8 @@ CallCtrlPage.defaultProps = {
   phoneTypeRenderer: undefined,
   recipientsContactInfoRenderer: undefined,
   recipientsContactPhoneRenderer: undefined,
-  onAdd: i => i,
-  onMerge: i => i,
+  onAdd: undefined,
+  onMerge: undefined,
   showSpinner: false,
   addDisabled: false,
   mergeDisabled: false,
@@ -469,8 +463,9 @@ function mapToFunctions(_, {
     onRecord: sessionId => webphone.startRecord(sessionId),
     onStopRecord: sessionId => webphone.stopRecord(sessionId),
     sendDTMF: (value, sessionId) => webphone.sendDTMF(value, sessionId),
-    updateSessionMatchedContact: (sessionId, contact) =>
-      webphone.updateSessionMatchedContact(sessionId, contact),
+    updateSessionMatchedContact: (sessionId, contact) => (
+      webphone.updateSessionMatchedContact(sessionId, contact)
+    ),
     getAvatarUrl,
     onBackButtonClick,
     onFlip: (flipNumber, sessionId) => webphone.flip(flipNumber, sessionId),
@@ -504,6 +499,7 @@ function mapToFunctions(_, {
     async onMerge(sessionId) {
       routerInteraction.replace(`${routerInteraction.currentPath}/${sessionId}`);
       const session = webphone._sessions.get(sessionId);
+      const isOnhold = session.isOnHold().local;
       conferenceCall.setMergeParty({ to: session });
       const sessionToMergeWith = conferenceCall.state.mergingPair.from;
       const webphoneSessions = sessionToMergeWith
@@ -511,7 +507,12 @@ function mapToFunctions(_, {
         : [session];
       await conferenceCall.mergeToConference(webphoneSessions);
       const conferenceData = Object.values(conferenceCall.conferences)[0];
-      if (conferenceData && conferenceData.session.isOnHold().local) {
+
+      if (
+        conferenceData
+        && !isOnhold
+        && conferenceData.session.isOnHold().local
+      ) {
         /**
          * because session termination operation in conferenceCall._mergeToConference,
          * need to wait for webphone.getActiveSessionIdReducer to update
