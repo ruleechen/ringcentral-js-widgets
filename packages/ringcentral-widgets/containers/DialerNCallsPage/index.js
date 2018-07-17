@@ -67,6 +67,7 @@ function renderTabs(
       currentPath={currentPath}
       goTo={goto}
       tabs={tabs}
+      fullSizeInk={false}
     />
   );
 }

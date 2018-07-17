@@ -50,6 +50,7 @@ export default class NavigationBar extends Component {
       currentPath,
       tabWidth,
       tabs,
+      fullSizeInk,
     } = this.props;
 
     const NavigationButton = button;
@@ -89,6 +90,7 @@ export default class NavigationBar extends Component {
             return (
               <NavigationButton
                 {...tab}
+                fullSizeInk={fullSizeInk}
                 key={index}
                 onClick={() => {
                   this.goTo(tab);
@@ -160,6 +162,7 @@ NavigationBar.propTypes = {
   currentPath: PropTypes.string.isRequired,
   currentVirtualPath: PropTypes.string,
   tabWidth: PropTypes.string,
+  fullSizeInk: PropTypes.bool,
 };
 
 NavigationBar.defaultProps = {
@@ -168,4 +171,5 @@ NavigationBar.defaultProps = {
   currentVirtualPath: undefined,
   tabWidth: undefined,
   tabs: [],
+  fullSizeInk: true,
 };
