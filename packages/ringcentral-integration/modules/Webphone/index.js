@@ -23,6 +23,7 @@ import {
   isRing,
   isOnHold,
   sortByCreationTimeDesc,
+  sortByLastHoldingTimeDesc,
 } from './webphoneHelper';
 import getWebphoneReducer from './getWebphoneReducer';
 
@@ -142,6 +143,11 @@ export default class Webphone extends RcModule {
       }
     );
 
+    this.addSelector('cachedSessions',
+      () => this.sessions,
+      sessions => sessions.filter(x => x.cached),
+    );
+
     this.addSelector('activeSession',
       () => this.activeSessionId,
       () => this.sessions,
@@ -153,21 +159,16 @@ export default class Webphone extends RcModule {
         const realActiveSession = sessions.find(
           session => session.id === activeSessionId
         );
-        if (cachedSessions) {
+        if (cachedSessions.length) {
           // means that the conference is being merging
           if (
-            (
-              realActiveSession &&
-              (
-                ((realActiveSession.to
-                  && realActiveSession.to.indexOf('conf_') === 0))// realActiveSession is a conference
-                || (cachedSessions.find(cachedSession => cachedSession.id === realActiveSession.id))// realActiveSession is cached
-              )
+            !realActiveSession || (
+              (realActiveSession.to && realActiveSession.to.indexOf('conf_') === 0) || // realActiveSession is a conference
+              (cachedSessions.find(cachedSession => cachedSession.id === realActiveSession.id)) // realActiveSession is cached
             )
-            || !realActiveSession) {
+          ) {
             return cachedSessions.sort(sortByCreationTimeDesc)[0];
           }
-
           return [...cachedSessions, realActiveSession].sort(sortByCreationTimeDesc)[0];
         }
         return realActiveSession;
@@ -648,8 +649,6 @@ export default class Webphone extends RcModule {
             accum[camelize(key)] = value;
             return accum;
           }, {});
-      } else {
-        session.data = null;
       }
       this._onCallStart(session);
     });
@@ -871,13 +870,11 @@ export default class Webphone extends RcModule {
       session.hold();
     });
 
-    // update the caching
-    if (Array.isArray(this.cachedSessions)) {
-      this.cachedSessions.forEach((cache) => {
-        cache.callStatus = sessionStatus.onHold;
-        cache.isOnHold = true;
-      });
-    }
+    // update cached sessions
+    this.cachedSessions.forEach((cachedSession) => {
+      cachedSession.callStatus = sessionStatus.onHold;
+      cachedSession.isOnHold = true;
+    });
   }
 
   @proxify
@@ -1172,23 +1169,46 @@ export default class Webphone extends RcModule {
     });
   }
 
-  updateSessionCaching(sessions) {
-    this.store.dispatch({
-      type: this.actionTypes.updateSessionCaching,
-      sessions
+  setSessionCaching(sessionIds) {
+    let needUpdate = false;
+    sessionIds.forEach((sessionId) => {
+      const session = this.sessions.find(x => x.id === sessionId);
+      if (session) {
+        session.cached = true;
+        needUpdate = true;
+      }
     });
+    if (needUpdate) {
+      this._updateSessions();
+    }
   }
 
   clearSessionCaching() {
-    this.store.dispatch({
-      type: this.actionTypes.clearSessionCaching,
+    let needUpdate = false;
+    this.sessions.forEach((session) => {
+      if (session.cached) {
+        session.cached = false;
+        needUpdate = true;
+      }
     });
+    if (needUpdate) {
+      this._updateSessions();
+    }
   }
 
   _updateSessions() {
+    const sessions = [...this._sessions.values()].map(normalizeSession);
+    this.cachedSessions.forEach((cachedSession) => {
+      const session = sessions.find(x => x.id === cachedSession.id);
+      if (session) {
+        session.cached = true;
+      } else {
+        sessions.push(cachedSession);
+      }
+    });
     this.store.dispatch({
       type: this.actionTypes.updateSessions,
-      sessions: [...this._sessions.values()].map(normalizeSession),
+      sessions: sessions.sort(sortByLastHoldingTimeDesc),
     });
   }
 
@@ -1364,7 +1384,7 @@ export default class Webphone extends RcModule {
   }
 
   get cachedSessions() {
-    return this.state.cachedSessions;
+    return this._selectors.cachedSessions();
   }
 
   get videoElementPrepared() {
