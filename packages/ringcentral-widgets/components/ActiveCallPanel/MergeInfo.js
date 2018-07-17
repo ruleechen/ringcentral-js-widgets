@@ -1,16 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import calleeTypes from 'ringcentral-integration/enums/calleeTypes';
 import sessionStatus from 'ringcentral-integration/modules/Webphone/sessionStatus';
 import classnames from 'classnames';
 import styles from './styles.scss';
 import i18n from './i18n';
 import CallAvatar from '../CallAvatar';
+import calleeTypes from '../../enums/calleeTypes';
 
 function MergeInfo({
   timeCounter, currentCall, currentLocale, lastTo
 }) {
-  const isConference = lastTo && lastTo.calleeType === calleeTypes.conference ? i18n.getString('conferenceCall', currentLocale) : i18n.getString('unknow', currentLocale);
+  // console.log(conferencePartiesAvatarUrls);
+  const isConference = lastTo && lastTo.calleeType === calleeTypes.conference ? i18n.getString('conferenceCall', currentLocale) : lastTo.name;
   const statusClasses = classnames({
     [styles.callee_status]: true,
     [styles.callee_status_disconnected]: lastTo.status === sessionStatus.finished

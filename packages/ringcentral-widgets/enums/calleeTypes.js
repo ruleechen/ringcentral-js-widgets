@@ -1,7 +1,7 @@
 import Enum from 'ringcentral-integration/lib/Enum';
 
 export default new Enum([
-  'normalCtrl',
-  'mergeCtrl',
-  'conferenceCtrl',
-], 'callCtrlLayout');
+  'unknow',
+  'contacts',
+  'conference',
+], 'calleeTypes');

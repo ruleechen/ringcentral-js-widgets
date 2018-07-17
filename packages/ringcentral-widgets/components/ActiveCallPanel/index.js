@@ -30,7 +30,7 @@ class ActiveCallPanel extends React.Component {
   handleResize(props) {
     const MAXIMUM_AVATARS = 4;
     // todo: handle width calculation
-    if (props.layout === callCtrlLayout.conferenceCtrl) {
+    if (props.layout === callCtrlLayouts.conferenceCtrl) {
       // conference is just created and waiting for parties data to return
       const profiles = this.props.getPartyProfiles();
       if (profiles) {
@@ -136,6 +136,7 @@ class ActiveCallPanel extends React.Component {
         timeCounter={timeCounter}
         lastTo={lastTo}
         currentCall={currentCall}
+        conferenceAvatarUrls={this.state.displayedProfiles}
       />)
       : (<CallInfo
         currentLocale={currentLocale}
@@ -157,9 +158,9 @@ class ActiveCallPanel extends React.Component {
       <div className={styles.root}>
         {backHeader}
         <Panel className={styles.panel}>
-          {layout !== callCtrlLayout.mergeCtrl ? timeCounter : null}
+          {layout !== callCtrlLayouts.mergeCtrl ? timeCounter : null}
           {
-            layout === callCtrlLayout.conferenceCtrl
+            layout === callCtrlLayouts.conferenceCtrl
               ? (
                 <ConferenceInfo
                   displayedProfiles={this.state.displayedProfiles}

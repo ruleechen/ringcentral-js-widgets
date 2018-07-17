@@ -53,7 +53,8 @@ function mapToProps(_, {
     hasConferenceCall: !!conference,
     disableMerge,
     conferencePartiesAvatarUrls: (conferenceData
-      && conferenceData.profiles.map(profile => profile.avatarUrl))
+      && conferenceCall
+        .getOnlinePartyProfiles(conferenceData.conference.id).map(profile => profile.avatarUrl))
       || []
   };
 }
