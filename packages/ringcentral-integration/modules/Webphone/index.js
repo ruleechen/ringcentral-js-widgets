@@ -157,22 +157,31 @@ export default class Webphone extends RcModule {
         if (!activeSessionId) {
           return null;
         }
+
         const realActiveSession = sessions.find(
           session => session.id === activeSessionId
         );
-        if (cachedSessions.length) {
-          // means that the conference is being merging
-          if (
-            !realActiveSession || (
-              isConferenceSession(realActiveSession) || // realActiveSession is a conference
-              (cachedSessions.find(cachedSession => cachedSession.id === realActiveSession.id)) // realActiveSession is cached
-            )
-          ) {
-            return cachedSessions.sort(sortByCreationTimeDesc)[0];
-          }
-          return [...cachedSessions, realActiveSession].sort(sortByCreationTimeDesc)[0];
+
+        // NOT in conference merging process
+        if (!cachedSessions.length) {
+          return realActiveSession;
         }
-        return realActiveSession;
+
+        // realActiveSession is a conference
+        if (isConferenceSession(realActiveSession)) {
+          return realActiveSession;
+        }
+
+        // realActiveSession is cached
+        if (
+          !realActiveSession ||
+          (cachedSessions.find(cachedSession => cachedSession.id === realActiveSession.id))
+        ) {
+          return cachedSessions.sort(sortByCreationTimeDesc)[0];
+        }
+
+        // default rule
+        return [...cachedSessions, realActiveSession].sort(sortByCreationTimeDesc)[0];
       }
     );
 
