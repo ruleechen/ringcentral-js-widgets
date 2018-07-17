@@ -404,10 +404,10 @@ function mapToProps(_, {
     mergeDisabled,
     hasConference: !!conferenceData,
     conferenceCall,
-    conferencePartiesAvatarUrls: (
-      conferenceData
-      && conferenceData.profiles.map(profile => profile.avatarUrl)
-    ) || [],
+    conferencePartiesAvatarUrls: (conferenceData
+      && conferenceCall
+        .getOnlinePartyProfiles(conferenceData.conference.id).map(profile => profile.avatarUrl))
+      || []
   };
 }
 
