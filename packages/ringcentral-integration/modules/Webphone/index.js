@@ -22,6 +22,7 @@ import {
   normalizeSession,
   isRing,
   isOnHold,
+  isConferenceSession,
   sortByCreationTimeDesc,
   sortByLastHoldingTimeDesc,
 } from './webphoneHelper';
@@ -99,12 +100,12 @@ export default class Webphone extends RcModule {
     this._appVersion = appVersion;
     this._alert = alert;
     this._webphoneLogLevel = webphoneLogLevel;
-    this._auth = this::ensureExist(auth, 'auth');
-    this._client = this::ensureExist(client, 'client');
-    this._rolesAndPermissions = this::ensureExist(rolesAndPermissions, 'rolesAndPermissions');
-    this._extensionDevice = this::ensureExist(extensionDevice, 'extensionDevice');
-    this._numberValidate = this::ensureExist(numberValidate, 'numberValidate');
-    this._audioSettings = this::ensureExist(audioSettings, 'audioSettings');
+    this._auth = this:: ensureExist(auth, 'auth');
+    this._client = this:: ensureExist(client, 'client');
+    this._rolesAndPermissions = this:: ensureExist(rolesAndPermissions, 'rolesAndPermissions');
+    this._extensionDevice = this:: ensureExist(extensionDevice, 'extensionDevice');
+    this._numberValidate = this:: ensureExist(numberValidate, 'numberValidate');
+    this._audioSettings = this:: ensureExist(audioSettings, 'audioSettings');
     this._contactMatcher = contactMatcher;
     this._tabManager = tabManager;
     this._onCallEndFunc = onCallEnd;
@@ -163,7 +164,7 @@ export default class Webphone extends RcModule {
           // means that the conference is being merging
           if (
             !realActiveSession || (
-              (realActiveSession.to && realActiveSession.to.indexOf('conf_') === 0) || // realActiveSession is a conference
+              isConferenceSession(realActiveSession) || // realActiveSession is a conference
               (cachedSessions.find(cachedSession => cachedSession.id === realActiveSession.id)) // realActiveSession is cached
             )
           ) {
