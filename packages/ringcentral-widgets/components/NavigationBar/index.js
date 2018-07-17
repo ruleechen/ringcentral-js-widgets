@@ -7,17 +7,26 @@ export default class NavigationBar extends Component {
   constructor(props) {
     super(props);
     this.goTo = this.goTo.bind(this);
+    this.mounted = false;
     this.state = {
       currentVirtualPath: this.props.currentVirtualPath,
     };
   }
 
+  componentDidMount() {
+    this.mounted = true;
+  }
+
   componentWillReceiveProps(nextProps) {
-    if (nextProps.currentVirtualPath) {
+    if (nextProps.currentVirtualPath && this.mounted) {
       this.setState({
         currentVirtualPath: nextProps.currentVirtualPath,
       });
     }
+  }
+
+  componentWillUnmount() {
+    this.mounted = false;
   }
 
   goTo(tab) {
@@ -25,9 +34,11 @@ export default class NavigationBar extends Component {
     // seems like the goTo is asynchronous
     // so here set timeout for resolving menu looks flash issue
     setTimeout(() => {
-      this.setState({
-        currentVirtualPath: tab.virtualPath,
-      });
+      if (this.mounted) {
+        this.setState({
+          currentVirtualPath: tab.virtualPath,
+        });
+      }
     }, 10);
   }
 
