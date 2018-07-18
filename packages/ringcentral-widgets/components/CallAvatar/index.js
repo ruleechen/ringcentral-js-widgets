@@ -49,7 +49,8 @@ class CallAvatar extends Component {
     const $snow = '#fff';
     const $gray = '#cee7f2';
     const $blue = '#0684bd';
-
+    const $borderColor = '#e2e2e2';
+    const $borderWidth = 1.5;
     let res;
 
     if (isOnConferenceCall && extraNum > 0) {
@@ -58,7 +59,8 @@ class CallAvatar extends Component {
           className={styles.callAvatar}
           viewBox={`0 0 ${initialSize} ${initialSize}`}
           preserveAspectRatio="xMidYMid meet"
-          xmlns="http://www.w3.org/2000/svg">
+          xmlns="http://www.w3.org/2000/svg"
+        >
           <defs>
             <g id="text">
               <text
@@ -81,7 +83,8 @@ class CallAvatar extends Component {
             cx={avatarCircleRadius}
             cy={margin + avatarCircleRadius}
             r={avatarCircleRadius}
-            fill={$snow} />
+            fill={$snow}
+          />
           <g>
             <clipPath id="circleClip">
               <circle
@@ -150,7 +153,8 @@ class CallAvatar extends Component {
             cx={initialSize / 2}
             cy={initialSize / 2}
             r={initialSize / 2}
-            fill={$snow} />
+            fill={$snow}
+          />
           <g>
             <clipPath id="circleClip">
               <circle

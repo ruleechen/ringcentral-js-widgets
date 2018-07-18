@@ -18,7 +18,8 @@ class CallCtrlPage extends Component {
     this.state = {
       selectedMatcherIndex: 0,
       avatarUrl: null,
-      lastTo: this.props.lastTo || null
+      lastTo: this.props.lastTo || null,
+      mergeDisabled: false
     };
     this.onSelectMatcherName = (option) => {
       const nameMatches = this.props.nameMatches || [];
@@ -85,20 +86,7 @@ class CallCtrlPage extends Component {
     if (this.props.session.id !== nextProps.session.id) {
       this._updateAvatarAndMatchIndex(nextProps);
     }
-    const lastEndedSessions = nextProps.lastEndedSessions;
-    if (lastEndedSessions.length) {
-      const lastEndedSession = lastEndedSessions[0];
-      const lastTo = this.state.lastTo;
-      if (lastEndedSession.id === lastTo.sessionId) {
-        this.setState(prev => ({
-          lastTo: {
-            ...prev.lastTo,
-            status: lastEndedSession.callStatus
-          }
-        })
-        )
-      }
-    }
+    this.updateLastToState(nextProps);
   }
 
   componentWillUnmount() {
@@ -172,21 +160,50 @@ class CallCtrlPage extends Component {
                 calleeType: calleeTypes.unknow,
                 avatarUrl: null,
                 sessionId: lastCall.webphoneSession ? lastCall.webphoneSession.id : null,
-                status: lastCall.webphoneSession ? lastCall.webphoneSession.callStatus : null
+                status: lastCall.webphoneSession ? lastCall.webphoneSession.callStatus : null,
+                name: lastCall.to.phoneNumber
               }
             }));
           }
         }
       }
     } else {
-      const { conferencePartiesAvatarUrls } = this.props;
-      this.setState(() => ({
+      const { conferencePartiesAvatarUrls, conferenceCall } = this.props;
+      if(Object.values(conferenceCall.conferences).length) {
+        this.setState(() => ({
+          lastTo: {
+            calleeType: calleeTypes.conference,
+            avatarUrl: conferencePartiesAvatarUrls[0],
+            extraNum: conferencePartiesAvatarUrls.length - 1,
+            sessionId: Object.values(conferenceCall.conferences)[0].session.id
+          }
+        }));
+      }
+    }
+  }
+  updateLastToState(nextProps) {
+    const lastEndedSessions = nextProps.lastEndedSessions;
+    if (lastEndedSessions.length) {
+      if (lastEndedSessions.filter((session) => session.id === this.state.lastTo.sessionId)[0]) {
+        this.setState(prev => ({
+          lastTo: {
+            ...prev.lastTo,
+            status: sessionStatus.finished
+          },
+          mergeDisabled: true
+        })
+        );
+      }
+    }
+    // update conference call particants number
+    if (Object.keys(nextProps.conferenceCall.conferences).length) {
+      const part = this.props.getPartyProfiles().length - 1;
+      this.setState((prev) => ({
         lastTo: {
-          calleeType: calleeTypes.conference,
-          avatarUrl: conferencePartiesAvatarUrls[0],
-          extraNum: conferencePartiesAvatarUrls.length - 1
+          ...prev.lastTo,
+          extraNum: part
         }
-      }));
+      }))
     }
   }
 
@@ -201,6 +218,7 @@ class CallCtrlPage extends Component {
       getPartyProfiles,
       conferencePartiesAvatarUrls,
     } = this.props;
+    console.log(conferencePartiesAvatarUrls.length);
     if (!session.id) {
       return null;
     }
@@ -267,7 +285,7 @@ class CallCtrlPage extends Component {
         showSpinner={showSpinner}
         direction={session.direction}
         addDisabled={addDisabled}
-        mergeDisabled={mergeDisabled}
+        mergeDisabled={mergeDisabled || this.state.mergeDisabled}
         hasConference={hasConference}
         getPartyProfiles={getPartyProfiles}
         lastTo={this.state.lastTo}
@@ -411,6 +429,33 @@ function mapToProps(_, {
   )
     && conferenceCall.isMerging;
   layout = isOnConference ? callCtrlLayouts.conferenceCtrl : layout;
+  // // lastTO
+  // let lastTo = null;
+  // const mergingPair = conferenceCall.state.mergingPair || {};
+  // if (Object.keys(mergingPair).length && mergingPair.from) {
+  //   console.log(callMonitor.calls);
+  //   const lastCall = callMonitor.calls.filter(call => call.webphoneSession && call.webphoneSession.id === mergingPair.from.id)[0];
+  //   console.log(lastCall);
+  //   const status = webphone.lastEndedSessions.filter((session) => session.id === mergingPair.from.id)[0]
+  //     ? sessionStatus.finished
+  //     : lastCall.webphoneSession.callStatus;
+  //   if (lastCall.toMatches.length) {
+  //     lastTo = {
+  //       avatarUrl: lastCall.toMatches[0].profileImageUrl,
+  //       name: lastCall.toMatches[0].name,
+  //       status: status,
+  //       calleeType: calleeTypes.contacts
+  //     };
+  //   } else {
+  //     lastTo = {
+  //       avatarUrl: null,
+  //       name: lastCall.to.phoneNumber,
+  //       status: status,
+  //       calleeType: calleeTypes.unknow
+  //     };
+  //   }
+  // }
+  // console.log(lastTo);
   return {
     brand: brand.fullName,
     nameMatches,

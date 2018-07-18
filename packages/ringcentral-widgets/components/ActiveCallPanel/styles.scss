@@ -7,8 +7,8 @@ $userInfoHeight: 134px;
 $conferenceAvatarSize: 51px;
 $timeCounterMarginTop:10px;
 $timeCounterHeight: 14px;
-$calleeAvatarSize: 30px;
-$calleeAvatarActiveSize: 45px;
+$calleeAvatarSize: 27px;
+$calleeAvatarActiveSize: 42px;
 .root {
   @include full-size;
   box-sizing: border-box;
@@ -170,13 +170,16 @@ $calleeAvatarActiveSize: 45px;
     .callee_avatar {
       width: $calleeAvatarSize;
       height: $calleeAvatarSize;
-      border: solid 2px #ffffff;
+      border: solid 1.5px #e2e2e2;
       float: left;
       margin-right: 35px;
       border-radius: 100%;
       @media only screen and (min-width: 150px) and (max-width: 265px) {
         margin-right: 11%;
       }
+    }
+    .noBorder {
+      border: none;
     }
     .callee_name {
       font-size: 15px;
@@ -215,7 +218,7 @@ $calleeAvatarActiveSize: 45px;
     .callee_avatar_active {
       width: $calleeAvatarActiveSize;
       height: $calleeAvatarActiveSize;
-      border: solid 1.5px #ffffff;
+      border: solid 1.5px #e2e2e2;
       border-radius: 100%;
       float: left;
       margin-right: 20px;

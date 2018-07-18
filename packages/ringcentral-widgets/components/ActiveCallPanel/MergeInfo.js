@@ -16,16 +16,21 @@ function MergeInfo({
     [styles.callee_status]: true,
     [styles.callee_status_disconnected]: lastTo.status === sessionStatus.finished
   })
+  const calleeAvatarClasses = classnames({
+    [styles.callee_avatar]: true,
+    [styles.noBorder]: lastTo.calleeType === calleeTypes.conference
+  })
   return lastTo ? (
     <div className={styles.mergeInfo}>
       <div className={styles.merge_item}>
-        <div className={styles.callee_avatar}>
+        <div className={calleeAvatarClasses}>
           {
             lastTo.calleeType === calleeTypes.conference
             ? <CallAvatar
               avatarUrl={lastTo.avatarUrl}
               extraNum={lastTo.extraNum}
-              isOnConferenceCall />
+              isOnConferenceCall
+            />
             : <CallAvatar avatarUrl={lastTo.avatarUrl} />
           }
         </div>
