@@ -82,14 +82,27 @@ function DialerNCallsPanel({
   sourceIcons,
   goto,
   showTab,
+  phoneTypeRenderer,
+  recipientsContactInfoRenderer,
+  recipientsContactPhoneRenderer,
+  dialButtonMuted,
+  showViewContact,
+  showContactDisplayPlaceholder,
 }) {
   const contentMap = {
-    '/dialer': <DialerPage />,
+    '/dialer': <DialerPage
+      phoneTypeRenderer={phoneTypeRenderer}
+      recipientsContactInfoRenderer={recipientsContactInfoRenderer}
+      recipientsContactPhoneRenderer={recipientsContactPhoneRenderer}
+      dialButtonMuted={dialButtonMuted}
+    />,
     '/calls': <ActiveCallsPage
       onLogCall={onLogCall}
       onCreateContact={onCreateContact}
       onCallsEmpty={onCallsEmpty}
       sourceIcons={sourceIcons}
+      showViewContact={showViewContact}
+      showContactDisplayPlaceholder={showContactDisplayPlaceholder}
     />
   };
   const tabsHeader = renderTabs(currentLocale, currentPath, goto);
@@ -115,6 +128,12 @@ DialerNCallsPanel.propTypes = {
   onCallsEmpty: PropTypes.func,
   sourceIcons: PropTypes.object,
   goto: PropTypes.func.isRequired,
+  phoneTypeRenderer: PropTypes.func,
+  recipientsContactInfoRenderer: PropTypes.element,
+  recipientsContactPhoneRenderer: PropTypes.element,
+  dialButtonMuted: PropTypes.bool,
+  showViewContact: PropTypes.bool,
+  showContactDisplayPlaceholder: PropTypes.bool,
 };
 
 
@@ -123,6 +142,12 @@ DialerNCallsPanel.defaultProps = {
   async onLogCall() { await sleep(1000); },
   onCreateContact() { },
   onCallsEmpty() { },
+  phoneTypeRenderer: i => i,
+  recipientsContactInfoRenderer: null,
+  recipientsContactPhoneRenderer: null,
+  dialButtonMuted: false,
+  showViewContact: true,
+  showContactDisplayPlaceholder: false,
 };
 
 
@@ -134,12 +159,18 @@ function mapToProps(_, {
     callingSettings: { callingMode },
   },
   sourceIcons,
+  phoneTypeRenderer,
+  recipientsContactInfoRenderer,
+  recipientsContactPhoneRenderer,
 }) {
   return {
     currentPath: routerInteraction.currentPath,
     currentLocale: locale.currentLocale,
     sourceIcons,
-    showTab: webphone.sessions.length && callingMode === callingModes.webphone
+    showTab: webphone.sessions.length && callingMode === callingModes.webphone,
+    phoneTypeRenderer,
+    recipientsContactInfoRenderer,
+    recipientsContactPhoneRenderer,
   };
 }
 
