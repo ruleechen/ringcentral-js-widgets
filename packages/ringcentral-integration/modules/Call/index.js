@@ -2,7 +2,6 @@ import { combineReducers } from 'redux';
 import RcModule from '../../lib/RcModule';
 import { Module } from '../../lib/di';
 import callingModes from '../CallingSettings/callingModes';
-import moduleStatuses from '../../enums/moduleStatuses';
 import proxify from '../../lib/proxy/proxify';
 import ensureExist from '../../lib/ensureExist';
 
@@ -282,21 +281,29 @@ export default class Call extends RcModule {
 
     const waitingValidateNumbers = [];
 
+    if (!isConference) {
+      waitingValidateNumbers.push({
+        type: 'toNumber',
+        number: toNumber,
+      });
+    }
+
     if (
       theFromNumber &&
       theFromNumber.length > 0 &&
       !(isWebphone && theFromNumber === 'anonymous')
     ) {
-      waitingValidateNumbers.push(theFromNumber);
+      waitingValidateNumbers.push({
+        type: 'fromNumber',
+        number: theFromNumber,
+      });
     }
 
-    if (!isConference) {
-      waitingValidateNumbers.push(toNumber);
-    }
-
-    let parsedNumbers = [];
+    let parsedToNumber;
+    let parsedFromNumber;
     if (waitingValidateNumbers.length) {
-      const validatedResult = await this._numberValidate.validateNumbers(waitingValidateNumbers);
+      const numbers = waitingValidateNumbers.map(x => x.number);
+      const validatedResult = await this._numberValidate.validateNumbers(numbers);
       if (!validatedResult.result) {
         validatedResult.errors.forEach((error) => {
           // this._alert.warning({
@@ -309,23 +316,12 @@ export default class Call extends RcModule {
         });
         return null;
       }
-      parsedNumbers = validatedResult.numbers;
+      const toNumberIndex = waitingValidateNumbers.findIndex(x => x.type === 'toNumber');
+      const fromNumberIndex = waitingValidateNumbers.findIndex(x => x.type === 'fromNumber');
+      parsedToNumber = validatedResult.numbers[toNumberIndex];
+      parsedFromNumber = validatedResult.numbers[fromNumberIndex];
     }
 
-    // using e164 in response to call
-    let parsedFromNumber =
-      parsedNumbers[0] ? parsedNumbers[0].e164 : '';
-    // add ext back if any
-    if (parsedFromNumber) {
-      parsedFromNumber = (parsedNumbers[0].subAddress) ?
-        [parsedNumbers[0].e164, parsedNumbers[0].subAddress].join('*') :
-        parsedNumbers[0].e164;
-    }
-    if (isWebphone && theFromNumber === 'anonymous') {
-      parsedFromNumber = 'anonymous';
-    }
-
-    const parsedToNumber = parsedNumbers[1];
     if (
       parsedToNumber &&
       parsedToNumber.international &&
@@ -338,9 +334,22 @@ export default class Call extends RcModule {
       throw error;
     }
 
+    // using e164 in response to call
+    let parsedFromNumberE164;
+    if (parsedFromNumber) {
+      parsedFromNumberE164 = parsedFromNumber.e164;
+      // add ext back if any
+      if (parsedFromNumber.e164 && parsedFromNumber.subAddress) {
+        parsedFromNumberE164 = [parsedFromNumber.e164, parsedFromNumber.subAddress].join('*');
+      }
+    }
+    if (isWebphone && theFromNumber === 'anonymous') {
+      parsedFromNumberE164 = 'anonymous';
+    }
+
     return {
-      fromNumber: parsedFromNumber,
       toNumber: parsedToNumber ? parsedToNumber.e164 : toNumber,
+      fromNumber: parsedFromNumberE164,
     };
   }
 
