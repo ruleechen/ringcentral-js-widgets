@@ -2,6 +2,7 @@ import { connect } from 'react-redux';
 import React from 'react';
 import PropTypes from 'prop-types';
 import sleep from 'ringcentral-integration/lib/sleep';
+import callingModes from 'ringcentral-integration/modules/CallingSettings/callingModes';
 import classnames from 'classnames';
 
 import DialerPage from '../DialerPage';
@@ -80,6 +81,7 @@ function DialerNCallsPanel({
   onCallsEmpty,
   sourceIcons,
   goto,
+  showTab,
 }) {
   const contentMap = {
     '/dialer': <DialerPage />,
@@ -91,15 +93,17 @@ function DialerNCallsPanel({
     />
   };
   const tabsHeader = renderTabs(currentLocale, currentPath, goto);
-
-  return (
-    <div className={styles.root}>
-      {tabsHeader}
-      <div className={styles.content}>
-        {contentMap[currentPath]}
+  if (showTab) {
+    return (
+      <div className={styles.root}>
+        {tabsHeader}
+        <div className={styles.content}>
+          {contentMap[currentPath]}
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
+  return contentMap[currentPath];
 }
 
 
@@ -126,13 +130,16 @@ function mapToProps(_, {
   phone: {
     locale,
     routerInteraction,
+    webphone,
+    callingSettings: { callingMode },
   },
   sourceIcons,
 }) {
   return {
     currentPath: routerInteraction.currentPath,
     currentLocale: locale.currentLocale,
-    sourceIcons
+    sourceIcons,
+    showTab: webphone.sessions.length && callingMode === callingModes.webphone
   };
 }
 
