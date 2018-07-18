@@ -38,7 +38,8 @@ export function normalizeSession(session) {
     contactMatch: session.contactMatch,
     minimized: !!session.minimized,
     data: session.data || null,
-    lastHoldingTime: session.lastHoldingTime || 0
+    lastHoldingTime: session.lastHoldingTime || 0,
+    cached: false,
   };
 }
 
