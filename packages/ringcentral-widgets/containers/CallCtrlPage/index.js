@@ -218,7 +218,6 @@ class CallCtrlPage extends Component {
       getPartyProfiles,
       conferencePartiesAvatarUrls,
     } = this.props;
-    console.log(conferencePartiesAvatarUrls.length);
     if (!session.id) {
       return null;
     }

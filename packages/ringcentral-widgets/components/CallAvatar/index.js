@@ -84,6 +84,8 @@ class CallAvatar extends Component {
             cy={margin + avatarCircleRadius}
             r={avatarCircleRadius}
             fill={$snow}
+            stroke={$borderColor}
+            strokeWidth={$borderWidth}
           />
           <g>
             <clipPath id="circleClip">
