@@ -1195,11 +1195,9 @@ export default class Webphone extends RcModule {
 
   clearSessionCaching() {
     let needUpdate = false;
-    this.sessions.forEach((session) => {
-      if (session.cached) {
-        session.cached = false;
-        needUpdate = true;
-      }
+    this.cachedSessions.forEach((session) => {
+      session.cached = false;
+      needUpdate = true;
     });
     if (needUpdate) {
       this._updateSessions();
@@ -1207,18 +1205,19 @@ export default class Webphone extends RcModule {
   }
 
   _updateSessions() {
-    const sessions = [...this._sessions.values()].map(normalizeSession);
-    this.cachedSessions.forEach((cachedSession) => {
-      const session = sessions.find(x => x.id === cachedSession.id);
+    const newSessions = [...this._sessions.values()].map(normalizeSession);
+    const cachedSessions = this.sessions.filter(x => x.cached);
+    cachedSessions.forEach((cachedSession) => {
+      const session = newSessions.find(x => x.id === cachedSession.id);
       if (session) {
         session.cached = true;
       } else {
-        sessions.push(cachedSession);
+        newSessions.push(cachedSession);
       }
     });
     this.store.dispatch({
       type: this.actionTypes.updateSessions,
-      sessions: sessions.sort(sortByLastHoldingTimeDesc),
+      sessions: newSessions.sort(sortByLastHoldingTimeDesc),
     });
   }
 
