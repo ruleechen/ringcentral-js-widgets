@@ -4,6 +4,4 @@ import moduleActionTypes from '../../enums/moduleActionTypes';
 export default new Enum([
   ...Object.keys(moduleActionTypes),
   'setData',
-  'updateCallsCaching',
-  'clearCallsCaching',
 ], 'callMonitorAcionTypes');
