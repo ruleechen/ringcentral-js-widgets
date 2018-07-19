@@ -202,7 +202,7 @@ class CallCtrlPage extends Component {
     }
   }
   lastToListen(sessionId) {
-    const { routerInteraction, webphone, conferenceCall } = this.props
+    const { routerInteraction, webphone } = this.props
     const session = webphone._sessions.get(sessionId);
     session.on('terminated', () => {
       this.setState(prev => ({

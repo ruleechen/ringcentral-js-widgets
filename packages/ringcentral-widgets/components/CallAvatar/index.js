@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import uuid from 'uuid';
 import styles from './styles.scss';
 
 class CallAvatar extends Component {
@@ -18,12 +19,12 @@ class CallAvatar extends Component {
     if (props.avatarUrl) {
       const $img = document.createElement('img');
       $img.src = props.avatarUrl;
-      $img.onload = () => this.setState(() => ({
+      $img.onload = () => this.setState({
         avatarUrl: props.avatarUrl,
-      }));
-      $img.onerror = () => this.setState(() => ({
+      });
+      $img.onerror = () => this.setState({
         avatarUrl: null,
-      }));
+      });
     }
   }
 
@@ -50,17 +51,21 @@ class CallAvatar extends Component {
     const $gray = '#cee7f2';
     const $blue = '#0684bd';
     let res;
-
+    const hash = uuid.v4();
+    const textId = `text-${hash}`;
+    const clipId = `circleClip-${hash}`;
+    const avatarStyle = { stroke: '#e2e2e2', strokeWidth: '1px' };
     if (isOnConferenceCall && extraNum > 0) {
       res = (
         <svg
           className={styles.callAvatar}
+          style={avatarUrl ? avatarStyle : null}
           viewBox={`0 0 ${initialSize} ${initialSize}`}
           preserveAspectRatio="xMidYMid meet"
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
-            <g id="text">
+            <g id={textId}>
               <text
                 x="0"
                 y="0"
@@ -84,7 +89,7 @@ class CallAvatar extends Component {
             fill={$snow}
           />
           <g>
-            <clipPath id="circleClip">
+            <clipPath id={clipId}>
               <circle
                 cx={avatarCircleRadius}
                 cy={margin + avatarCircleRadius}
@@ -94,8 +99,8 @@ class CallAvatar extends Component {
           </g>
           {
             avatarUrl ?
-              <image clipPath="url(#circleClip)" height="100%" width="100%" xlinkHref={avatarUrl} /> :
-              <use xlinkHref="#text" clipPath="url(#circleClip)" />
+              <image clipPath={`url(#${clipId})`} height="100%" width="100%" xlinkHref={avatarUrl} /> :
+              <use xlinkHref={`#${textId}`} clipPath={`url(#${clipId})`} />
           }
           <circle
             cx={initialSize - extraNumCircleRadius}
@@ -128,10 +133,11 @@ class CallAvatar extends Component {
       res = (
         <svg
           className={styles.callAvatar}
+          style={avatarUrl ? avatarStyle : null}
           viewBox={`0 0 ${initialSize} ${initialSize}`}
           xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <g id="text">
+            <g id={textId}>
               <text
                 x="0"
                 y="0"
@@ -154,7 +160,7 @@ class CallAvatar extends Component {
             fill={$snow}
           />
           <g>
-            <clipPath id="circleClip">
+            <clipPath id={clipId}>
               <circle
                 cx={initialSize / 2}
                 cy={initialSize / 2}
@@ -165,12 +171,12 @@ class CallAvatar extends Component {
           {
             avatarUrl ?
               <image
-                clipPath="url(#circleClip)"
+                clipPath={`url(#${clipId})`}
                 height="100%"
                 width="100%"
                 xlinkHref={avatarUrl}
                 preserveAspectRatio="xMinYMin slice" /> :
-              <use xlinkHref="#text" clipPath="url(#circleClip)" />
+              <use xlinkHref={`#${textId}`} clipPath={`url(#${clipId})`} />
           }
         </svg>
       );

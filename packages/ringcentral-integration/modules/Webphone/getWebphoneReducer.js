@@ -1,7 +1,8 @@
 import { combineReducers } from 'redux';
 import getModuleStatusReducer from '../../lib/getModuleStatusReducer';
 import connectionStatus from './connectionStatus';
-import { isRing, isOnHold } from './webphoneHelper';
+import sessionStatus from './sessionStatus';
+import { isRing, isOnHold, sortByLastHoldingTimeDesc } from './webphoneHelper';
 
 export function getVideoElementPreparedReducer(types) {
   return (state = false, { type }) => {
@@ -158,10 +159,56 @@ export function getLastEndedSessionsReducer(types) {
 }
 
 export function getSessionsReducer(types) {
-  return (state = [], { type, sessions }) => {
+  return (state = [], { type, sessions, cachingSessionIds }) => {
     switch (type) {
-      case types.updateSessions:
-        return sessions;
+      case types.updateSessions: {
+        const cachedSessions = state.filter(x => x.cached);
+        cachedSessions.forEach((cachedSession) => {
+          const session = sessions.find(x => x.id === cachedSession.id);
+          if (session) {
+            session.cached = true;
+          } else {
+            cachedSession.removed = true;
+            sessions.push(cachedSession);
+          }
+        });
+        return sessions.sort(sortByLastHoldingTimeDesc);
+      }
+      case types.setSessionCaching: {
+        let needUpdate = false;
+        cachingSessionIds.forEach((sessionId) => {
+          const session = state.find(x => x.id === sessionId);
+          if (session) {
+            session.cached = true;
+            needUpdate = true;
+          }
+        });
+        return needUpdate ? [...state] : state;
+      }
+      case types.clearSessionCaching: {
+        let needUpdate = false;
+        state.forEach((session) => {
+          if (session.cached) {
+            session.cached = false;
+            needUpdate = true;
+          }
+        });
+        if (needUpdate) {
+          return state.filter(x => !x.cached && x.removed);
+        }
+        return state;
+      }
+      case types.onholdCachedSession: {
+        let needUpdate = false;
+        state.forEach((session) => {
+          if (session.cached) {
+            session.callStatus = sessionStatus.onHold;
+            session.isOnHold = true;
+            needUpdate = true;
+          }
+        });
+        return needUpdate ? [...state] : state;
+      }
       case types.destroySessions:
         return [];
       default:
