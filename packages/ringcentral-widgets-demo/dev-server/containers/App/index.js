@@ -30,7 +30,6 @@ import UserGuidePage from 'ringcentral-widgets/containers/UserGuidePage';
 import ConferenceCallDialerPage from 'ringcentral-widgets/containers/ConferenceCallDialerPage';
 import ConferenceCallMergeCtrlPage from 'ringcentral-widgets/containers/ConferenceCallMergeCtrlPage';
 import CallsOnholdPage from 'ringcentral-widgets/containers/CallsOnholdPage';
-import DialerNCallsPage from 'ringcentral-widgets/containers/DialerNCallsPage';
 
 import ContactSourceFilter from 'ringcentral-widgets/components/ContactSourceFilter';
 import MeetingScheduleButton from 'ringcentral-widgets/components/MeetingScheduleButton';
@@ -120,7 +119,7 @@ export default function App({
               <Route
                 path="/dialer"
                 component={() => (
-                  <DialerNCallsPage />
+                  <DialerPage />
                 )} />
               <Route
                 path="/settings"
@@ -145,7 +144,7 @@ export default function App({
               <Route
                 path="/calls"
                 component={() => (
-                  <DialerNCallsPage
+                  <ActiveCallsPage
                     onLogCall={async () => { await sleep(1000); }}
                     onCreateContact={() => { }}
                     onCallsEmpty={() => { }}

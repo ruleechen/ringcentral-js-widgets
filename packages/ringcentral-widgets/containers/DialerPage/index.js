@@ -12,6 +12,7 @@ function mapToProps(_, {
     callingSettings,
     contactSearch,
     connectivityMonitor,
+    routerInteraction,
     locale,
     rateLimiter,
     webphone,
@@ -50,10 +51,13 @@ function mapToProps(_, {
     dialButtonVolume: audioSettings ? audioSettings.dialButtonVolume : 1,
     // If audioSettings is used, then use values from audioSettings module
     dialButtonMuted: audioSettings ? audioSettings.dialButtonMuted : dialButtonMuted,
+    showTab: !!(isWebphoneMode && webphone.sessions.length),
+    currentPath: routerInteraction.currentPath,
   };
 }
 function mapToFunctions(_, {
   phone: {
+    routerInteraction,
     callingSettings,
     regionSettings,
     contactSearch,
@@ -64,6 +68,9 @@ function mapToFunctions(_, {
   recipientsContactPhoneRenderer,
 }) {
   return {
+    goTo(path) {
+      routerInteraction.push(path);
+    },
     onToNumberChange: value => (
       dialerUI.setToNumberField(value)
     ),
