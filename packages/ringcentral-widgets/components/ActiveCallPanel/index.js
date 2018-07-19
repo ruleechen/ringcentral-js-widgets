@@ -129,6 +129,7 @@ class ActiveCallPanel extends React.Component {
         timeCounter={timeCounter}
         lastTo={lastTo}
         currentCall={currentCall}
+        conferenceAvatarUrls={this.state.displayedProfiles}
       />)
       : (<CallInfo
         currentLocale={currentLocale}

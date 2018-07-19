@@ -170,7 +170,6 @@ $calleeAvatarActiveSize: 45px;
     .callee_avatar {
       width: $calleeAvatarSize;
       height: $calleeAvatarSize;
-      border: solid 2px #ffffff;
       float: left;
       margin-right: 35px;
       border-radius: 100%;
@@ -178,13 +177,16 @@ $calleeAvatarActiveSize: 45px;
         margin-right: 11%;
       }
     }
+    .noBorder {
+      border: none;
+    }
     .callee_name {
       font-size: 15px;
       letter-spacing: normal;
       color: #666666;
       float: left;
       line-height: 30px;
-      max-width: 51%;
+      max-width: 43%;
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
@@ -206,13 +208,15 @@ $calleeAvatarActiveSize: 45px;
       float: right;
       line-height: 30px;
     }
+    .callee_status_disconnected {
+      color: #f95b5c;
+    }
   }
   .merge_item_active {
     height: 45px;
     .callee_avatar_active {
       width: $calleeAvatarActiveSize;
       height: $calleeAvatarActiveSize;
-      border: solid 1.5px #ffffff;
       border-radius: 100%;
       float: left;
       margin-right: 20px;
@@ -229,7 +233,7 @@ $calleeAvatarActiveSize: 45px;
       letter-spacing: normal;
       color: #303030;
       float: left;
-      max-width: 51%;
+      max-width: 43%;
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;

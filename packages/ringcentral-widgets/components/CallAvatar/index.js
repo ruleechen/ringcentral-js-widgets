@@ -50,7 +50,6 @@ class CallAvatar extends Component {
     const $snow = '#fff';
     const $gray = '#cee7f2';
     const $blue = '#0684bd';
-
     let res;
     const hash = uuid.v4();
     const textId = `text-${hash}`;
@@ -63,7 +62,8 @@ class CallAvatar extends Component {
           style={avatarUrl ? avatarStyle : null}
           viewBox={`0 0 ${initialSize} ${initialSize}`}
           preserveAspectRatio="xMidYMid meet"
-          xmlns="http://www.w3.org/2000/svg">
+          xmlns="http://www.w3.org/2000/svg"
+        >
           <defs>
             <g id={textId}>
               <text
@@ -86,7 +86,8 @@ class CallAvatar extends Component {
             cx={avatarCircleRadius}
             cy={margin + avatarCircleRadius}
             r={avatarCircleRadius}
-            fill={$snow} />
+            fill={$snow}
+          />
           <g>
             <clipPath id={clipId}>
               <circle
@@ -156,7 +157,8 @@ class CallAvatar extends Component {
             cx={initialSize / 2}
             cy={initialSize / 2}
             r={initialSize / 2}
-            fill={$snow} />
+            fill={$snow}
+          />
           <g>
             <clipPath id={clipId}>
               <circle
