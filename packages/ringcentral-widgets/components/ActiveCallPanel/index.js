@@ -36,10 +36,10 @@ class ActiveCallPanel extends React.Component {
           : profiles)
           .map(({ avatarUrl, toUserName, id }) => ({ avatarUrl, toUserName, id }));
         const remains = profiles.length <= MAXIMUM_AVATARS ? 0 : profiles.length - MAXIMUM_AVATARS;
-        this.setState(() => ({
+        this.setState({
           displayedProfiles,
           remains,
-        }));
+        });
       }
     }
   }
