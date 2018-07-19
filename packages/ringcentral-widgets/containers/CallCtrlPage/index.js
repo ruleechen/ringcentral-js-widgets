@@ -197,7 +197,6 @@ class CallCtrlPage extends Component {
 
     return (
       <CallCtrlPanel
-        backButtonLabel={backButtonLabel}
         currentLocale={this.props.currentLocale}
         formatPhone={this.props.formatPhone}
         phoneNumber={phoneNumber}
@@ -209,6 +208,8 @@ class CallCtrlPage extends Component {
         isOnFlip={session.isOnFlip}
         isOnTransfer={session.isOnTransfer}
         recordStatus={session.recordStatus}
+        showBackButton={this.props.showBackButton}
+        backButtonLabel={backButtonLabel}
         onBackButtonClick={this.props.onBackButtonClick}
         onMute={this.onMute}
         onUnmute={this.onUnmute}
@@ -233,7 +234,6 @@ class CallCtrlPage extends Component {
         brand={this.props.brand}
         showContactDisplayPlaceholder={this.props.showContactDisplayPlaceholder}
         flipNumbers={this.props.flipNumbers}
-        calls={this.props.calls}
         sourceIcons={this.props.sourceIcons}
         searchContactList={this.props.searchContactList}
         searchContact={this.props.searchContact}
@@ -290,9 +290,10 @@ CallCtrlPage.propTypes = {
   areaCode: PropTypes.string.isRequired,
   countryCode: PropTypes.string.isRequired,
   getAvatarUrl: PropTypes.func.isRequired,
-  onBackButtonClick: PropTypes.func.isRequired,
   updateSessionMatchedContact: PropTypes.func.isRequired,
+  showBackButton: PropTypes.bool,
   backButtonLabel: PropTypes.string,
+  onBackButtonClick: PropTypes.func,
   brand: PropTypes.string.isRequired,
   showContactDisplayPlaceholder: PropTypes.bool.isRequired,
   flipNumbers: PropTypes.array.isRequired,
@@ -317,7 +318,9 @@ CallCtrlPage.propTypes = {
 
 CallCtrlPage.defaultProps = {
   children: undefined,
+  showBackButton: false,
   backButtonLabel: null,
+  onBackButtonClick: null,
   sourceIcons: undefined,
   phoneTypeRenderer: undefined,
   recipientsContactInfoRenderer: undefined,
@@ -397,6 +400,7 @@ function mapToProps(_, {
     countryCode: regionSettings.countryCode,
     flipNumbers: forwardingNumber.flipNumbers,
     calls: callMonitor.calls,
+    showBackButton: true, // callMonitor.calls.length > 0,
     searchContactList: contactSearch.sortedResult,
     layout,
     showSpinner: isMerging,
@@ -404,10 +408,11 @@ function mapToProps(_, {
     mergeDisabled,
     hasConference: !!conferenceData,
     conferenceCall,
-    conferencePartiesAvatarUrls: (conferenceData
-      && conferenceCall
-        .getOnlinePartyProfiles(conferenceData.conference.id).map(profile => profile.avatarUrl))
-      || []
+    conferencePartiesAvatarUrls: (
+      conferenceData && conferenceCall
+        .getOnlinePartyProfiles(conferenceData.conference.id)
+        .map(profile => profile.avatarUrl)
+    ) || []
   };
 }
 
