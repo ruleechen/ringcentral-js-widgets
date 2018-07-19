@@ -19,7 +19,9 @@ class CallCtrlPage extends Component {
       selectedMatcherIndex: 0,
       avatarUrl: null,
       lastTo: this.props.lastTo || null,
-      mergeDisabled: false
+      mergeDisabled: false,
+      lastToSession: null,
+      currentCallSession: null
     };
     this.onSelectMatcherName = (option) => {
       const nameMatches = this.props.nameMatches || [];
@@ -41,7 +43,6 @@ class CallCtrlPage extends Component {
         });
       }
     };
-
     this.onMute = () =>
       this.props.onMute(this.props.session.id);
     this.onUnmute = () =>
@@ -68,6 +69,8 @@ class CallCtrlPage extends Component {
       this.props.onAdd(this.props.session.id);
     this.onMerge = () =>
       this.props.onMerge(this.props.session.id);
+    this.terminatedCallback = this::this.terminatedCallback;
+    this.terminatedSuccessHander = this::this.terminatedSuccessHander;
   }
 
   componentDidMount() {
@@ -94,6 +97,12 @@ class CallCtrlPage extends Component {
 
   componentWillUnmount() {
     this._mounted = false;
+    if (this.state.lastToSession) {
+      this.terminatedCallback(this.state.lastToSession, true);
+    }
+    if (this.state.currentCallSession) {
+      this.terminatedCallback(this.state.currentCallSession);
+    }
   }
 
   _updateAvatarAndMatchIndex(props) {
@@ -192,52 +201,71 @@ class CallCtrlPage extends Component {
       const part = this.props.getPartyProfiles().length - 1;
       if (!this._mounted) {
         return;
+      } else {
+        this.setState(prev => ({
+          lastTo: {
+            ...prev.lastTo,
+            extraNum: part
+          }
+        }));
       }
-      this.setState((prev) => ({
-        lastTo: {
-          ...prev.lastTo,
-          extraNum: part
-        }
-      }));
     }
   }
-  lastToListen(sessionId) {
-    const { routerInteraction, webphone } = this.props
-    const session = webphone._sessions.get(sessionId);
-    session.on('terminated', () => {
+  terminatedCallback(session, isLastTo = false) {
+    return () => this.terminatedSuccessHander(session, isLastTo);
+  }
+  terminatedSuccessHander(session, isLastTo) {
+    console.log(session,isLastTo,'this');
+    session.removeListener('terminated', this.terminatedSuccessHander);
+    const { routerInteraction, webphone, conferenceCall } = this.props;
+    if (isLastTo) {
       this.setState(prev => ({
         lastTo: {
           ...prev.lastTo,
           status: sessionStatus.finished
         },
         mergeDisabled: true
-      }))
+      }));
+      if (!conferenceCall.isConferenceSession(webphone.activeSessionId)) {
+        if (webphone.activeSession) {
+          setTimeout(() => {
+            routerInteraction.push('calls/active');
+          }, 2000);
+        } else {
+          routerInteraction.push('/dialer');
+        }
+      }
+    } else if (!conferenceCall.isConferenceSession(webphone.activeSessionId)) {
       if (webphone.activeSession) {
-        setTimeout(() => {
-          routerInteraction.push('calls/active');
-        }, 2000);
+        routerInteraction.push('calls/active');
       } else {
         routerInteraction.push('/dialer');
       }
-    });
+    }
+  }
+  lastToListen(sessionId) {
+    const { webphone } = this.props;
+    const session = webphone._sessions.get(sessionId);
+    session.on('terminated', this.terminatedCallback(session, true));
+    this.setState(prev => ({
+      ...prev,
+      lastToSession: session
+    }));
   }
   currentCallListen(sessionId) {
-    const { routerInteraction, webphone } = this.props;
+    const { webphone } = this.props;
     const session = webphone._sessions.get(sessionId);
-    session.on('terminated', () => {
-      if (webphone.activeSession) {
-        routerInteraction.push('/calls/active');
-      } else {
-        routerInteraction.push('/dialer');
-      }
-    });
+    session.on('terminated', this.terminatedCallback(session));
+    this.setState(prev => ({
+      ...prev,
+      currentCallSession: session
+    }));
   }
   checkCalleeType(call) {
     if (call.toMatches.length) {
       return calleeTypes.contacts;
-    } else {
-      return calleeTypes.unknow;
     }
+    return calleeTypes.unknow;
   }
 
   render() {
