@@ -43,7 +43,6 @@ import ContactSearch from 'ringcentral-integration/modules/ContactSearch';
 import DateTimeFormat from 'ringcentral-integration/modules/DateTimeFormat';
 import Conference from 'ringcentral-integration/modules/Conference';
 import ConferenceCall from 'ringcentral-integration/modules/ConferenceCall';
-import conferenceCallStatus from 'ringcentral-integration/modules/ConferenceCall/conferenceCallStatus';
 
 import ActiveCalls from 'ringcentral-integration/modules/ActiveCalls';
 import DetailedPresence from 'ringcentral-integration/modules/DetailedPresence';
@@ -272,7 +271,10 @@ export default class BasePhone extends RcModule {
         return;
       }
 
-      const isConferenceCallSession = conferenceCall.isConferenceSession(session.id);
+      const isConferenceCallSession = (
+        conferenceCall
+        && conferenceCall.isConferenceSession(session.id)
+      );
 
       if (
         routerInteraction.currentPath !== '/calls/active' &&

@@ -15,19 +15,21 @@ function mapToProps(_, {
     rolesAndPermissions,
     conferenceCall,
     callingSettings,
-    webphone
   },
   showContactDisplayPlaceholder = false,
 }) {
-  const conferenceList = Object.values(conferenceCall.conferences);
-  const conference = conferenceList.length ? conferenceList[0] : null;
-  let disableMerge;
   const isWebRTC = callingSettings.callingMode === callingModes.webphone;
-  const conferenceData = Object.values(conferenceCall.conferences)[0];
-  if (conference) {
-    disableMerge = conferenceCall.isOverload(conference.conference.id);
-  } else {
-    disableMerge = !isWebRTC;
+  let disableMerge = !isWebRTC;
+  let hasConferenceCall = false;
+  let conferenceData = null;
+  if (conferenceCall) {
+    const conferenceList = Object.values(conferenceCall.conferences);
+    const conference = conferenceList.length ? conferenceList[0] : null;
+    conferenceData = Object.values(conferenceCall.conferences)[0];
+    hasConferenceCall = !!conference;
+    if (conference) {
+      disableMerge = conferenceCall.isOverload(conference.conference.id);
+    }
   }
   return {
     currentLocale: locale.currentLocale,
@@ -45,17 +47,18 @@ function mapToProps(_, {
       rolesAndPermissions.permissions &&
       rolesAndPermissions.permissions.InternalSMS
     ),
-    showSpinner: conferenceCall.isMerging,
+    showSpinner: !!(conferenceCall && conferenceCall.isMerging),
     brand: brand.fullName,
     showContactDisplayPlaceholder,
     autoLog: !!(callLogger && callLogger.autoLog),
     isWebRTC,
-    hasConferenceCall: !!conference,
+    hasConferenceCall,
     disableMerge,
-    conferencePartiesAvatarUrls: (conferenceData
-      && conferenceCall
-        .getOnlinePartyProfiles(conferenceData.conference.id).map(profile => profile.avatarUrl))
-      || []
+    conferencePartiesAvatarUrls: (
+      conferenceData && conferenceCall
+        .getOnlinePartyProfiles(conferenceData.conference.id)
+        .map(profile => profile.avatarUrl)
+    ) || []
   };
 }
 
@@ -168,7 +171,12 @@ function mapToFunctions(_, {
         webphone.resume(conferenceData.session.id);
       }
     },
-    isSessionAConferenceCall: sessionId => conferenceCall.isConferenceSession(sessionId),
+    isSessionAConferenceCall(sessionId) {
+      return !!(
+        conferenceCall
+        && conferenceCall.isConferenceSession(sessionId)
+      );
+    },
   };
 }
 
@@ -179,4 +187,3 @@ export {
   mapToFunctions,
   ActiveCallsPage as default,
 };
-
