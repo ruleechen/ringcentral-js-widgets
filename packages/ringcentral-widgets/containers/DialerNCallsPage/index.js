@@ -139,10 +139,10 @@ DialerNCallsPanel.propTypes = {
 
 DialerNCallsPanel.defaultProps = {
   sourceIcons: null,
-  async onLogCall() { await sleep(1000); },
-  onCreateContact() { },
-  onCallsEmpty() { },
-  phoneTypeRenderer: i => i,
+  onLogCall: null,
+  onCreateContact: null,
+  onCallsEmpty: null,
+  phoneTypeRenderer: null,
   recipientsContactInfoRenderer: null,
   recipientsContactPhoneRenderer: null,
   dialButtonMuted: false,
