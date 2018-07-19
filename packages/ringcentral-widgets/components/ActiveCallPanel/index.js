@@ -100,8 +100,8 @@ class ActiveCallPanel extends React.Component {
       addDisabled,
       mergeDisabled,
       hasConference,
-      calls,
       lastTo,
+      hasConferenceCallModule,
     } = this.props;
     const currentCall = {
       avatarUrl,
@@ -187,6 +187,7 @@ class ActiveCallPanel extends React.Component {
             addDisabled={addDisabled}
             mergeDisabled={mergeDisabled}
             hasConference={hasConference}
+            hasConferenceCallModule={hasConferenceCallModule}
           />
           {children}
         </Panel>
@@ -239,6 +240,7 @@ ActiveCallPanel.propTypes = {
   mergeDisabled: PropTypes.bool,
   getPartyProfiles: PropTypes.func,
   hasConference: PropTypes.bool,
+  hasConferenceCallModule: PropTypes.bool,
   lastTo: PropTypes.object,
 };
 
@@ -266,6 +268,7 @@ ActiveCallPanel.defaultProps = {
   getPartyProfiles: i => i,
   hasConference: false,
   lastTo: null,
+  hasConferenceCallModule: true,
 };
 
 export default ActiveCallPanel;

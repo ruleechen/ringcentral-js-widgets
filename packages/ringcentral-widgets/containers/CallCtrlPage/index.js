@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import formatNumber from 'ringcentral-integration/lib/formatNumber';
+import { isObject } from 'ringcentral-integration/lib/di/utils/is_type';
 import callDirections from 'ringcentral-integration/enums/callDirections';
 import callingModes from 'ringcentral-integration/modules/CallingSettings/callingModes';
 import calleeTypes from '../../enums/calleeTypes';
@@ -116,6 +117,10 @@ class CallCtrlPage extends Component {
 
   getLastTo() {
     const { calls, conferenceCall } = this.props;
+    if (isObject(conferenceCall)) {
+      return;
+    }
+
     const mergingPair = conferenceCall.state.mergingPair ? conferenceCall.state.mergingPair : {};
     if (
       Object.keys(mergingPair).length
@@ -176,7 +181,8 @@ class CallCtrlPage extends Component {
       mergeDisabled,
       hasConference,
       getPartyProfiles,
-      conferencePartiesAvatarUrls
+      conferencePartiesAvatarUrls,
+      conferenceCall,
     } = this.props;
     if (!session.id) {
       return null;
@@ -194,6 +200,7 @@ class CallCtrlPage extends Component {
     const backButtonLabel = this.props.backButtonLabel
       ? this.props.backButtonLabel
       : i18n.getString('activeCalls', this.props.currentLocale);
+    const hasConferenceCallModule = isObject(conferenceCall);
 
     return (
       <CallCtrlPanel
@@ -249,6 +256,7 @@ class CallCtrlPage extends Component {
         getPartyProfiles={getPartyProfiles}
         lastTo={this.state.lastTo}
         conferencePartiesAvatarUrls={conferencePartiesAvatarUrls}
+        hasConferenceCallModule={hasConferenceCallModule}
       >
         {this.props.children}
       </CallCtrlPanel>
@@ -356,9 +364,11 @@ function mapToProps(_, {
   const toMatches = (contactMapping && contactMapping[currentSession.to]) || [];
   const nameMatches =
     currentSession.direction === callDirections.outbound ? toMatches : fromMatches;
-  const isOnConference = conferenceCall.isConferenceSession(currentSession.id);
+  const isOnConference = isObject(conferenceCall)
+    ? conferenceCall.isConferenceSession(currentSession.id)
+    : false;
 
-  const conferenceData = Object.values(conferenceCall.conferences)[0];
+  const conferenceData = conferenceCall ? Object.values(conferenceCall.conferences)[0] : null;
 
   /**
    * button disabled criteria
@@ -377,7 +387,7 @@ function mapToProps(_, {
     addDisabled = newVal;
   }
 
-  const isMerging = (
+  const isMerging = isObject(conferenceCall) && (
     Object
       .values(conferenceCall.state.mergingPair)
       .map(session => session.id)
@@ -407,7 +417,7 @@ function mapToProps(_, {
     conferencePartiesAvatarUrls: (conferenceData
       && conferenceCall
         .getOnlinePartyProfiles(conferenceData.conference.id).map(profile => profile.avatarUrl))
-      || []
+      || [],
   };
 }
 
