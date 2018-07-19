@@ -5,7 +5,7 @@ import recordStatus from 'ringcentral-integration/modules/Webphone/recordStatus'
 import { isObject } from 'ringcentral-integration/lib/di/utils/is_type';
 
 import CircleButton from '../CircleButton';
-import DropDown from '../DropDown';
+import Tooltip from '../Tooltip';
 import ActiveCallButton from '../ActiveCallButton';
 import MuteIcon from '../../assets/images/Mute.svg';
 import UnmuteIcon from '../../assets/images/Unmute.svg';
@@ -60,8 +60,8 @@ class ActiveCallPad extends Component {
     super(props);
     this.moreButton = createRef();
     this.dropdown = createRef();
-    this.onClick = this::this.onClick;
-    this.toggleMore = this::this.toggleMore;
+    this.onClick = this:: this.onClick;
+    this.toggleMore = this:: this.toggleMore;
     this.state = {
       expandMore: props.expandMore,
       moreButton: this.moreButton && this.moreButton.current,
@@ -205,7 +205,7 @@ class ActiveCallPad extends Component {
           className={classnames(styles.moreButton, btnClassName)}
           disabled={disabledFlip && disabledTransfer}
           icon={MoreIcon} />
-        <DropDown
+        <Tooltip
           fixed={false}
           open={this.state.expandMore}
           direction="top"
@@ -234,7 +234,7 @@ class ActiveCallPad extends Component {
               />))
             }
           </div>
-        </DropDown>
+        </Tooltip>
       </span>
     ];
 

@@ -8,7 +8,10 @@ import CallAvatar from '../CallAvatar';
 import calleeTypes from '../../enums/calleeTypes';
 
 function MergeInfo({
-  timeCounter, currentCall, currentLocale, lastTo
+  timeCounter,
+  currentCall,
+  currentLocale,
+  lastTo,
 }) {
   const isConference = lastTo && lastTo.calleeType === calleeTypes.conference
     ? i18n.getString('conferenceCall', currentLocale)
@@ -32,7 +35,11 @@ function MergeInfo({
           }
         </div>
         <div className={styles.callee_name}>
-          { lastTo.calleeType === calleeTypes.contacts ? lastTo.name : isConference }
+          {
+            (lastTo.calleeType === calleeTypes.contacts)
+              ? lastTo.name
+              : isConference
+          }
         </div>
         <div className={statusClasses}>
           { lastTo.status === sessionStatus.finished
@@ -42,13 +49,15 @@ function MergeInfo({
       </div>
       <div className={styles.merge_item_active}>
         <div className={styles.callee_avatar_active} >
-          { !currentCall.nameMatches.length || !currentCall.avatarUrl
-            ? <CallAvatar avatarUrl={null} />
-            : <CallAvatar avatarUrl={currentCall.avatarUrl} />
+          {
+            (!currentCall.nameMatches.length || !currentCall.avatarUrl)
+              ? <CallAvatar avatarUrl={null} />
+              : <CallAvatar avatarUrl={currentCall.avatarUrl} />
           }
         </div>
         <div className={styles.callee_name_active}>
-          { currentCall.nameMatches.length
+          {
+            currentCall.nameMatches.length
               ? currentCall.nameMatches[0].name
               : currentCall.fallBackName
           }
@@ -60,15 +69,18 @@ function MergeInfo({
     </div>
   ) : (<span />);
 }
+
 MergeInfo.propTypes = {
-  timeCounter: PropTypes.element,
-  currentCall: PropTypes.object,
-  currentLocale: PropTypes.string,
-  lastTo: PropTypes.object
+  currentLocale: PropTypes.string.isRequired,
+  currentCall: PropTypes.object.isRequired,
+  timeCounter: PropTypes.element.isRequired,
+  lastTo: PropTypes.object,
 };
+
 MergeInfo.defaultProps = {
   lastTo: {
-    calleeTypes: 'unknow'
-  }
+    calleeTypes: 'unknow',
+  },
 };
+
 export default MergeInfo;
