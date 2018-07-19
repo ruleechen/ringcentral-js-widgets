@@ -215,7 +215,6 @@ class CallCtrlPage extends Component {
     return () => this.terminatedSuccessHander(session, isLastTo);
   }
   terminatedSuccessHander(session, isLastTo) {
-    console.log(session,isLastTo,'this');
     session.removeListener('terminated', this.terminatedSuccessHander);
     const { routerInteraction, webphone, conferenceCall } = this.props;
     if (isLastTo) {
