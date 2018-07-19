@@ -132,7 +132,9 @@ class CallCtrlPanel extends Component {
     return (
       <ActiveCallPanel
         getAvatarUrl={this.props.getAvatarUrl}
+        showBackButton={this.props.showBackButton}
         backButtonLabel={this.props.backButtonLabel}
+        onBackButtonClick={this.props.onBackButtonClick}
         currentLocale={this.props.currentLocale}
         formatPhone={this.props.formatPhone}
         phoneNumber={this.props.phoneNumber}
@@ -142,7 +144,6 @@ class CallCtrlPanel extends Component {
         isOnMute={this.props.isOnMute}
         isOnHold={this.props.isOnHold}
         recordStatus={this.props.recordStatus}
-        onBackButtonClick={this.props.onBackButtonClick}
         onMute={this.props.onMute}
         onUnmute={this.props.onUnmute}
         onHold={this.props.onHold}
@@ -167,7 +168,6 @@ class CallCtrlPanel extends Component {
         onToggleTransferPanel={this.toggleTransferPanel}
         onOpenPartiesModal={this.onOpenPartiesModal}
         flipNumbers={this.props.flipNumbers}
-        calls={this.props.calls}
         sourceIcons={this.props.sourceIcons}
         layout={this.props.layout}
         direction={this.props.direction}
@@ -207,7 +207,6 @@ CallCtrlPanel.propTypes = {
   isOnFlip: PropTypes.bool,
   isOnTransfer: PropTypes.bool,
   flipNumbers: PropTypes.array,
-  calls: PropTypes.array.isRequired,
   recordStatus: PropTypes.string.isRequired,
   onMute: PropTypes.func.isRequired,
   onUnmute: PropTypes.func.isRequired,
@@ -221,7 +220,9 @@ CallCtrlPanel.propTypes = {
   onHangup: PropTypes.func.isRequired,
   onFlip: PropTypes.func.isRequired,
   onTransfer: PropTypes.func.isRequired,
-  onBackButtonClick: PropTypes.func.isRequired,
+  showBackButton: PropTypes.bool,
+  backButtonLabel: PropTypes.string,
+  onBackButtonClick: PropTypes.func,
   onKeyPadChange: PropTypes.func.isRequired,
   formatPhone: PropTypes.func.isRequired,
   children: PropTypes.node,
@@ -230,7 +231,6 @@ CallCtrlPanel.propTypes = {
   selectedMatcherIndex: PropTypes.number.isRequired,
   onSelectMatcherName: PropTypes.func.isRequired,
   avatarUrl: PropTypes.string,
-  backButtonLabel: PropTypes.string,
   brand: PropTypes.string,
   showContactDisplayPlaceholder: PropTypes.bool,
   sourceIcons: PropTypes.object,
@@ -262,7 +262,9 @@ CallCtrlPanel.defaultProps = {
   phoneNumber: null,
   children: undefined,
   avatarUrl: null,
+  showBackButton: false,
   backButtonLabel: 'Active Calls',
+  onBackButtonClick: null,
   sessionId: undefined,
   callStatus: null,
   brand: 'RingCentral',
