@@ -17,7 +17,7 @@ export default function BackHeader(props) {
   return (
     <Header
       buttons={buttons}
-      className={classnames(styles.header, props.className)}>
+      className={props.className}>
       {props.children}
     </Header>
   );
