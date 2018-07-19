@@ -10,20 +10,15 @@ import calleeTypes from '../../enums/calleeTypes';
 function MergeInfo({
   timeCounter, currentCall, currentLocale, lastTo
 }) {
-  // console.log(conferencePartiesAvatarUrls);
   const isConference = lastTo && lastTo.calleeType === calleeTypes.conference ? i18n.getString('conferenceCall', currentLocale) : lastTo.name;
   const statusClasses = classnames({
     [styles.callee_status]: true,
     [styles.callee_status_disconnected]: lastTo.status === sessionStatus.finished
   })
-  const calleeAvatarClasses = classnames({
-    [styles.callee_avatar]: true,
-    [styles.noBorder]: lastTo.calleeType === calleeTypes.conference
-  })
   return lastTo ? (
     <div className={styles.mergeInfo}>
       <div className={styles.merge_item}>
-        <div className={calleeAvatarClasses}>
+        <div className={styles.callee_avatar}>
           {
             lastTo.calleeType === calleeTypes.conference
             ? <CallAvatar

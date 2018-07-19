@@ -49,8 +49,6 @@ class CallAvatar extends Component {
     const $snow = '#fff';
     const $gray = '#cee7f2';
     const $blue = '#0684bd';
-    const $borderColor = '#e2e2e2';
-    const $borderWidth = 1.5;
     let res;
 
     if (isOnConferenceCall && extraNum > 0) {
@@ -84,8 +82,6 @@ class CallAvatar extends Component {
             cy={margin + avatarCircleRadius}
             r={avatarCircleRadius}
             fill={$snow}
-            stroke={$borderColor}
-            strokeWidth={$borderWidth}
           />
           <g>
             <clipPath id="circleClip">

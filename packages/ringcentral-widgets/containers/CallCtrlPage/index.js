@@ -73,7 +73,10 @@ class CallCtrlPage extends Component {
   componentDidMount() {
     this._mounted = true;
     this._updateAvatarAndMatchIndex(this.props);
-    this.getLastTo();
+    if (this.props.layout === callCtrlLayouts.mergeCtrl) {
+      this.getLastTo();
+      this.currentCallListen(this.props.session.id);
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -129,13 +132,15 @@ class CallCtrlPage extends Component {
           item => (item.webphoneSession ? item.webphoneSession.id === mergingPair.from.id : null)
         )[0];
         if (lastCall) {
-          if (lastCall.toMatches[0]) {
+          this.lastToListen(lastCall.webphoneSession.id);
+          if (this.checkCalleeType(lastCall) === calleeTypes.contacts) {
             const lastTo = {
               avatarUrl: lastCall.toMatches[0].profileImageUrl,
               name: lastCall.toName,
               status: lastCall.webphoneSession.callStatus,
               calleeType: calleeTypes.contacts,
-              sessionId: lastCall.webphoneSession.id
+              sessionId: lastCall.webphoneSession.id,
+              session: lastCall.webphoneSession
             };
             this.setState(prev => ({
               ...prev,
@@ -153,7 +158,7 @@ class CallCtrlPage extends Component {
                 }));
               });
             }
-          } else {
+          } else if (this.checkCalleeType(lastCall) === calleeTypes.unknow) {
             this.setState(prev => ({
               ...prev,
               lastTo: {
@@ -169,7 +174,8 @@ class CallCtrlPage extends Component {
       }
     } else {
       const { conferencePartiesAvatarUrls, conferenceCall } = this.props;
-      if(Object.values(conferenceCall.conferences).length) {
+      if (Object.values(conferenceCall.conferences).length) {
+        this.lastToListen(Object.values(conferenceCall.conferences)[0].session.id);
         this.setState(() => ({
           lastTo: {
             calleeType: calleeTypes.conference,
@@ -182,28 +188,55 @@ class CallCtrlPage extends Component {
     }
   }
   updateLastToState(nextProps) {
-    const lastEndedSessions = nextProps.lastEndedSessions;
-    if (lastEndedSessions.length) {
-      if (lastEndedSessions.filter((session) => session.id === this.state.lastTo.sessionId)[0]) {
-        this.setState(prev => ({
-          lastTo: {
-            ...prev.lastTo,
-            status: sessionStatus.finished
-          },
-          mergeDisabled: true
-        })
-        );
-      }
-    }
-    // update conference call particants number
     if (Object.keys(nextProps.conferenceCall.conferences).length) {
       const part = this.props.getPartyProfiles().length - 1;
+      if (!this._mounted) {
+        return;
+      }
       this.setState((prev) => ({
         lastTo: {
           ...prev.lastTo,
           extraNum: part
         }
+      }));
+    }
+  }
+  lastToListen(sessionId) {
+    const { routerInteraction, webphone, conferenceCall } = this.props
+    const session = webphone._sessions.get(sessionId);
+    session.on('terminated', () => {
+      this.setState(prev => ({
+        lastTo: {
+          ...prev.lastTo,
+          status: sessionStatus.finished
+        },
+        mergeDisabled: true
       }))
+      if (webphone.activeSession) {
+        setTimeout(() => {
+          routerInteraction.push('calls/active');
+        }, 2000);
+      } else {
+        routerInteraction.push('/dialer');
+      }
+    });
+  }
+  currentCallListen(sessionId) {
+    const { routerInteraction, webphone } = this.props;
+    const session = webphone._sessions.get(sessionId);
+    session.on('terminated', () => {
+      if (webphone.activeSession) {
+        routerInteraction.push('/calls/active');
+      } else {
+        routerInteraction.push('/dialer');
+      }
+    });
+  }
+  checkCalleeType(call) {
+    if (call.toMatches.length) {
+      return calleeTypes.contacts;
+    } else {
+      return calleeTypes.unknow;
     }
   }
 
@@ -353,7 +386,9 @@ CallCtrlPage.propTypes = {
   lastTo: PropTypes.object,
   conferenceCall: PropTypes.object,
   conferencePartiesAvatarUrls: PropTypes.arrayOf(PropTypes.string),
-  lastEndedSessions: PropTypes.array
+  lastEndedSessions: PropTypes.array,
+  webphone: PropTypes.object,
+  routerInteraction: PropTypes.object
 };
 
 CallCtrlPage.defaultProps = {
@@ -389,6 +424,7 @@ function mapToProps(_, {
     contactSearch,
     conferenceCall,
     callingSettings,
+    routerInteraction
   },
   layout = callCtrlLayouts.normalCtrl,
 }) {
@@ -428,33 +464,6 @@ function mapToProps(_, {
   )
     && conferenceCall.isMerging;
   layout = isOnConference ? callCtrlLayouts.conferenceCtrl : layout;
-  // // lastTO
-  // let lastTo = null;
-  // const mergingPair = conferenceCall.state.mergingPair || {};
-  // if (Object.keys(mergingPair).length && mergingPair.from) {
-  //   console.log(callMonitor.calls);
-  //   const lastCall = callMonitor.calls.filter(call => call.webphoneSession && call.webphoneSession.id === mergingPair.from.id)[0];
-  //   console.log(lastCall);
-  //   const status = webphone.lastEndedSessions.filter((session) => session.id === mergingPair.from.id)[0]
-  //     ? sessionStatus.finished
-  //     : lastCall.webphoneSession.callStatus;
-  //   if (lastCall.toMatches.length) {
-  //     lastTo = {
-  //       avatarUrl: lastCall.toMatches[0].profileImageUrl,
-  //       name: lastCall.toMatches[0].name,
-  //       status: status,
-  //       calleeType: calleeTypes.contacts
-  //     };
-  //   } else {
-  //     lastTo = {
-  //       avatarUrl: null,
-  //       name: lastCall.to.phoneNumber,
-  //       status: status,
-  //       calleeType: calleeTypes.unknow
-  //     };
-  //   }
-  // }
-  // console.log(lastTo);
   return {
     brand: brand.fullName,
     nameMatches,
@@ -474,7 +483,9 @@ function mapToProps(_, {
     conferencePartiesAvatarUrls: (conferenceData
       && conferenceData.profiles.map(profile => profile.avatarUrl))
       || [],
-    lastEndedSessions: webphone.lastEndedSessions
+    lastEndedSessions: webphone.lastEndedSessions,
+    webphone,
+    routerInteraction
   };
 }
 
