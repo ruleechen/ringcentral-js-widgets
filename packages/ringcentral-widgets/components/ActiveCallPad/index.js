@@ -77,9 +77,9 @@ class ActiveCallPad extends Component {
         && !this.moreButton.current.contains(e.target)
         && this.state.expandMore
       ) {
-        this.setState(() => ({
+        this.setState({
           expandMore: false,
-        }));
+        });
       }
     }
   }
@@ -92,15 +92,15 @@ class ActiveCallPad extends Component {
 
   componentDidMount() {
     document.body.addEventListener('click', this.onClick);
-    this.setState(() => ({
-      moreButton: this.moreButton && this.moreButton.current
-    }));
+    this.setState({
+      moreButton: this.moreButton && this.moreButton.current,
+    });
   }
 
   componentWillReceiveProps() {
-    this.setState(() => ({
-      moreButton: this.moreButton && this.moreButton.current
-    }));
+    this.setState({
+      moreButton: this.moreButton && this.moreButton.current,
+    });
   }
 
   componentWillUnmount() {
