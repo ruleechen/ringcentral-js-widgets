@@ -10,7 +10,9 @@ import calleeTypes from '../../enums/calleeTypes';
 function MergeInfo({
   timeCounter, currentCall, currentLocale, lastTo
 }) {
-  const isConference = lastTo && lastTo.calleeType === calleeTypes.conference ? i18n.getString('conferenceCall', currentLocale) : lastTo.name;
+  const isConference = lastTo && lastTo.calleeType === calleeTypes.conference
+    ? i18n.getString('conferenceCall', currentLocale)
+    : lastTo.name;
   const statusClasses = classnames({
     [styles.callee_status]: true,
     [styles.callee_status_disconnected]: lastTo.status === sessionStatus.finished
@@ -33,7 +35,9 @@ function MergeInfo({
           { lastTo.calleeType === calleeTypes.contacts ? lastTo.name : isConference }
         </div>
         <div className={statusClasses}>
-          { lastTo.status === sessionStatus.finished ? i18n.getString('disconnected', currentLocale) : i18n.getString('onHold', currentLocale)}
+          { lastTo.status === sessionStatus.finished
+            ? i18n.getString('disconnected', currentLocale)
+            : i18n.getString('onHold', currentLocale)}
         </div>
       </div>
       <div className={styles.merge_item_active}>

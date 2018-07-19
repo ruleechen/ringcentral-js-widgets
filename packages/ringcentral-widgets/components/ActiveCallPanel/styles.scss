@@ -171,7 +171,8 @@ $calleeAvatarActiveSize: 45px;
       width: $calleeAvatarSize;
       height: $calleeAvatarSize;
       float: left;
-      margin-right: 35px;
+      margin-right: 27.5px;
+      margin-left: 7.5px;
       border-radius: 100%;
       @media only screen and (min-width: 150px) and (max-width: 265px) {
         margin-right: 11%;
@@ -209,7 +210,7 @@ $calleeAvatarActiveSize: 45px;
       line-height: 30px;
     }
     .callee_status_disconnected {
-      color: #f95b5c;
+      color: $tomato;
     }
   }
   .merge_item_active {
