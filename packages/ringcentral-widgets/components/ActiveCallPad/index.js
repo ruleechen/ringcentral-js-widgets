@@ -296,7 +296,6 @@ class ActiveCallPad extends Component {
 }
 
 ActiveCallPad.propTypes = {
-  expandMore: PropTypes.bool,
   currentLocale: PropTypes.string.isRequired,
   className: PropTypes.string,
   isOnMute: PropTypes.bool,
@@ -316,24 +315,26 @@ ActiveCallPad.propTypes = {
   onShowFlipPanel: PropTypes.func.isRequired,
   onToggleTransferPanel: PropTypes.func.isRequired,
   flipNumbers: PropTypes.array.isRequired,
-  layout: PropTypes.string.isRequired,
+  layout: PropTypes.string,
   addDisabled: PropTypes.bool,
   mergeDisabled: PropTypes.bool,
   conferenceCallEquipped: PropTypes.bool,
   hasConferenceCall: PropTypes.bool,
+  expandMore: PropTypes.bool,
 };
 
 ActiveCallPad.defaultProps = {
-  expandMore: false,
   className: null,
   isOnMute: false,
   isOnHold: false,
+  layout: callCtrlLayouts.normalCtrl,
   addDisabled: false,
   mergeDisabled: false,
   conferenceCallEquipped: false,
   hasConferenceCall: false,
   onAdd: undefined,
   onMerge: undefined,
+  expandMore: false,
 };
 
 export default ActiveCallPad;
