@@ -95,12 +95,6 @@ class CallCtrlPage extends Component {
 
   componentWillUnmount() {
     this._mounted = false;
-    if (this.state.lastToSession) {
-      this.terminatedCallback(this.state.lastToSession, true);
-    }
-    if (this.state.currentCallSession) {
-      this.terminatedCallback(this.state.currentCallSession);
-    }
     // reject the merge from listener
     this.props.removeOnMergingPairDisconnected('from', this.handleLastToTernimated);
   }
@@ -387,7 +381,6 @@ CallCtrlPage.propTypes = {
   lastTo: PropTypes.object,
   conferenceCall: PropTypes.object,
   conferencePartiesAvatarUrls: PropTypes.arrayOf(PropTypes.string),
-  lastEndedSessions: PropTypes.array,
   webphone: PropTypes.object,
   routerInteraction: PropTypes.object,
   onMergingPairDisconnected: PropTypes.func,
@@ -414,7 +407,6 @@ CallCtrlPage.defaultProps = {
   getPartyProfiles: i => i,
   gotoNormalCallCtrl: i => i,
   conferencePartiesAvatarUrls: [],
-  lastEndedSessions: []
 };
 
 function mapToProps(_, {
@@ -486,7 +478,6 @@ function mapToProps(_, {
     mergeDisabled,
     hasConference: !!conferenceData,
     conferenceCall,
-    lastEndedSessions: webphone.lastEndedSessions,
     webphone,
     routerInteraction,
     onMergingPairDisconnected: conferenceCall.onMergingPairDisconnected,

@@ -53,10 +53,6 @@ function ascendSortParties(parties) {
       dep: 'ConferenceCallOptions',
       optional: true
     },
-    {
-      dep: 'CallMonitor',
-      optional: true
-    }
   ]
 })
 export default class ConferenceCall extends RcModule {
@@ -79,7 +75,6 @@ export default class ConferenceCall extends RcModule {
     pulling = true,
     capacity = MAXIMUM_CAPACITY,
     timeout = DEFAULT_TIMEOUT,
-    callMonitor,
     ...options
   }) {
     super({
@@ -93,7 +88,6 @@ export default class ConferenceCall extends RcModule {
       contactMatcher,
       webphone,
       connectivityMonitor,
-      callMonitor,
       ...options,
       actionTypes,
     });
@@ -159,15 +153,6 @@ export default class ConferenceCall extends RcModule {
         conference,
         session
       });
-      // logic to update lastTo at merge control page
-      const partyProfiles = this.getOnlinePartyProfiles(id);
-      this.store.dispatch({
-        type: this.actionTypes.updateLastTo,
-        lastTo: {
-          avatarUrl: partyProfiles[0],
-          extraNum: partyProfiles.length - 1
-        }
-      })
     } catch (e) {
       // TODO: alert
       this.store.dispatch({
