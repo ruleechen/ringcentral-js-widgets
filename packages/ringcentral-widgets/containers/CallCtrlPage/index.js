@@ -227,6 +227,7 @@ class CallCtrlPage extends Component {
     }
     this.props.removeOnMergingPairDisconnected('from', this.handleLastToTernimated);
   }
+  
   checkCalleeType(call) {
     if (call.toMatches.length) {
       return calleeTypes.contacts;
