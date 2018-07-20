@@ -59,7 +59,7 @@ function MergeInfo({
           {
             currentCall.nameMatches.length
               ? currentCall.nameMatches[0].name
-              : currentCall.fallBackName
+              : currentCall.phoneNumber
           }
         </div>
         <div className={styles.callee_status_active}>

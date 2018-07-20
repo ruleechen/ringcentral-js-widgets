@@ -107,6 +107,7 @@ class ActiveCallPanel extends React.Component {
       avatarUrl,
       nameMatches,
       fallBackName,
+      phoneNumber
     };
     const timeCounter =
       (

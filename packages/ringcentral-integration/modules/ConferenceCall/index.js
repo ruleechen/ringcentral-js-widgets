@@ -53,6 +53,10 @@ function ascendSortParties(parties) {
       dep: 'ConferenceCallOptions',
       optional: true
     },
+    {
+      dep: 'CallMonitor',
+      optional: true
+    }
   ]
 })
 export default class ConferenceCall extends RcModule {
@@ -75,6 +79,7 @@ export default class ConferenceCall extends RcModule {
     pulling = true,
     capacity = MAXIMUM_CAPACITY,
     timeout = DEFAULT_TIMEOUT,
+    callMonitor,
     ...options
   }) {
     super({
@@ -88,6 +93,7 @@ export default class ConferenceCall extends RcModule {
       contactMatcher,
       webphone,
       connectivityMonitor,
+      callMonitor,
       ...options,
       actionTypes,
     });
@@ -108,6 +114,8 @@ export default class ConferenceCall extends RcModule {
     this._timers = {};
     this._pulling = pulling;
     this.capacity = capacity;
+    this.onMergingPairDisconnected = this::this.onMergingPairDisconnected;
+    this.removeOnMergingPairDisconnected = this::this.removeOnMergingPairDisconnected;
   }
 
   isConferenceSession(sessionId) {
@@ -151,6 +159,15 @@ export default class ConferenceCall extends RcModule {
         conference,
         session
       });
+      // logic to update lastTo at merge control page
+      const partyProfiles = this.getOnlinePartyProfiles(id);
+      this.store.dispatch({
+        type: this.actionTypes.updateLastTo,
+        lastTo: {
+          avatarUrl: partyProfiles[0],
+          extraNum: partyProfiles.length - 1
+        }
+      })
     } catch (e) {
       // TODO: alert
       this.store.dispatch({
@@ -354,6 +371,7 @@ export default class ConferenceCall extends RcModule {
    * to avoid `this._webphone` criterias to improve performance ahead of time
    */
   async mergeToConference(webphoneSessions = []) {
+    webphoneSessions = webphoneSessions.filter(session => !this.isConferenceSession(session.id));
     webphoneSessions = webphoneSessions.filter(session => Object.prototype.toString.call(session).toLowerCase() === '[object object]');
 
     if (!webphoneSessions.length) {
@@ -546,6 +564,18 @@ export default class ConferenceCall extends RcModule {
     }
     this._timout = timeout;
     return timeout;
+  }
+
+  onMergingPairDisconnected(party, func) {
+    if (this.state.mergingPair && this.state.mergingPair[party]) {
+      this.state.mergingPair[party].on('terminated', func);
+    }
+  }
+
+  removeOnMergingPairDisconnected(party, func) {
+    if (this.state.mergingPair && this.state.mergingPair[party]) {
+      this.state.mergingPair[party].removeListener('terminated', func);
+    }
   }
   _init() {
     this.store.dispatch({

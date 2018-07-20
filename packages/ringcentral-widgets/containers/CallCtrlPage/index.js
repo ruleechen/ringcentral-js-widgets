@@ -20,8 +20,6 @@ class CallCtrlPage extends Component {
       avatarUrl: null,
       lastTo: this.props.lastTo || null,
       mergeDisabled: false,
-      lastToSession: null,
-      currentCallSession: null
     };
     this.onSelectMatcherName = (option) => {
       const nameMatches = this.props.nameMatches || [];
@@ -69,8 +67,7 @@ class CallCtrlPage extends Component {
       this.props.onAdd(this.props.session.id);
     this.onMerge = () =>
       this.props.onMerge(this.props.session.id);
-    this.terminatedCallback = this::this.terminatedCallback;
-    this.terminatedSuccessHander = this::this.terminatedSuccessHander;
+    this.handleLastToTernimated = this::this.handleLastToTernimated;
   }
 
   componentDidMount() {
@@ -78,7 +75,6 @@ class CallCtrlPage extends Component {
     this._updateAvatarAndMatchIndex(this.props);
     if (this.props.layout === callCtrlLayouts.mergeCtrl) {
       this.getLastTo();
-      this.currentCallListen(this.props.session.id);
     }
   }
 
@@ -92,7 +88,9 @@ class CallCtrlPage extends Component {
     if (this.props.session.id !== nextProps.session.id) {
       this._updateAvatarAndMatchIndex(nextProps);
     }
-    this.updateLastToState(nextProps);
+    if (nextProps.layout === callCtrlLayouts.mergeCtrl) {
+      this.updateConferenceAvatar(nextProps);
+    }
   }
 
   componentWillUnmount() {
@@ -103,6 +101,8 @@ class CallCtrlPage extends Component {
     if (this.state.currentCallSession) {
       this.terminatedCallback(this.state.currentCallSession);
     }
+    // reject the merge from listener
+    this.props.removeOnMergingPairDisconnected('from', this.handleLastToTernimated);
   }
 
   _updateAvatarAndMatchIndex(props) {
@@ -130,18 +130,35 @@ class CallCtrlPage extends Component {
   }
 
   getLastTo() {
-    const { calls, conferenceCall } = this.props;
+    const {
+      calls,
+      conferenceCall,
+      conferencePartiesAvatarUrls,
+      onMergingPairDisconnected
+    } = this.props;
     const mergingPair = conferenceCall.state.mergingPair ? conferenceCall.state.mergingPair : {};
     if (
       Object.keys(mergingPair).length
       && mergingPair.from
     ) {
+      const lastToSessionId = mergingPair.from.id;
+      onMergingPairDisconnected('from', this.handleLastToTernimated)
       if (calls.length) {
         const lastCall = calls.filter(
           item => (item.webphoneSession ? item.webphoneSession.id === mergingPair.from.id : null)
         )[0];
         if (lastCall) {
-          this.lastToListen(lastCall.webphoneSession.id);
+          if (conferenceCall.isConferenceSession(lastToSessionId)) {
+            this.setState(() => ({
+              lastTo: {
+                calleeType: calleeTypes.conference,
+                avatarUrl: conferencePartiesAvatarUrls[0],
+                extraNum: conferencePartiesAvatarUrls.length - 1,
+                sessionId: lastToSessionId
+              }
+            }));
+            return;
+          }
           if (this.checkCalleeType(lastCall) === calleeTypes.contacts) {
             const lastTo = {
               avatarUrl: lastCall.toMatches[0].profileImageUrl,
@@ -181,89 +198,44 @@ class CallCtrlPage extends Component {
           }
         }
       }
-    } else {
-      const { conferencePartiesAvatarUrls, conferenceCall } = this.props;
-      if (Object.values(conferenceCall.conferences).length) {
-        this.lastToListen(Object.values(conferenceCall.conferences)[0].session.id);
-        this.setState(() => ({
-          lastTo: {
-            calleeType: calleeTypes.conference,
-            avatarUrl: conferencePartiesAvatarUrls[0],
-            extraNum: conferencePartiesAvatarUrls.length - 1,
-            sessionId: Object.values(conferenceCall.conferences)[0].session.id
-          }
-        }));
-      }
     }
   }
-  updateLastToState(nextProps) {
+  updateConferenceAvatar(nextProps) {
     if (Object.keys(nextProps.conferenceCall.conferences).length) {
-      const part = this.props.getPartyProfiles().length - 1;
+      const part = this.props.getPartyProfiles();
       if (!this._mounted) {
         return;
-      } else {
+      } else if (part.length) {
         this.setState(prev => ({
           lastTo: {
             ...prev.lastTo,
-            extraNum: part
+            extraNum: part.length - 1,
+            avatarUrl: part[0].avatarUrl,
           }
         }));
       }
     }
   }
-  terminatedCallback(session, isLastTo = false) {
-    return () => this.terminatedSuccessHander(session, isLastTo);
-  }
-  terminatedSuccessHander(session, isLastTo) {
-    console.log(session,isLastTo,'this');
-    session.removeListener('terminated', this.terminatedSuccessHander);
-    const { routerInteraction, webphone, conferenceCall } = this.props;
-    if (isLastTo) {
-      this.setState(prev => ({
-        lastTo: {
-          ...prev.lastTo,
-          status: sessionStatus.finished
-        },
-        mergeDisabled: true
-      }));
-      if (!conferenceCall.isConferenceSession(webphone.activeSessionId)) {
-        if (webphone.activeSession) {
-          setTimeout(() => {
-            routerInteraction.push('calls/active');
-          }, 2000);
-        } else {
-          routerInteraction.push('/dialer');
-        }
-      }
-    } else if (!conferenceCall.isConferenceSession(webphone.activeSessionId)) {
-      if (webphone.activeSession) {
-        routerInteraction.push('calls/active');
-      } else {
-        routerInteraction.push('/dialer');
-      }
-    }
-  }
-  lastToListen(sessionId) {
-    const { webphone } = this.props;
-    const session = webphone._sessions.get(sessionId);
-    session.on('terminated', this.terminatedCallback(session, true));
-    this.setState(prev => ({
+  handleLastToTernimated() {
+    const { routerInteraction } = this.props;
+    this.setState((prev) => ({
       ...prev,
-      lastToSession: session
+      lastTo: {
+        ...prev.lastTo,
+        status: sessionStatus.finished
+      },
+      mergeDisabled: true
     }));
-  }
-  currentCallListen(sessionId) {
-    const { webphone } = this.props;
-    const session = webphone._sessions.get(sessionId);
-    session.on('terminated', this.terminatedCallback(session));
-    this.setState(prev => ({
-      ...prev,
-      currentCallSession: session
-    }));
+    setTimeout(() => {
+      routerInteraction.push('/calls/active');
+    }, 2000);
+    this.props.removeOnMergingPairDisconnected('from', this.handleLastToTernimated);
   }
   checkCalleeType(call) {
     if (call.toMatches.length) {
       return calleeTypes.contacts;
+    } else if (call.webphoneSession.to.includes('conf_')) {
+      return calleeTypes.conference;
     }
     return calleeTypes.unknow;
   }
@@ -416,7 +388,9 @@ CallCtrlPage.propTypes = {
   conferencePartiesAvatarUrls: PropTypes.arrayOf(PropTypes.string),
   lastEndedSessions: PropTypes.array,
   webphone: PropTypes.object,
-  routerInteraction: PropTypes.object
+  routerInteraction: PropTypes.object,
+  onMergingPairDisconnected: PropTypes.func,
+  removeOnMergingPairDisconnected: PropTypes.func
 };
 
 CallCtrlPage.defaultProps = {
@@ -513,7 +487,9 @@ function mapToProps(_, {
       || [],
     lastEndedSessions: webphone.lastEndedSessions,
     webphone,
-    routerInteraction
+    routerInteraction,
+    onMergingPairDisconnected: conferenceCall.onMergingPairDisconnected,
+    removeOnMergingPairDisconnected: conferenceCall.removeOnMergingPairDisconnected,
   };
 }
 
@@ -564,10 +540,8 @@ function mapToFunctions(_, {
       const sessionData = find(x => x.id === sessionId, webphone.sessions);
       if (sessionData) {
         const isConferenceCallSession = conferenceCall.isConferenceSession(sessionId);
-        if (!isConferenceCallSession) {
-          const session = webphone._sessions.get(sessionId);
-          conferenceCall.setMergeParty({ from: session });
-        }
+        const session = webphone._sessions.get(sessionId);
+        conferenceCall.setMergeParty({ from: session });
         const outBoundOnholdCalls = callMonitor.activeOnHoldCalls
           .filter(call => call.direction === callDirections.outbound);
         if (outBoundOnholdCalls.length) {
