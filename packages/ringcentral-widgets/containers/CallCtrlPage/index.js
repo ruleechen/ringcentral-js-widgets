@@ -174,7 +174,8 @@ class CallCtrlPage extends Component {
       showSpinner,
       addDisabled,
       mergeDisabled,
-      hasConference,
+      conferenceCallEquipped,
+      hasConferenceCall,
       getPartyProfiles,
       conferencePartiesAvatarUrls
     } = this.props;
@@ -245,7 +246,8 @@ class CallCtrlPage extends Component {
         direction={session.direction}
         addDisabled={addDisabled}
         mergeDisabled={mergeDisabled}
-        hasConference={hasConference}
+        conferenceCallEquipped={conferenceCallEquipped}
+        hasConferenceCall={hasConferenceCall}
         getPartyProfiles={getPartyProfiles}
         lastTo={this.state.lastTo}
         conferencePartiesAvatarUrls={conferencePartiesAvatarUrls}
@@ -310,7 +312,8 @@ CallCtrlPage.propTypes = {
   mergeDisabled: PropTypes.bool,
   getPartyProfiles: PropTypes.func,
   gotoNormalCallCtrl: PropTypes.func,
-  hasConference: PropTypes.bool,
+  conferenceCallEquipped: PropTypes.bool,
+  hasConferenceCall: PropTypes.bool,
   lastTo: PropTypes.object,
   conferenceCall: PropTypes.object,
   conferencePartiesAvatarUrls: PropTypes.arrayOf(PropTypes.string),
@@ -330,7 +333,8 @@ CallCtrlPage.defaultProps = {
   showSpinner: false,
   addDisabled: false,
   mergeDisabled: false,
-  hasConference: false,
+  conferenceCallEquipped: false,
+  hasConferenceCall: false,
   lastTo: { calleeType: calleeTypes.unknow },
   conferenceCall: null,
   getPartyProfiles: i => i,
@@ -406,7 +410,8 @@ function mapToProps(_, {
     showSpinner: isMerging,
     addDisabled,
     mergeDisabled,
-    hasConference: !!conferenceData,
+    conferenceCallEquipped: !!conferenceCall,
+    hasConferenceCall: !!conferenceData,
     conferenceCall,
     conferencePartiesAvatarUrls: (
       conferenceData && conferenceCall

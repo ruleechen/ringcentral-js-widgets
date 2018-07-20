@@ -156,24 +156,26 @@ class ActiveCallPad extends Component {
     );
 
     /* --------------------- Add/Merge --------------------------- */
-    const showMerge = (
-      this.props.layout === callCtrlLayouts.mergeCtrl ||
-      (this.props.layout === callCtrlLayouts.normalCtrl && this.props.hasConference)
-    );
-    buttons.push(showMerge
-      ? {
-        icon: MergeIcon,
-        title: i18n.getString('mergeToConference', this.props.currentLocale),
-        disabled: this.props.mergeDisabled,
-        onClick: this.props.onMerge,
-      }
-      : {
-        icon: CombineIcon,
-        title: i18n.getString('add', this.props.currentLocale),
-        disabled: this.props.addDisabled,
-        onClick: this.props.onAdd,
-      }
-    );
+    if (this.props.conferenceCallEquipped) {
+      const showMerge = (
+        this.props.layout === callCtrlLayouts.mergeCtrl ||
+        (this.props.layout === callCtrlLayouts.normalCtrl && this.props.hasConferenceCall)
+      );
+      buttons.push(showMerge
+        ? {
+          icon: MergeIcon,
+          title: i18n.getString('mergeToConference', this.props.currentLocale),
+          disabled: this.props.mergeDisabled,
+          onClick: this.props.onMerge,
+        }
+        : {
+          icon: CombineIcon,
+          title: i18n.getString('add', this.props.currentLocale),
+          disabled: this.props.addDisabled,
+          onClick: this.props.onAdd,
+        }
+      );
+    }
 
     /* --------------------- Record/Stop --------------------------- */
     buttons.push(
@@ -317,7 +319,8 @@ ActiveCallPad.propTypes = {
   layout: PropTypes.string.isRequired,
   addDisabled: PropTypes.bool,
   mergeDisabled: PropTypes.bool,
-  hasConference: PropTypes.bool,
+  conferenceCallEquipped: PropTypes.bool,
+  hasConferenceCall: PropTypes.bool,
 };
 
 ActiveCallPad.defaultProps = {
@@ -327,7 +330,8 @@ ActiveCallPad.defaultProps = {
   isOnHold: false,
   addDisabled: false,
   mergeDisabled: false,
-  hasConference: false,
+  conferenceCallEquipped: false,
+  hasConferenceCall: false,
   onAdd: undefined,
   onMerge: undefined,
 };
