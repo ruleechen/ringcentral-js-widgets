@@ -59,8 +59,9 @@ class ActiveCallPanel extends React.Component {
 
   render() {
     const {
-      onBackButtonClick,
+      showBackButton,
       backButtonLabel,
+      onBackButtonClick,
       currentLocale,
       nameMatches,
       fallBackName,
@@ -100,70 +101,79 @@ class ActiveCallPanel extends React.Component {
       addDisabled,
       mergeDisabled,
       hasConference,
-      calls,
       lastTo,
     } = this.props;
+
     const currentCall = {
       avatarUrl,
       nameMatches,
       fallBackName,
       phoneNumber
     };
-    const timeCounter =
-      (
-        <div className={styles.timeCounter}>
-          {
-            startTime
-              ? <DurationCounter startTime={startTime} offset={startTimeOffset} />
-              : <span aria-hidden="true">&nbsp;</span>
-          }
-        </div>
-      );
-    const backHeader = (
+
+    const backHeader = showBackButton ? (
       <BackHeader
         onBackClick={onBackButtonClick}
         backButton={<BackButton label={backButtonLabel} />}
       />
+    ) : null;
+
+    const timeCounter = (
+      <div className={styles.timeCounter}>
+        {
+          startTime
+            ? <DurationCounter startTime={startTime} offset={startTimeOffset} />
+            : <span aria-hidden="true">&nbsp;</span>
+        }
+      </div>
     );
-    const mergeCtrlCom = layout === callCtrlLayouts.mergeCtrl
-      ? (<MergeInfo
-        timeCounter={timeCounter}
-        lastTo={lastTo}
-        currentCall={currentCall}
-        conferenceAvatarUrls={this.state.displayedProfiles}
-      />)
-      : (<CallInfo
-        currentLocale={currentLocale}
-        nameMatches={nameMatches}
-        fallBackName={fallBackName}
-        phoneNumber={phoneNumber}
-        formatPhone={formatPhone}
-        startTime={startTime}
-        areaCode={areaCode}
-        countryCode={countryCode}
-        selectedMatcherIndex={selectedMatcherIndex}
-        onSelectMatcherName={onSelectMatcherName}
-        avatarUrl={avatarUrl}
-        brand={brand}
-        showContactDisplayPlaceholder={showContactDisplayPlaceholder}
-        sourceIcons={sourceIcons}
-      />);
+
+    let callInfo;
+
+    switch (layout) {
+      case callCtrlLayouts.mergeCtrl:
+        callInfo = (<MergeInfo
+          timeCounter={timeCounter}
+          lastTo={lastTo}
+          currentCall={currentCall}
+          conferenceAvatarUrls={this.state.displayedProfiles}
+        />);
+        break;
+
+      case callCtrlLayouts.conferenceCtrl:
+        callInfo = (<ConferenceInfo
+          currentLocale={currentLocale}
+          displayedProfiles={this.state.displayedProfiles}
+          remains={this.state.remains}
+          onClick={onOpenPartiesModal}
+        />);
+        break;
+
+      default:
+        callInfo = (<CallInfo
+          currentLocale={currentLocale}
+          nameMatches={nameMatches}
+          fallBackName={fallBackName}
+          phoneNumber={phoneNumber}
+          formatPhone={formatPhone}
+          startTime={startTime}
+          areaCode={areaCode}
+          countryCode={countryCode}
+          selectedMatcherIndex={selectedMatcherIndex}
+          onSelectMatcherName={onSelectMatcherName}
+          avatarUrl={avatarUrl}
+          brand={brand}
+          showContactDisplayPlaceholder={showContactDisplayPlaceholder}
+          sourceIcons={sourceIcons}
+        />);
+        break;
+    }
     return (
       <div className={styles.root}>
         {backHeader}
         <Panel className={styles.panel}>
           {layout !== callCtrlLayouts.mergeCtrl ? timeCounter : null}
-          {
-            layout === callCtrlLayouts.conferenceCtrl
-              ? (
-                <ConferenceInfo
-                  displayedProfiles={this.state.displayedProfiles}
-                  remains={this.state.remains}
-                  onClick={onOpenPartiesModal}
-                />
-              )
-              : mergeCtrlCom
-          }
+          {callInfo}
           <ActiveCallPad
             className={styles.callPad}
             currentLocale={currentLocale}
@@ -217,7 +227,9 @@ ActiveCallPanel.propTypes = {
   onMerge: PropTypes.func,
   onHangup: PropTypes.func.isRequired,
   onPark: PropTypes.func.isRequired,
-  onBackButtonClick: PropTypes.func.isRequired,
+  showBackButton: PropTypes.bool,
+  backButtonLabel: PropTypes.string,
+  onBackButtonClick: PropTypes.func,
   onShowKeyPad: PropTypes.func.isRequired,
   formatPhone: PropTypes.func.isRequired,
   children: PropTypes.node,
@@ -226,12 +238,10 @@ ActiveCallPanel.propTypes = {
   selectedMatcherIndex: PropTypes.number.isRequired,
   onSelectMatcherName: PropTypes.func.isRequired,
   avatarUrl: PropTypes.string,
-  backButtonLabel: PropTypes.string,
   brand: PropTypes.string,
   showContactDisplayPlaceholder: PropTypes.bool,
   onShowFlipPanel: PropTypes.func,
   flipNumbers: PropTypes.array,
-  calls: PropTypes.array.isRequired,
   onToggleTransferPanel: PropTypes.func,
   onOpenPartiesModal: PropTypes.func,
   sourceIcons: PropTypes.object,
@@ -252,7 +262,9 @@ ActiveCallPanel.defaultProps = {
   phoneNumber: null,
   children: undefined,
   avatarUrl: null,
+  showBackButton: false,
   backButtonLabel: 'Active Calls',
+  onBackButtonClick: null,
   brand: 'RingCentral',
   showContactDisplayPlaceholder: true,
   flipNumbers: [],

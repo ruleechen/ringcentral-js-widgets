@@ -1,7 +1,6 @@
 import { connect } from 'react-redux';
 import React from 'react';
 import PropTypes from 'prop-types';
-import sleep from 'ringcentral-integration/lib/sleep';
 import callingModes from 'ringcentral-integration/modules/CallingSettings/callingModes';
 import classnames from 'classnames';
 
@@ -129,8 +128,8 @@ DialerNCallsPanel.propTypes = {
   sourceIcons: PropTypes.object,
   goto: PropTypes.func.isRequired,
   phoneTypeRenderer: PropTypes.func,
-  recipientsContactInfoRenderer: PropTypes.element,
-  recipientsContactPhoneRenderer: PropTypes.element,
+  recipientsContactInfoRenderer: PropTypes.func,
+  recipientsContactPhoneRenderer: PropTypes.func,
   dialButtonMuted: PropTypes.bool,
   showViewContact: PropTypes.bool,
   showContactDisplayPlaceholder: PropTypes.bool,

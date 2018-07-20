@@ -60,7 +60,7 @@ export default function App({
                 {routerProps.children}
                 <CallBadgeContainer
                   defaultOffsetX={0}
-                  defaultOffsetY={45}
+                  defaultOffsetY={73}
                   hidden={(
                     routerProps.location.pathname === '/calls/active' ||
                     routerProps.location.pathname === '/conferenceCall/mergeCtrl' ||
