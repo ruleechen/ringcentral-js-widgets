@@ -47,7 +47,6 @@ class CallCtrlPanel extends Component {
         isShowTransferPanel: !prevState.isShowTransferPanel
       }));
     };
-
     this.onMerge = () => {
       if (
         this.props.hasConferenceCall &&
@@ -58,7 +57,6 @@ class CallCtrlPanel extends Component {
         this.props.onMerge();
       }
     };
-
     this.showMergeConfirm = () => {
       this.setState({
         isShowMergeConfirm: true,

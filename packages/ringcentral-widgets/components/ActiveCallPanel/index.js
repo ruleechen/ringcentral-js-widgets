@@ -109,6 +109,7 @@ class ActiveCallPanel extends React.Component {
       avatarUrl,
       nameMatches,
       fallBackName,
+      phoneNumber
     };
 
     const backHeader = showBackButton ? (
@@ -133,10 +134,10 @@ class ActiveCallPanel extends React.Component {
     switch (layout) {
       case callCtrlLayouts.mergeCtrl:
         callInfo = (<MergeInfo
-          currentLocale={currentLocale}
           timeCounter={timeCounter}
           lastTo={lastTo}
           currentCall={currentCall}
+          currentLocale={currentLocale}
         />);
         break;
 
@@ -168,7 +169,6 @@ class ActiveCallPanel extends React.Component {
         />);
         break;
     }
-
     return (
       <div className={styles.root}>
         {backHeader}
