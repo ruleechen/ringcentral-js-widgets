@@ -108,8 +108,6 @@ export default class ConferenceCall extends RcModule {
     this._timers = {};
     this._pulling = pulling;
     this.capacity = capacity;
-    this.onMergingPairDisconnected = this::this.onMergingPairDisconnected;
-    this.removeOnMergingPairDisconnected = this::this.removeOnMergingPairDisconnected;
   }
 
   isConferenceSession(sessionId) {

@@ -480,8 +480,8 @@ function mapToProps(_, {
     conferenceCall,
     webphone,
     routerInteraction,
-    onMergingPairDisconnected: conferenceCall.onMergingPairDisconnected,
-    removeOnMergingPairDisconnected: conferenceCall.removeOnMergingPairDisconnected,
+    onMergingPairDisconnected: (...args) => conferenceCall.onMergingPairDisconnected(...args),
+    removeOnMergingPairDisconnected: (...args) => conferenceCall.removeOnMergingPairDisconnected(...args),
     conferencePartiesAvatarUrls: (
       conferenceData && conferenceCall
         .getOnlinePartyProfiles(conferenceData.conference.id)

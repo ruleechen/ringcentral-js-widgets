@@ -13,32 +13,26 @@ function MergeInfo({
   currentLocale,
   lastTo,
 }) {
-  const isConference = lastTo && lastTo.calleeType === calleeTypes.conference
-    ? i18n.getString('conferenceCall', currentLocale)
-    : lastTo.name;
   const statusClasses = classnames({
     [styles.callee_status]: true,
     [styles.callee_status_disconnected]: lastTo.status === sessionStatus.finished
   })
+  const isOnConferenCall = lastTo.calleeType === calleeTypes.conference
   return lastTo ? (
     <div className={styles.mergeInfo}>
       <div className={styles.merge_item}>
         <div className={styles.callee_avatar}>
-          {
-            lastTo.calleeType === calleeTypes.conference
-            ? <CallAvatar
-              avatarUrl={lastTo.avatarUrl}
-              extraNum={lastTo.extraNum}
-              isOnConferenceCall
-            />
-            : <CallAvatar avatarUrl={lastTo.avatarUrl} />
-          }
+          <CallAvatar
+            avatarUrl={lastTo.avatarUrl}
+            extraNum={isOnConferenCall ? lastTo.extraNum : 0}
+            isOnConferenceCall={isOnConferenCall}
+          />
         </div>
         <div className={styles.callee_name}>
           {
-            (lastTo.calleeType === calleeTypes.contacts)
-              ? lastTo.name
-              : isConference
+            (lastTo.calleeType === calleeTypes.conference)
+              ? i18n.getString('conferenceCall', currentLocale)
+              : lastTo.name
           }
         </div>
         <div className={statusClasses}>
