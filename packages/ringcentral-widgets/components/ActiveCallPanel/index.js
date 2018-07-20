@@ -100,7 +100,8 @@ class ActiveCallPanel extends React.Component {
       direction,
       addDisabled,
       mergeDisabled,
-      hasConference,
+      conferenceCallEquipped,
+      hasConferenceCall,
       lastTo,
     } = this.props;
 
@@ -198,7 +199,8 @@ class ActiveCallPanel extends React.Component {
             direction={direction}
             addDisabled={addDisabled}
             mergeDisabled={mergeDisabled}
-            hasConference={hasConference}
+            conferenceCallEquipped={conferenceCallEquipped}
+            hasConferenceCall={hasConferenceCall}
           />
           {children}
         </Panel>
@@ -250,7 +252,8 @@ ActiveCallPanel.propTypes = {
   addDisabled: PropTypes.bool,
   mergeDisabled: PropTypes.bool,
   getPartyProfiles: PropTypes.func,
-  hasConference: PropTypes.bool,
+  conferenceCallEquipped: PropTypes.bool,
+  hasConferenceCall: PropTypes.bool,
   lastTo: PropTypes.object,
 };
 
@@ -278,7 +281,8 @@ ActiveCallPanel.defaultProps = {
   addDisabled: false,
   mergeDisabled: false,
   getPartyProfiles: i => i,
-  hasConference: false,
+  conferenceCallEquipped: false,
+  hasConferenceCall: false,
   lastTo: null,
 };
 

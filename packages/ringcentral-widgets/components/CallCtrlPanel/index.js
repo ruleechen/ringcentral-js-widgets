@@ -49,7 +49,7 @@ class CallCtrlPanel extends Component {
     };
     this.onMerge = () => {
       if (
-        this.props.hasConference &&
+        this.props.hasConferenceCall &&
         this.props.layout === callCtrlLayouts.normalCtrl
       ) {
         this.showMergeConfirm();
@@ -82,7 +82,7 @@ class CallCtrlPanel extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (!nextProps.hasConference && this.state.isShowMergeConfirm) {
+    if (!nextProps.hasConferenceCall && this.state.isShowMergeConfirm) {
       this.hideMergeConfirm();
     }
   }
@@ -171,7 +171,8 @@ class CallCtrlPanel extends Component {
         direction={this.props.direction}
         addDisabled={this.props.addDisabled}
         mergeDisabled={this.props.mergeDisabled}
-        hasConference={this.props.hasConference}
+        conferenceCallEquipped={this.props.conferenceCallEquipped}
+        hasConferenceCall={this.props.hasConferenceCall}
         getPartyProfiles={this.props.getPartyProfiles}
         lastTo={this.props.lastTo}
       >
@@ -243,7 +244,8 @@ CallCtrlPanel.propTypes = {
   direction: PropTypes.string,
   addDisabled: PropTypes.bool,
   mergeDisabled: PropTypes.bool,
-  hasConference: PropTypes.bool,
+  conferenceCallEquipped: PropTypes.bool,
+  hasConferenceCall: PropTypes.bool,
   lastTo: PropTypes.object,
   getPartyProfiles: PropTypes.func,
   conferencePartiesAvatarUrls: PropTypes.arrayOf(PropTypes.string),
@@ -277,7 +279,8 @@ CallCtrlPanel.defaultProps = {
   direction: null,
   addDisabled: false,
   mergeDisabled: false,
-  hasConference: false,
+  conferenceCallEquipped: false,
+  hasConferenceCall: false,
   lastTo: null,
   getPartyProfiles: i => i,
   conferencePartiesAvatarUrls: []

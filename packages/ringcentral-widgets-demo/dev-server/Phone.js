@@ -261,7 +261,7 @@ export default class BasePhone extends RcModule {
           routerInteraction.push('/dialer');
           return;
         }
-        if (routerInteraction.currentPath !== '/calls/active') { // mean have params
+        if (routerInteraction.currentPath.indexOf('/calls/active') !== 0) { // mean have params
           routerInteraction.push('/calls/active');
         }
         routerInteraction.goBack();
@@ -280,7 +280,7 @@ export default class BasePhone extends RcModule {
       );
 
       if (
-        routerInteraction.currentPath !== '/calls/active' &&
+        routerInteraction.currentPath.indexOf('/calls/active') !== 0 &&
         routerInteraction.currentPath.indexOf('/conferenceCall/mergeCtrl') !== 0 &&
         !(isConferenceCallSession && routerInteraction.currentPath === '/calls')
       ) {

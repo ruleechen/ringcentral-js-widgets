@@ -153,7 +153,7 @@ export default function App({
                   />
                 )} />
               <Route
-                path="/calls/active"
+                path="/calls/active(/:sessionId)"
                 component={() => (
                   <CallCtrlPage
                     showContactDisplayPlaceholder={false}
