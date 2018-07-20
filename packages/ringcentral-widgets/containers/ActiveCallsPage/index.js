@@ -15,6 +15,7 @@ function mapToProps(_, {
     rolesAndPermissions,
     conferenceCall,
     callingSettings,
+    webphone
   },
   showContactDisplayPlaceholder = false,
 }) {
