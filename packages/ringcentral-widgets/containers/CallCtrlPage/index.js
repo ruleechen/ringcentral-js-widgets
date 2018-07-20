@@ -6,6 +6,7 @@ import formatNumber from 'ringcentral-integration/lib/formatNumber';
 import callDirections from 'ringcentral-integration/enums/callDirections';
 import callingModes from 'ringcentral-integration/modules/CallingSettings/callingModes';
 import sessionStatus from 'ringcentral-integration/modules/Webphone/sessionStatus';
+import sleep from 'ringcentral-integration/lib/sleep';
 import withPhone from '../../lib/withPhone';
 import callCtrlLayouts from '../../enums/callCtrlLayouts';
 import CallCtrlPanel from '../../components/CallCtrlPanel';
@@ -210,8 +211,8 @@ class CallCtrlPage extends Component {
       }
     }
   }
-  handleLastToTernimated() {
-    const { routerInteraction } = this.props;
+  async handleLastToTernimated() {
+    const { routerInteraction, webphone, conferenceCall } = this.props;
     this.setState((prev) => ({
       ...prev,
       lastTo: {
@@ -220,9 +221,10 @@ class CallCtrlPage extends Component {
       },
       mergeDisabled: true
     }));
-    setTimeout(() => {
+    await sleep(2000);
+    if(!conferenceCall.isConferenceSession(webphone.activeSession.id) || this._mounted) {
       routerInteraction.push('/calls/active');
-    }, 2000);
+    }
     this.props.removeOnMergingPairDisconnected('from', this.handleLastToTernimated);
   }
   checkCalleeType(call) {
