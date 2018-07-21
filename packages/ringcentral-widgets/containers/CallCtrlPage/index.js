@@ -68,7 +68,7 @@ class CallCtrlPage extends Component {
       this.props.onAdd(this.props.session.id);
     this.onMerge = () =>
       this.props.onMerge(this.props.session.id);
-    this.handleLastToTernimated = this::this.handleLastToTernimated;
+    this.handleLastToTernimated = this:: this.handleLastToTernimated;
   }
 
   componentDidMount() {
@@ -131,16 +131,12 @@ class CallCtrlPage extends Component {
       conferencePartiesAvatarUrls,
       onMergingPairDisconnected
     } = this.props;
-    const mergingPair = conferenceCall.state.mergingPair ? conferenceCall.state.mergingPair : {};
-    if (
-      Object.keys(mergingPair).length
-      && mergingPair.from
-    ) {
-      const lastToSessionId = mergingPair.from.id;
-      onMergingPairDisconnected('from', this.handleLastToTernimated)
+    const lastToSessionId = conferenceCall.mergingPair.fromSessionId;
+    if (lastToSessionId) {
+      onMergingPairDisconnected('from', this.handleLastToTernimated);
       if (calls.length) {
         const lastCall = calls.filter(
-          item => (item.webphoneSession ? item.webphoneSession.id === mergingPair.from.id : null)
+          item => (item.webphoneSession ? item.webphoneSession.id === lastToSessionId : null)
         )[0];
         if (lastCall) {
           if (conferenceCall.isConferenceSession(lastToSessionId)) {
@@ -213,16 +209,16 @@ class CallCtrlPage extends Component {
   }
   async handleLastToTernimated() {
     const { routerInteraction, webphone, conferenceCall } = this.props;
-    this.setState((prev) => ({
+    this.setState(prev => ({
       ...prev,
       lastTo: {
         ...prev.lastTo,
-        status: sessionStatus.finished
+        status: sessionStatus.finished,
       },
-      mergeDisabled: true
+      mergeDisabled: true,
     }));
     await sleep(2000);
-    if(!conferenceCall.isConferenceSession(webphone.activeSession.id) || this._mounted) {
+    if (!conferenceCall.isConferenceSession(webphone.activeSession.id) || this._mounted) {
       routerInteraction.push('/calls/active');
     }
     this.props.removeOnMergingPairDisconnected('from', this.handleLastToTernimated);
@@ -461,8 +457,7 @@ function mapToProps(_, {
 
   const isMerging = (
     Object
-      .values(conferenceCall.state.mergingPair)
-      .map(session => session.id)
+      .values(conferenceCall.mergingPair)
       .find(id => id === currentSession.id)
     || (isOnConference)
   )
@@ -544,9 +539,7 @@ function mapToFunctions(_, {
     onAdd(sessionId) {
       const sessionData = find(x => x.id === sessionId, webphone.sessions);
       if (sessionData) {
-        const isConferenceCallSession = conferenceCall.isConferenceSession(sessionId);
-        const session = webphone._sessions.get(sessionId);
-        conferenceCall.setMergeParty({ from: session });
+        conferenceCall.setMergeParty({ fromSessionId: sessionId });
         const outBoundOnholdCalls = callMonitor.activeOnHoldCalls
           .filter(call => call.direction === callDirections.outbound);
         if (outBoundOnholdCalls.length) {
@@ -562,8 +555,8 @@ function mapToFunctions(_, {
       routerInteraction.replace(`${routerInteraction.currentPath}/${sessionId}`);
       const session = webphone._sessions.get(sessionId);
       const isOnhold = session.isOnHold().local;
-      conferenceCall.setMergeParty({ to: session });
-      const sessionToMergeWith = conferenceCall.state.mergingPair.from;
+      conferenceCall.setMergeParty({ toSessionId: sessionId });
+      const sessionToMergeWith = webphone._sessions.get(conferenceCall.mergingPair.fromSessionId);
       const webphoneSessions = sessionToMergeWith
         ? [sessionToMergeWith, session]
         : [session];

@@ -450,16 +450,16 @@ export default class ConferenceCall extends RcModule {
    * we need to record the merge destination when merge from the call control pages
    * @param {webphone.session} from
    */
-  setMergeParty({ from, to }) {
-    if (from) {
+  setMergeParty({ fromSessionId, toSessionId }) {
+    if (fromSessionId) {
       return this.store.dispatch({
         type: this.actionTypes.updateFromSession,
-        from,
+        fromSessionId,
       });
     }
     return this.store.dispatch({
       type: this.actionTypes.updateToSession,
-      to,
+      toSessionId,
     });
   }
 
@@ -770,5 +770,9 @@ export default class ConferenceCall extends RcModule {
 
   get isMerging() {
     return this.state.isMerging;
+  }
+
+  get mergingPair() {
+    return this.state.mergingPair;
   }
 }
