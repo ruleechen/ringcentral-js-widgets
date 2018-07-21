@@ -13,6 +13,7 @@ import { isConferenceSession } from '../Webphone/webphoneHelper';
 import ensureExist from '../../lib/ensureExist';
 // import sleep from '../../lib/sleep';
 import callingModes from '../CallingSettings/callingModes';
+import calleeTypes from '../../enums/calleeTypes';
 
 const DEFAULT_TIMEOUT = 30000;// time out for conferencing session being accepted.
 const DEFAULT_TTL = 5000;// timer to update the conference information
@@ -39,6 +40,7 @@ function ascendSortParties(parties) {
     },
     'CallingSettings',
     'Client',
+    'CallMonitor',
     'RolesAndPermissions',
     {
       dep: 'ContactMatcher',
@@ -71,6 +73,7 @@ export default class ConferenceCall extends RcModule {
     rolesAndPermissions,
     contactMatcher,
     webphone,
+    callMonitor,
     connectivityMonitor,
     pulling = true,
     capacity = MAXIMUM_CAPACITY,
@@ -78,16 +81,6 @@ export default class ConferenceCall extends RcModule {
     ...options
   }) {
     super({
-      auth,
-      alert,
-      call,
-      callingSettings,
-      client,
-      rolesAndPermissions,
-      pulling,
-      contactMatcher,
-      webphone,
-      connectivityMonitor,
       ...options,
       actionTypes,
     });
@@ -101,6 +94,7 @@ export default class ConferenceCall extends RcModule {
     this._connectivityMonitor = connectivityMonitor;
     this._contactMatcher = contactMatcher;
     this._rolesAndPermissions = this::ensureExist(rolesAndPermissions, 'rolesAndPermissions');
+    this._callMonitor = this::ensureExist(callMonitor, 'callMonitor');
     // we need the constructed actions
     this._reducer = getConferenceCallReducer(this.actionTypes);
     this._ttl = DEFAULT_TTL;
@@ -108,6 +102,64 @@ export default class ConferenceCall extends RcModule {
     this._timers = {};
     this._pulling = pulling;
     this.capacity = capacity;
+
+    this.addSelector('lastCallInfo',
+      () => this._webphone && this._webphone.sessions,
+      () => this._callMonitor.calls,
+      () => this.mergingPair.fromSessionId,
+      (sessions, calls, fromSessionId) => {
+        let lastCalleeType = null;
+        const lastCall = calls.find(
+          call => call.webphoneSession && call.webphoneSession.id === fromSessionId
+        );
+        if (lastCall) {
+          if (lastCall.toMatches.length) {
+            lastCalleeType = calleeTypes.contacts;
+          } else if (isConferenceSession(lastCall.webphoneSession)) {
+            lastCalleeType = calleeTypes.conference;
+          } else {
+            lastCalleeType = calleeTypes.unknow;
+          }
+        }
+
+        if (lastCalleeType === calleeTypes.conference) {
+          const conferenceData = Object.values(this.conferences)[0];
+          const conferencePartiesAvatarUrls = (conferenceData && this
+            .getOnlinePartyProfiles(conferenceData.conference.id)
+            .map(profile => profile.avatarUrl)
+          ) || [];
+          return {
+            calleeType: calleeTypes.conference,
+            avatarUrl: conferencePartiesAvatarUrls[0],
+            extraNum: conferencePartiesAvatarUrls.length - 1,
+            sessionId: fromSessionId,
+          };
+        }
+
+        if (lastCalleeType === calleeTypes.contacts) {
+          return {
+            calleeType: calleeTypes.contacts,
+            avatarUrl: lastCall.toMatches[0].profileImageUrl,
+            name: lastCall.toName,
+            status: lastCall.webphoneSession.callStatus,
+            sessionId: lastCall.webphoneSession.id,
+            session: lastCall.webphoneSession,
+          };
+        }
+
+        if (lastCalleeType === calleeTypes.unknow) {
+          return {
+            calleeType: calleeTypes.unknow,
+            avatarUrl: null,
+            sessionId: lastCall.webphoneSession ? lastCall.webphoneSession.id : null,
+            status: lastCall.webphoneSession ? lastCall.webphoneSession.callStatus : null,
+            name: lastCall.to.phoneNumber,
+          };
+        }
+
+        return {};
+      },
+    );
   }
 
   isConferenceSession(sessionId) {
@@ -774,5 +826,9 @@ export default class ConferenceCall extends RcModule {
 
   get mergingPair() {
     return this.state.mergingPair;
+  }
+
+  get lastCallInfo() {
+    return this._selectors.lastCallInfo();
   }
 }
