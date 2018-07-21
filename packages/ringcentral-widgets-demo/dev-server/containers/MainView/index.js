@@ -200,14 +200,17 @@ function mapToFunctions(_, {
   phone: {
     routerInteraction,
     callingSettings,
+    conferenceCall,
     webphone,
   },
 }) {
+  const conferenceCallEquipped = !!conferenceCall;
   return {
     goTo(path) {
       if (path) {
         if (
           path === '/dialer'
+          && conferenceCallEquipped
           && webphone.sessions.length
           && callingSettings.callingMode === callingModes.webphone
         ) {
