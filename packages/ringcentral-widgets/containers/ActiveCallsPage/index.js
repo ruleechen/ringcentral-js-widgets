@@ -21,10 +21,11 @@ function mapToProps(_, {
   showContactDisplayPlaceholder = false,
 }) {
   const isWebRTC = callingSettings.callingMode === callingModes.webphone;
+  const conferenceCallEquipped = !!conferenceCall;
   let disableMerge = !isWebRTC;
   let hasConferenceCall = false;
   let conferenceData = null;
-  if (conferenceCall) {
+  if (conferenceCallEquipped) {
     const conferenceList = Object.values(conferenceCall.conferences);
     const conference = conferenceList.length ? conferenceList[0] : null;
     conferenceData = Object.values(conferenceCall.conferences)[0];
@@ -54,7 +55,7 @@ function mapToProps(_, {
     showContactDisplayPlaceholder,
     autoLog: !!(callLogger && callLogger.autoLog),
     isWebRTC,
-    conferenceCallEquipped: !!conferenceCall,
+    conferenceCallEquipped,
     hasConferenceCall,
     disableMerge,
     conferencePartiesAvatarUrls: (
@@ -62,7 +63,7 @@ function mapToProps(_, {
         .getOnlinePartyProfiles(conferenceData.conference.id)
         .map(profile => profile.avatarUrl)
     ) || [],
-    showTab: !!(isWebRTC && webphone.sessions.length),
+    showTab: !!(conferenceCallEquipped && isWebRTC && webphone.sessions.length),
     currentPath: routerInteraction.currentPath,
   };
 }

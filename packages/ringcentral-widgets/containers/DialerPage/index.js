@@ -13,6 +13,7 @@ function mapToProps(_, {
     contactSearch,
     connectivityMonitor,
     routerInteraction,
+    conferenceCall,
     locale,
     rateLimiter,
     webphone,
@@ -20,6 +21,7 @@ function mapToProps(_, {
   },
   dialButtonMuted = false,
 }) {
+  const conferenceCallEquipped = !!conferenceCall;
   const isWebphoneMode = (callingSettings.callingMode === callingModes.webphone);
   const waitingWebphoneConnected = (isWebphoneMode && webphone && webphone.connecting);
   const webphoneDisconnected = (isWebphoneMode && webphone && !webphone.connected);
@@ -51,7 +53,7 @@ function mapToProps(_, {
     dialButtonVolume: audioSettings ? audioSettings.dialButtonVolume : 1,
     // If audioSettings is used, then use values from audioSettings module
     dialButtonMuted: audioSettings ? audioSettings.dialButtonMuted : dialButtonMuted,
-    showTab: !!(isWebphoneMode && webphone.sessions.length),
+    showTab: !!(conferenceCallEquipped && isWebphoneMode && webphone.sessions.length),
     currentPath: routerInteraction.currentPath,
   };
 }
