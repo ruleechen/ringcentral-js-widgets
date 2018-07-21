@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import calleeTypes from '../../enums/calleeTypes';
+import sessionStatus from 'ringcentral-integration/modules/Webphone/sessionStatus';
+import classnames from 'classnames';
 import styles from './styles.scss';
 import i18n from './i18n';
 import CallAvatar from '../CallAvatar';
+import calleeTypes from '../../enums/calleeTypes';
 
 function MergeInfo({
   timeCounter,
@@ -11,34 +13,32 @@ function MergeInfo({
   currentLocale,
   lastTo,
 }) {
-  const isConference = (lastTo && lastTo.calleeType === calleeTypes.conference)
-    ? i18n.getString('conferenceCall', currentLocale)
-    : i18n.getString('unknow', currentLocale);
+  const statusClasses = classnames({
+    [styles.callee_status]: true,
+    [styles.callee_status_disconnected]: lastTo.status === sessionStatus.finished
+  })
+  const isOnConferenCall = lastTo.calleeType === calleeTypes.conference
   return lastTo ? (
     <div className={styles.mergeInfo}>
       <div className={styles.merge_item}>
         <div className={styles.callee_avatar}>
-          {
-            (lastTo.calleeType === calleeTypes.conference)
-              ? <CallAvatar
-                avatarUrl={lastTo.avatarUrl}
-                extraNum={lastTo.extraNum}
-                isOnConferenceCall
-              />
-              : <CallAvatar
-                avatarUrl={lastTo.avatarUrl}
-              />
-          }
+          <CallAvatar
+            avatarUrl={lastTo.avatarUrl}
+            extraNum={isOnConferenCall ? lastTo.extraNum : 0}
+            isOnConferenceCall={isOnConferenCall}
+          />
         </div>
         <div className={styles.callee_name}>
           {
-            (lastTo.calleeType === calleeTypes.contacts)
-              ? lastTo.name
-              : isConference
+            (lastTo.calleeType === calleeTypes.conference)
+              ? i18n.getString('conferenceCall', currentLocale)
+              : lastTo.name
           }
         </div>
-        <div className={styles.callee_status}>
-          {i18n.getString('onHold', currentLocale)}
+        <div className={statusClasses}>
+          { lastTo.status === sessionStatus.finished
+            ? i18n.getString('disconnected', currentLocale)
+            : i18n.getString('onHold', currentLocale)}
         </div>
       </div>
       <div className={styles.merge_item_active}>
@@ -53,7 +53,7 @@ function MergeInfo({
           {
             currentCall.nameMatches.length
               ? currentCall.nameMatches[0].name
-              : currentCall.fallBackName
+              : currentCall.phoneNumber
           }
         </div>
         <div className={styles.callee_status_active}>

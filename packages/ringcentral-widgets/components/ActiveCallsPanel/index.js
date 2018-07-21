@@ -90,6 +90,7 @@ export default class ActiveCallsPanel extends Component {
       sourceIcons,
       activeCurrentCalls,
       isWebRTC,
+      conferenceCallEquipped,
       hasConferenceCall,
       disableMerge,
       mergeToConference,
@@ -123,6 +124,7 @@ export default class ActiveCallsPanel extends Component {
         enableContactFallback={enableContactFallback}
         sourceIcons={sourceIcons}
         isWebRTC={isWebRTC}
+        conferenceCallEquipped={conferenceCallEquipped}
         hasConferenceCall={hasConferenceCall}
         disableMerge={disableMerge}
         currentCall={activeCurrentCalls[0]}
@@ -229,6 +231,7 @@ ActiveCallsPanel.propTypes = {
   onCallsEmpty: PropTypes.func,
   sourceIcons: PropTypes.object,
   isWebRTC: PropTypes.bool.isRequired,
+  conferenceCallEquipped: PropTypes.bool,
   hasConferenceCall: PropTypes.bool,
   showSpinner: PropTypes.bool,
   disableMerge: PropTypes.bool,
@@ -258,6 +261,7 @@ ActiveCallsPanel.defaultProps = {
   autoLog: false,
   onCallsEmpty: undefined,
   sourceIcons: undefined,
+  conferenceCallEquipped: false,
   hasConferenceCall: false,
   showSpinner: false,
   disableMerge: false,

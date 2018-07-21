@@ -354,7 +354,8 @@ export default class ConferenceCall extends RcModule {
    * to avoid `this._webphone` criterias to improve performance ahead of time
    */
   async mergeToConference(webphoneSessions = []) {
-    webphoneSessions = webphoneSessions.filter(session => Object.prototype.toString.call(session).toLowerCase() === '[object object]');
+    webphoneSessions = webphoneSessions.filter(session => !this.isConferenceSession(session.id))
+      .filter(session => Object.prototype.toString.call(session).toLowerCase() === '[object object]');
 
     if (!webphoneSessions.length) {
       this._alert.warning({
@@ -546,6 +547,18 @@ export default class ConferenceCall extends RcModule {
     }
     this._timout = timeout;
     return timeout;
+  }
+
+  onMergingPairDisconnected(party, func) {
+    if (this.state.mergingPair && this.state.mergingPair[party]) {
+      this.state.mergingPair[party].on('terminated', func);
+    }
+  }
+
+  removeOnMergingPairDisconnected(party, func) {
+    if (this.state.mergingPair && this.state.mergingPair[party]) {
+      this.state.mergingPair[party].removeListener('terminated', func);
+    }
   }
   _init() {
     this.store.dispatch({

@@ -54,6 +54,7 @@ function mapToProps(_, {
     showContactDisplayPlaceholder,
     autoLog: !!(callLogger && callLogger.autoLog),
     isWebRTC,
+    conferenceCallEquipped: !!conferenceCall,
     hasConferenceCall,
     disableMerge,
     conferencePartiesAvatarUrls: (
