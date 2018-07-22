@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import sessionStatus from 'ringcentral-integration/modules/Webphone/sessionStatus';
@@ -7,67 +7,83 @@ import styles from './styles.scss';
 import i18n from './i18n';
 import CallAvatar from '../CallAvatar';
 
-function MergeInfo({
-  currentLocale,
-  timeCounter,
-  lastCallInfo,
-  onLastCallEnded,
-  currentCallTitle,
-  currentCallAvatarUrl,
-}) {
-  const isLastCallEnded = !!(
-    lastCallInfo && lastCallInfo.status === sessionStatus.finished
-  );
-  const isOnConferenCall = !!(
-    lastCallInfo && lastCallInfo.calleeType === calleeTypes.conference
-  );
-  if (isLastCallEnded && onLastCallEnded) {
-    onLastCallEnded();
+class MergeInfo extends Component {
+  static isLastCallEnded({ lastCallInfo }) {
+    return !!(
+      lastCallInfo && lastCallInfo.status === sessionStatus.finished
+    );
   }
-  const statusClasses = classnames({
-    [styles.callee_status]: true,
-    [styles.callee_status_disconnected]: isLastCallEnded,
-  });
-  return lastCallInfo ? (
-    <div className={styles.mergeInfo}>
-      <div className={styles.merge_item}>
-        <div className={styles.callee_avatar}>
-          <CallAvatar
-            avatarUrl={lastCallInfo.avatarUrl}
-            extraNum={isOnConferenCall ? lastCallInfo.extraNum : 0}
-            isOnConferenceCall={isOnConferenCall}
-          />
+
+  componentWillReceiveProps(nextProps) {
+    if (
+      MergeInfo.isLastCallEnded(this.props) === false
+      && MergeInfo.isLastCallEnded(nextProps) === true
+      && this.props.onLastCallEnded
+    ) {
+      this.props.onLastCallEnded();
+    }
+  }
+
+  render() {
+    const {
+      currentLocale,
+      timeCounter,
+      lastCallInfo,
+      currentCallTitle,
+      currentCallAvatarUrl,
+    } = this.props;
+
+    const isLastCallEnded = MergeInfo.isLastCallEnded(this.props);
+    const statusClasses = classnames({
+      [styles.callee_status]: true,
+      [styles.callee_status_disconnected]: isLastCallEnded,
+    });
+
+    const isOnConferenCall = !!(
+      lastCallInfo && lastCallInfo.calleeType === calleeTypes.conference
+    );
+
+    return lastCallInfo ? (
+      <div className={styles.mergeInfo}>
+        <div className={styles.merge_item}>
+          <div className={styles.callee_avatar}>
+            <CallAvatar
+              avatarUrl={lastCallInfo.avatarUrl}
+              extraNum={isOnConferenCall ? lastCallInfo.extraNum : 0}
+              isOnConferenceCall={isOnConferenCall}
+            />
+          </div>
+          <div className={styles.callee_name}>
+            {
+              (lastCallInfo.calleeType === calleeTypes.conference)
+                ? i18n.getString('conferenceCall', currentLocale)
+                : lastCallInfo.name
+            }
+          </div>
+          <div className={statusClasses}>
+            {lastCallInfo.status === sessionStatus.finished
+              ? i18n.getString('disconnected', currentLocale)
+              : i18n.getString('onHold', currentLocale)}
+          </div>
         </div>
-        <div className={styles.callee_name}>
-          {
-            (lastCallInfo.calleeType === calleeTypes.conference)
-              ? i18n.getString('conferenceCall', currentLocale)
-              : lastCallInfo.name
-          }
-        </div>
-        <div className={statusClasses}>
-          {lastCallInfo.status === sessionStatus.finished
-            ? i18n.getString('disconnected', currentLocale)
-            : i18n.getString('onHold', currentLocale)}
+        <div className={styles.merge_item_active}>
+          <div className={styles.callee_avatar_active} >
+            {
+              currentCallAvatarUrl
+                ? <CallAvatar avatarUrl={currentCallAvatarUrl} />
+                : <CallAvatar avatarUrl={null} />
+            }
+          </div>
+          <div className={styles.callee_name_active}>
+            {currentCallTitle}
+          </div>
+          <div className={styles.callee_status_active}>
+            {timeCounter}
+          </div>
         </div>
       </div>
-      <div className={styles.merge_item_active}>
-        <div className={styles.callee_avatar_active} >
-          {
-            currentCallAvatarUrl
-              ? <CallAvatar avatarUrl={currentCallAvatarUrl} />
-              : <CallAvatar avatarUrl={null} />
-          }
-        </div>
-        <div className={styles.callee_name_active}>
-          {currentCallTitle}
-        </div>
-        <div className={styles.callee_status_active}>
-          {timeCounter}
-        </div>
-      </div>
-    </div>
-  ) : (<span />);
+    ) : (<span />);
+  }
 }
 
 MergeInfo.propTypes = {

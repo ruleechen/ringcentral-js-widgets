@@ -20,6 +20,7 @@ class CallCtrlPage extends Component {
       selectedMatcherIndex: 0,
       avatarUrl: null,
     };
+
     this.onSelectMatcherName = (option) => {
       const nameMatches = this.props.nameMatches || [];
       let selectedMatcherIndex = nameMatches.findIndex(
@@ -40,6 +41,7 @@ class CallCtrlPage extends Component {
         });
       }
     };
+
     this.onMute = () =>
       this.props.onMute(this.props.session.id);
     this.onUnmute = () =>
@@ -114,14 +116,14 @@ class CallCtrlPage extends Component {
   }
 
   render() {
-    const {
-      session,
-    } = this.props;
+    const { session } = this.props;
     if (!session.id) {
       return null;
     }
+
     const phoneNumber = session.direction === callDirections.outbound ?
       session.to : session.from;
+
     let fallbackUserName;
     if (session.direction === callDirections.inbound && session.from === 'anonymous') {
       fallbackUserName = i18n.getString('anonymous', this.props.currentLocale);
@@ -331,9 +333,12 @@ function mapToProps(_, {
 
     hasConferenceCall = !!conferenceData;
     conferenceCallParties = conferenceCall.partyProfiles;
-
     lastCallInfo = conferenceCall.lastCallInfo;
-    if (!lastCallInfo || lastCallInfo.status === sessionStatus.finished) {
+
+    if (
+      layout === callCtrlLayouts.mergeCtrl
+      && (!lastCallInfo || lastCallInfo.status === sessionStatus.finished)
+    ) {
       mergeDisabled = true;
     }
   }
@@ -453,7 +458,7 @@ function mapToFunctions(_, {
     async onLastCallEnded() {
       await sleep(2000);
       routerInteraction.push('/calls/active');
-    }
+    },
   };
 }
 
