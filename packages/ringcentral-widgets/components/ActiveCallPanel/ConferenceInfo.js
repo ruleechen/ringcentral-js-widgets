@@ -12,14 +12,15 @@ function ConferenceInfo({
   onClick,
 }) {
   const MAXIMUM_AVATARS = 4;
+  const profiles = partyProfiles || [];
 
   const displayedProfiles =
-    partyProfiles.length >= MAXIMUM_AVATARS
-      ? partyProfiles.slice(0, MAXIMUM_AVATARS)
-      : partyProfiles;
+    profiles.length >= MAXIMUM_AVATARS
+      ? profiles.slice(0, MAXIMUM_AVATARS)
+      : profiles;
 
-  const remains = partyProfiles.length > MAXIMUM_AVATARS
-    ? partyProfiles.length - MAXIMUM_AVATARS
+  const remains = profiles.length > MAXIMUM_AVATARS
+    ? profiles.length - MAXIMUM_AVATARS
     : 0;
 
   return (
@@ -28,7 +29,7 @@ function ConferenceInfo({
       onClick={(e) => { e.preventDefault(); onClick(); }}
     >
       {
-        Array.isArray(displayedProfiles) && displayedProfiles.length
+        displayedProfiles.length
           ? (
             <div className={styles.avatarContainer}>
               {
@@ -70,7 +71,10 @@ function ConferenceInfo({
 
 ConferenceInfo.propTypes = {
   currentLocale: PropTypes.string.isRequired,
-  partyProfiles: PropTypes.array,
+  partyProfiles: PropTypes.arrayOf(PropTypes.shape({
+    avatarUrl: PropTypes.string,
+    toUserName: PropTypes.string,
+  })),
   onClick: PropTypes.func,
 };
 
