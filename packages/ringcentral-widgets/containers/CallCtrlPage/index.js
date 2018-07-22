@@ -329,13 +329,13 @@ function mapToProps(_, {
       addDisabled = newVal;
     }
 
+    hasConferenceCall = !!conferenceData;
+    conferenceCallParties = conferenceCall.partyProfiles;
+
+    lastCallInfo = conferenceCall.lastCallInfo;
     if (!lastCallInfo || lastCallInfo.status === sessionStatus.finished) {
       mergeDisabled = true;
     }
-
-    hasConferenceCall = !!conferenceData;
-    lastCallInfo = conferenceCall.lastCallInfo;
-    conferenceCallParties = conferenceCall.partyProfiles;
   }
 
   layout = isOnConference ? callCtrlLayouts.conferenceCtrl : layout;
