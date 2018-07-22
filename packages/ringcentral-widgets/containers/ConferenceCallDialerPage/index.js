@@ -48,6 +48,7 @@ function mapToProps(_, {
   return {
     ...baseProps,
     showFromField: false,
+    showPageTab: false,
   };
 }
 
