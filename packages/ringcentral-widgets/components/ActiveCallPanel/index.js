@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import throttle from 'ringcentral-integration/lib/throttle';
 
 import CallInfo from './CallInfo';
+import MergeInfo from './MergeInfo';
 import ConferenceInfo from './ConferenceInfo';
 import BackButton from '../BackButton';
 import BackHeader from '../BackHeader';
@@ -11,202 +11,155 @@ import DurationCounter from '../DurationCounter';
 import ActiveCallPad from '../ActiveCallPad';
 import callCtrlLayouts from '../../enums/callCtrlLayouts';
 import styles from './styles.scss';
-import MergeInfo from './MergeInfo';
 
-class ActiveCallPanel extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      displayedProfiles: [],
-      remains: 0,
-    };
+function ActiveCallPanel({
+  showBackButton,
+  backButtonLabel,
+  onBackButtonClick,
+  currentLocale,
+  nameMatches,
+  fallBackName,
+  phoneNumber,
+  formatPhone,
+  startTime,
+  startTimeOffset,
+  areaCode,
+  countryCode,
+  selectedMatcherIndex,
+  onSelectMatcherName,
+  avatarUrl,
+  isOnMute,
+  isOnHold,
+  recordStatus,
+  onMute,
+  onUnmute,
+  onHold,
+  onUnhold,
+  onRecord,
+  onStopRecord,
+  onShowKeyPad,
+  onHangup,
+  onPark,
+  onAdd,
+  onMerge,
+  onShowFlipPanel,
+  onToggleTransferPanel,
+  onOpenPartiesModal,
+  children,
+  showContactDisplayPlaceholder,
+  brand,
+  flipNumbers,
+  sourceIcons,
+  layout,
+  direction,
+  addDisabled,
+  mergeDisabled,
+  conferenceCallEquipped,
+  hasConferenceCall,
+  conferenceCallParties,
+  lastCallInfo,
+  onLastCallEnded,
+}) {
+  const backHeader = showBackButton ? (
+    <BackHeader
+      onBackClick={onBackButtonClick}
+      backButton={<BackButton label={backButtonLabel} />}
+    />
+  ) : null;
 
-    this.throttleResize = throttle(() => this.handleResize(this.props));
-  }
-
-  handleResize(props) {
-    const MAXIMUM_AVATARS = 4;
-    // todo: handle width calculation
-    if (props.layout === callCtrlLayouts.conferenceCtrl) {
-      // conference is just created and waiting for parties data to return
-      const profiles = this.props.getPartyProfiles();
-      if (profiles) {
-        const displayedProfiles = (profiles.length >= MAXIMUM_AVATARS
-          ? profiles.slice(0, MAXIMUM_AVATARS)
-          : profiles)
-          .map(({ avatarUrl, toUserName, id }) => ({ avatarUrl, toUserName, id }));
-        const remains = profiles.length <= MAXIMUM_AVATARS ? 0 : profiles.length - MAXIMUM_AVATARS;
-        this.setState({
-          displayedProfiles,
-          remains,
-        });
+  const timeCounter = (
+    <div className={styles.timeCounter}>
+      {
+        startTime
+          ? <DurationCounter startTime={startTime} offset={startTimeOffset} />
+          : <span aria-hidden="true">&nbsp;</span>
       }
-    }
+    </div>
+  );
+
+  const currentCallTitle = nameMatches.length
+    ? nameMatches[0].name
+    : phoneNumber;
+
+  let callInfo;
+
+  switch (layout) {
+    case callCtrlLayouts.mergeCtrl:
+      callInfo = (<MergeInfo
+        currentLocale={currentLocale}
+        timeCounter={timeCounter}
+        lastCallInfo={lastCallInfo}
+        onLastCallEnded={onLastCallEnded}
+        currentCallAvatarUrl={avatarUrl}
+        currentCallTitle={currentCallTitle || fallBackName}
+      />);
+      break;
+
+    case callCtrlLayouts.conferenceCtrl:
+      callInfo = (<ConferenceInfo
+        currentLocale={currentLocale}
+        partyProfiles={conferenceCallParties}
+        onClick={onOpenPartiesModal}
+      />);
+      break;
+
+    default:
+      callInfo = (<CallInfo
+        currentLocale={currentLocale}
+        nameMatches={nameMatches}
+        fallBackName={fallBackName}
+        phoneNumber={phoneNumber}
+        formatPhone={formatPhone}
+        startTime={startTime}
+        areaCode={areaCode}
+        countryCode={countryCode}
+        selectedMatcherIndex={selectedMatcherIndex}
+        onSelectMatcherName={onSelectMatcherName}
+        avatarUrl={avatarUrl}
+        brand={brand}
+        showContactDisplayPlaceholder={showContactDisplayPlaceholder}
+        sourceIcons={sourceIcons}
+      />);
+      break;
   }
 
-  componentDidMount() {
-    this.handleResize(this.props);
-    window.addEventListener('resize', this.throttleResize);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.throttleResize);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.handleResize(nextProps);
-  }
-
-  render() {
-    const {
-      showBackButton,
-      backButtonLabel,
-      onBackButtonClick,
-      currentLocale,
-      nameMatches,
-      fallBackName,
-      phoneNumber,
-      formatPhone,
-      startTime,
-      startTimeOffset,
-      areaCode,
-      countryCode,
-      selectedMatcherIndex,
-      onSelectMatcherName,
-      avatarUrl,
-      isOnMute,
-      isOnHold,
-      recordStatus,
-      onMute,
-      onUnmute,
-      onHold,
-      onUnhold,
-      onRecord,
-      onStopRecord,
-      onShowKeyPad,
-      onHangup,
-      onPark,
-      onAdd,
-      onMerge,
-      onShowFlipPanel,
-      onToggleTransferPanel,
-      onOpenPartiesModal,
-      children,
-      showContactDisplayPlaceholder,
-      brand,
-      flipNumbers,
-      sourceIcons,
-      layout,
-      direction,
-      addDisabled,
-      mergeDisabled,
-      conferenceCallEquipped,
-      hasConferenceCall,
-      lastTo,
-    } = this.props;
-
-    const currentCall = {
-      avatarUrl,
-      nameMatches,
-      fallBackName,
-      phoneNumber
-    };
-
-    const backHeader = showBackButton ? (
-      <BackHeader
-        onBackClick={onBackButtonClick}
-        backButton={<BackButton label={backButtonLabel} />}
-      />
-    ) : null;
-
-    const timeCounter = (
-      <div className={styles.timeCounter}>
-        {
-          startTime
-            ? <DurationCounter startTime={startTime} offset={startTimeOffset} />
-            : <span aria-hidden="true">&nbsp;</span>
-        }
-      </div>
-    );
-
-    let callInfo;
-
-    switch (layout) {
-      case callCtrlLayouts.mergeCtrl:
-        callInfo = (<MergeInfo
-          timeCounter={timeCounter}
-          lastTo={lastTo}
-          currentCall={currentCall}
+  return (
+    <div className={styles.root}>
+      {backHeader}
+      <Panel className={styles.panel}>
+        {layout !== callCtrlLayouts.mergeCtrl ? timeCounter : null}
+        {callInfo}
+        <ActiveCallPad
+          className={styles.callPad}
           currentLocale={currentLocale}
-        />);
-        break;
-
-      case callCtrlLayouts.conferenceCtrl:
-        callInfo = (<ConferenceInfo
-          currentLocale={currentLocale}
-          displayedProfiles={this.state.displayedProfiles}
-          remains={this.state.remains}
-          onClick={onOpenPartiesModal}
-        />);
-        break;
-
-      default:
-        callInfo = (<CallInfo
-          currentLocale={currentLocale}
-          nameMatches={nameMatches}
-          fallBackName={fallBackName}
-          phoneNumber={phoneNumber}
-          formatPhone={formatPhone}
-          startTime={startTime}
-          areaCode={areaCode}
-          countryCode={countryCode}
-          selectedMatcherIndex={selectedMatcherIndex}
-          onSelectMatcherName={onSelectMatcherName}
-          avatarUrl={avatarUrl}
-          brand={brand}
-          showContactDisplayPlaceholder={showContactDisplayPlaceholder}
-          sourceIcons={sourceIcons}
-        />);
-        break;
-    }
-    return (
-      <div className={styles.root}>
-        {backHeader}
-        <Panel className={styles.panel}>
-          {layout !== callCtrlLayouts.mergeCtrl ? timeCounter : null}
-          {callInfo}
-          <ActiveCallPad
-            className={styles.callPad}
-            currentLocale={currentLocale}
-            isOnMute={isOnMute}
-            isOnHold={isOnHold}
-            recordStatus={recordStatus}
-            onMute={onMute}
-            onUnmute={onUnmute}
-            onHold={onHold}
-            onUnhold={onUnhold}
-            onRecord={onRecord}
-            onStopRecord={onStopRecord}
-            onShowKeyPad={onShowKeyPad}
-            onHangup={onHangup}
-            onAdd={onAdd}
-            onMerge={onMerge}
-            onShowFlipPanel={onShowFlipPanel}
-            onToggleTransferPanel={onToggleTransferPanel}
-            flipNumbers={flipNumbers}
-            onPark={onPark}
-            layout={layout}
-            direction={direction}
-            addDisabled={addDisabled}
-            mergeDisabled={mergeDisabled}
-            conferenceCallEquipped={conferenceCallEquipped}
-            hasConferenceCall={hasConferenceCall}
-          />
-          {children}
-        </Panel>
-      </div>
-    );
-  }
+          isOnMute={isOnMute}
+          isOnHold={isOnHold}
+          recordStatus={recordStatus}
+          onMute={onMute}
+          onUnmute={onUnmute}
+          onHold={onHold}
+          onUnhold={onUnhold}
+          onRecord={onRecord}
+          onStopRecord={onStopRecord}
+          onShowKeyPad={onShowKeyPad}
+          onHangup={onHangup}
+          onAdd={onAdd}
+          onMerge={onMerge}
+          onShowFlipPanel={onShowFlipPanel}
+          onToggleTransferPanel={onToggleTransferPanel}
+          flipNumbers={flipNumbers}
+          onPark={onPark}
+          layout={layout}
+          direction={direction}
+          addDisabled={addDisabled}
+          mergeDisabled={mergeDisabled}
+          conferenceCallEquipped={conferenceCallEquipped}
+          hasConferenceCall={hasConferenceCall}
+        />
+        {children}
+      </Panel>
+    </div>
+  );
 }
 
 ActiveCallPanel.propTypes = {
@@ -251,10 +204,11 @@ ActiveCallPanel.propTypes = {
   direction: PropTypes.string,
   addDisabled: PropTypes.bool,
   mergeDisabled: PropTypes.bool,
-  getPartyProfiles: PropTypes.func,
+  conferenceCallParties: PropTypes.array,
   conferenceCallEquipped: PropTypes.bool,
   hasConferenceCall: PropTypes.bool,
-  lastTo: PropTypes.object,
+  lastCallInfo: PropTypes.object,
+  onLastCallEnded: PropTypes.func,
 };
 
 ActiveCallPanel.defaultProps = {
@@ -280,10 +234,11 @@ ActiveCallPanel.defaultProps = {
   direction: null,
   addDisabled: false,
   mergeDisabled: false,
-  getPartyProfiles: i => i,
   conferenceCallEquipped: false,
   hasConferenceCall: false,
-  lastTo: null,
+  conferenceCallParties: undefined,
+  lastCallInfo: undefined,
+  onLastCallEnded: undefined,
 };
 
 export default ActiveCallPanel;

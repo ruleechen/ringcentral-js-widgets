@@ -1,16 +1,27 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import styles from './styles.scss';
+
 import dynamicsFont from '../../assets/DynamicsFont/DynamicsFont.scss';
+import styles from './styles.scss';
 import i18n from './i18n';
 
-export default function ConferenceInfo({
+function ConferenceInfo({
   currentLocale,
-  displayedProfiles,
-  remains,
+  partyProfiles,
   onClick,
 }) {
+  const MAXIMUM_AVATARS = 4;
+
+  const displayedProfiles =
+    partyProfiles.length >= MAXIMUM_AVATARS
+      ? partyProfiles.slice(0, MAXIMUM_AVATARS)
+      : partyProfiles;
+
+  const remains = partyProfiles.length > MAXIMUM_AVATARS
+    ? partyProfiles.length - MAXIMUM_AVATARS
+    : 0;
+
   return (
     <a
       className={styles.conferenceCallInfoContainer}
@@ -36,7 +47,7 @@ export default function ConferenceInfo({
                 )
                 )
               }{
-                remains
+                remains > 0
                   ? (<div className={classnames(styles.avatar, styles.remains)}>{`+${remains}`}</div>)
                   : null
               }
@@ -59,15 +70,13 @@ export default function ConferenceInfo({
 
 ConferenceInfo.propTypes = {
   currentLocale: PropTypes.string.isRequired,
-  displayedProfiles: PropTypes.arrayOf(PropTypes.shape({
-    avatarUrl: PropTypes.string,
-    toUserName: PropTypes.string,
-  })).isRequired,
-  remains: PropTypes.number,
-  onClick: PropTypes.func
+  partyProfiles: PropTypes.array,
+  onClick: PropTypes.func,
 };
 
 ConferenceInfo.defaultProps = {
-  remains: 0,
+  partyProfiles: null,
   onClick: i => i,
 };
+
+export default ConferenceInfo;

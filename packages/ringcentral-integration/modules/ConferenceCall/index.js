@@ -9,6 +9,7 @@ import proxify from '../../lib/proxy/proxify';
 import permissionsMessages from '../RolesAndPermissions/permissionsMessages';
 import conferenceErrors from './conferenceCallErrors';
 import { isConferenceSession } from '../Webphone/webphoneHelper';
+import sessionStatus from '../Webphone/sessionStatus';
 // import webphoneErrors from '../Webphone/webphoneErrors';
 import ensureExist from '../../lib/ensureExist';
 // import sleep from '../../lib/sleep';
@@ -103,15 +104,31 @@ export default class ConferenceCall extends RcModule {
     this._pulling = pulling;
     this.capacity = capacity;
 
+    this.addSelector('partyProfiles',
+      () => (
+        Object.values(this.conferences)[0] &&
+        Object.values(this.conferences)[0].conference.parties
+      ),
+      () => {
+        const conferenceData = Object.values(this.conferences)[0];
+        if (!conferenceData) {
+          return [];
+        }
+        return this.getOnlinePartyProfiles(conferenceData.conference.id);
+      },
+    );
+
+    let _lastCallInfo = {};
     this.addSelector('lastCallInfo',
-      () => this._webphone && this._webphone.sessions,
       () => this._callMonitor.calls,
       () => this.mergingPair.fromSessionId,
-      (sessions, calls, fromSessionId) => {
-        let lastCalleeType = null;
+      this._selectors.partyProfiles,
+      (calls, fromSessionId, partyProfiles) => {
         const lastCall = calls.find(
           call => call.webphoneSession && call.webphoneSession.id === fromSessionId
         );
+
+        let lastCalleeType = null;
         if (lastCall) {
           if (lastCall.toMatches.length) {
             lastCalleeType = calleeTypes.contacts;
@@ -120,24 +137,24 @@ export default class ConferenceCall extends RcModule {
           } else {
             lastCalleeType = calleeTypes.unknow;
           }
+        } else if (_lastCallInfo.calleeType) {
+          _lastCallInfo = {
+            ..._lastCallInfo,
+            status: sessionStatus.finished,
+          };
+          return _lastCallInfo;
         }
 
         if (lastCalleeType === calleeTypes.conference) {
-          const conferenceData = Object.values(this.conferences)[0];
-          const conferencePartiesAvatarUrls = (conferenceData && this
-            .getOnlinePartyProfiles(conferenceData.conference.id)
-            .map(profile => profile.avatarUrl)
-          ) || [];
-          return {
+          const partiesAvatarUrls = partyProfiles.map(profile => profile.avatarUrl);
+          _lastCallInfo = {
             calleeType: calleeTypes.conference,
-            avatarUrl: conferencePartiesAvatarUrls[0],
-            extraNum: conferencePartiesAvatarUrls.length - 1,
+            avatarUrl: partiesAvatarUrls[0],
+            extraNum: partiesAvatarUrls.length - 1,
             sessionId: fromSessionId,
           };
-        }
-
-        if (lastCalleeType === calleeTypes.contacts) {
-          return {
+        } else if (lastCalleeType === calleeTypes.contacts) {
+          _lastCallInfo = {
             calleeType: calleeTypes.contacts,
             avatarUrl: lastCall.toMatches[0].profileImageUrl,
             name: lastCall.toName,
@@ -145,10 +162,8 @@ export default class ConferenceCall extends RcModule {
             sessionId: lastCall.webphoneSession.id,
             session: lastCall.webphoneSession,
           };
-        }
-
-        if (lastCalleeType === calleeTypes.unknow) {
-          return {
+        } else if (lastCalleeType === calleeTypes.unknow) {
+          _lastCallInfo = {
             calleeType: calleeTypes.unknow,
             avatarUrl: null,
             sessionId: lastCall.webphoneSession ? lastCall.webphoneSession.id : null,
@@ -157,7 +172,7 @@ export default class ConferenceCall extends RcModule {
           };
         }
 
-        return {};
+        return _lastCallInfo;
       },
     );
   }
@@ -601,17 +616,6 @@ export default class ConferenceCall extends RcModule {
     return timeout;
   }
 
-  onMergingPairDisconnected(party, func) {
-    if (this.state.mergingPair && this.state.mergingPair[party]) {
-      this.state.mergingPair[party].on('terminated', func);
-    }
-  }
-
-  removeOnMergingPairDisconnected(party, func) {
-    if (this.state.mergingPair && this.state.mergingPair[party]) {
-      this.state.mergingPair[party].removeListener('terminated', func);
-    }
-  }
   _init() {
     this.store.dispatch({
       type: this.actionTypes.initSuccess
@@ -826,6 +830,10 @@ export default class ConferenceCall extends RcModule {
 
   get mergingPair() {
     return this.state.mergingPair;
+  }
+
+  get partyProfiles() {
+    return this._selectors.partyProfiles();
   }
 
   get lastCallInfo() {

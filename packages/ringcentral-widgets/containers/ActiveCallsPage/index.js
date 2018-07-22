@@ -24,11 +24,9 @@ function mapToProps(_, {
   const conferenceCallEquipped = !!conferenceCall;
   let disableMerge = !isWebRTC;
   let hasConferenceCall = false;
-  let conferenceData = null;
   if (conferenceCallEquipped) {
     const conferenceList = Object.values(conferenceCall.conferences);
     const conference = conferenceList.length ? conferenceList[0] : null;
-    conferenceData = Object.values(conferenceCall.conferences)[0];
     hasConferenceCall = !!conference;
     if (conference) {
       disableMerge = conferenceCall.isOverload(conference.conference.id);
@@ -58,11 +56,7 @@ function mapToProps(_, {
     conferenceCallEquipped,
     hasConferenceCall,
     disableMerge,
-    conferencePartiesAvatarUrls: (
-      conferenceData && conferenceCall
-        .getOnlinePartyProfiles(conferenceData.conference.id)
-        .map(profile => profile.avatarUrl)
-    ) || [],
+    conferenceCallParties: conferenceCall ? conferenceCall.partyProfiles : null,
     showTab: !!(conferenceCallEquipped && isWebRTC && webphone.sessions.length),
     currentPath: routerInteraction.currentPath,
   };
