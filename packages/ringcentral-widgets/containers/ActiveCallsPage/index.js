@@ -57,7 +57,7 @@ function mapToProps(_, {
     hasConferenceCall,
     disableMerge,
     conferenceCallParties: conferenceCall ? conferenceCall.partyProfiles : null,
-    showTab: !!(conferenceCallEquipped && isWebRTC && webphone.sessions.length),
+    showPageTab: !!(conferenceCallEquipped && isWebRTC && webphone.sessions.length),
     currentPath: routerInteraction.currentPath,
   };
 }
@@ -183,7 +183,10 @@ function mapToFunctions(_, {
   };
 }
 
-const ActiveCallsPage = withPhone(connect(mapToProps, mapToFunctions)(ActiveCallsPanel));
+const ActiveCallsPage = withPhone(connect(
+  mapToProps,
+  mapToFunctions,
+)(ActiveCallsPanel));
 
 export {
   mapToProps,
