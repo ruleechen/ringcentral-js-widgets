@@ -781,15 +781,37 @@ export default class ConferenceCall extends RcModule {
 
   async _getProfile(sessionInstance) {
     const session = this._webphone.sessions.find(session => session.id === sessionInstance.id);
-    const { to, contactMatch } = session;
+    const {
+      to, contactMatch, from, fromNumber, direction
+    } = session;
+
     let { toUserName } = session;
     let avatarUrl;
     let rcId;
+    let partyNumber;
+
+    if (direction === callDirections.outbound) {
+      partyNumber = to;
+    } else {
+      partyNumber = fromNumber;
+    }
+
+    // HACK: refresh the cache
+    await this._contactMatcher.match({
+      queries: [partyNumber],
+      ignoreCache: true
+    });
 
     if (this._contactMatcher && this._contactMatcher.dataMapping) {
       const contactMapping = this._contactMatcher.dataMapping;
       let contact = contactMatch;
-      const nameMatches = (contactMapping && contactMapping[to]) || [];
+      let nameMatches;
+
+      if (direction === callDirections.outbound) {
+        nameMatches = (contactMapping && contactMapping[to]) || [];
+      } else {
+        nameMatches = (contactMapping && contactMapping[from]) || [];
+      }
 
       if (!contact) {
         contact = nameMatches && nameMatches[0];
@@ -800,10 +822,11 @@ export default class ConferenceCall extends RcModule {
         rcId = contact.id;
       }
     }
+
     return {
       avatarUrl,
       toUserName,
-      to,
+      partyNumber,
       rcId,
     };
   }
