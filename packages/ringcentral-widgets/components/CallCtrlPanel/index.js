@@ -129,7 +129,6 @@ class CallCtrlPanel extends Component {
     }
     return (
       <ActiveCallPanel
-        getAvatarUrl={this.props.getAvatarUrl}
         showBackButton={this.props.showBackButton}
         backButtonLabel={this.props.backButtonLabel}
         onBackButtonClick={this.props.onBackButtonClick}
@@ -173,8 +172,9 @@ class CallCtrlPanel extends Component {
         mergeDisabled={this.props.mergeDisabled}
         conferenceCallEquipped={this.props.conferenceCallEquipped}
         hasConferenceCall={this.props.hasConferenceCall}
-        getPartyProfiles={this.props.getPartyProfiles}
-        lastTo={this.props.lastTo}
+        conferenceCallParties={this.props.conferenceCallParties}
+        lastCallInfo={this.props.lastCallInfo}
+        onLastCallEnded={this.props.onLastCallEnded}
       >
         {this.props.children}
         {this.props.showSpinner ? <SpinnerOverlay /> : null}
@@ -184,7 +184,7 @@ class CallCtrlPanel extends Component {
             show={this.state.isShowMergeConfirm}
             onMerge={this.confirmMerge}
             onCancel={this.hideMergeConfirm}
-            avatarUrls={this.props.conferencePartiesAvatarUrls}
+            partyProfiles={this.props.conferenceCallParties}
           />
           : null
         }
@@ -238,7 +238,6 @@ CallCtrlPanel.propTypes = {
   phoneTypeRenderer: PropTypes.func,
   recipientsContactInfoRenderer: PropTypes.func,
   recipientsContactPhoneRenderer: PropTypes.func,
-  getAvatarUrl: PropTypes.func,
   layout: PropTypes.string.isRequired,
   showSpinner: PropTypes.bool,
   direction: PropTypes.string,
@@ -246,13 +245,12 @@ CallCtrlPanel.propTypes = {
   mergeDisabled: PropTypes.bool,
   conferenceCallEquipped: PropTypes.bool,
   hasConferenceCall: PropTypes.bool,
-  lastTo: PropTypes.object,
-  getPartyProfiles: PropTypes.func,
-  conferencePartiesAvatarUrls: PropTypes.arrayOf(PropTypes.string),
+  lastCallInfo: PropTypes.object,
+  onLastCallEnded: PropTypes.func,
+  conferenceCallParties: PropTypes.array,
 };
 
 CallCtrlPanel.defaultProps = {
-  getAvatarUrl: null,
   startTime: null,
   isOnMute: false,
   isOnHold: false,
@@ -281,9 +279,9 @@ CallCtrlPanel.defaultProps = {
   mergeDisabled: false,
   conferenceCallEquipped: false,
   hasConferenceCall: false,
-  lastTo: null,
-  getPartyProfiles: i => i,
-  conferencePartiesAvatarUrls: []
+  conferenceCallParties: undefined,
+  lastCallInfo: undefined,
+  onLastCallEnded: undefined,
 };
 
 export default CallCtrlPanel;
