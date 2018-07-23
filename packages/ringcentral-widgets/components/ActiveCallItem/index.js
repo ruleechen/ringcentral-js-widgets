@@ -454,6 +454,7 @@ export default class ActiveCallItem extends Component {
       externalViewEntity,
       externalHasEntity,
       readTextPermission,
+<<<<<<< a2a38130afab762869d7ff348b1bf90b95d68dcf
       isOnConferenceCall,
       showMergeCall,
       onMergeCall,
@@ -462,6 +463,8 @@ export default class ActiveCallItem extends Component {
       showAnswer,
       avatarUrl,
       showAvatar,
+=======
+>>>>>>> git subrepo commit packages/ringcentral-js-widgets
     } = this.props;
     const phoneNumber = this.getPhoneNumber();
     const parsedInfo = parseNumber({
@@ -547,6 +550,7 @@ export default class ActiveCallItem extends Component {
           />
           {extraButton}
         </div>
+<<<<<<< a2a38130afab762869d7ff348b1bf90b95d68dcf
         {
           hasActionMenu
             ? <ActionMenu
@@ -578,6 +582,35 @@ export default class ActiveCallItem extends Component {
             />
             : null
         }
+=======
+        <ActionMenu
+          extended={this.state.extended}
+          onToggle={this.toggleExtended}
+          currentLocale={currentLocale}
+          disableLinks={disableLinks}
+          phoneNumber={phoneNumber}
+          onClickToSms={
+            readTextPermission ?
+              () => this.clickToSms({ countryCode, areaCode })
+              : undefined
+          }
+          hasEntity={!!contactMatches.length}
+          onViewEntity={onViewContact && this.viewSelectedContact}
+          onCreateEntity={onCreateContact && this.createSelectedContact}
+          textTitle={i18n.getString('text', currentLocale)}
+          onLog={onLogCall}
+          isLogging={isLogging || this.state.isLogging}
+          isLogged={activityMatches.length > 0}
+          isCreating={this.state.isCreating}
+          addLogTitle={i18n.getString('addLog', currentLocale)}
+          editLogTitle={i18n.getString('editLog', currentLocale)}
+          createEntityTitle={i18n.getString('addEntity', currentLocale)}
+          viewEntityTitle={i18n.getString('viewDetails', currentLocale)}
+          externalViewEntity={() => externalViewEntity && externalViewEntity(this.props.call)}
+          externalHasEntity={externalHasEntity && externalHasEntity(this.props.call)}
+          disableClickToSms={disableClickToSms}
+        />
+>>>>>>> git subrepo commit packages/ringcentral-js-widgets
       </div>
     );
   }
@@ -631,6 +664,7 @@ ActiveCallItem.propTypes = {
   externalViewEntity: PropTypes.func,
   externalHasEntity: PropTypes.func,
   readTextPermission: PropTypes.bool,
+<<<<<<< a2a38130afab762869d7ff348b1bf90b95d68dcf
   isOnConferenceCall: PropTypes.bool,
   disableMerge: PropTypes.bool,
   hasActionMenu: PropTypes.bool,
@@ -640,6 +674,8 @@ ActiveCallItem.propTypes = {
   showCallDetail: PropTypes.bool,
   showMergeCall: PropTypes.bool,
   onMergeCall: PropTypes.func,
+=======
+>>>>>>> git subrepo commit packages/ringcentral-js-widgets
 };
 
 ActiveCallItem.defaultProps = {
@@ -667,6 +703,7 @@ ActiveCallItem.defaultProps = {
   externalViewEntity: undefined,
   externalHasEntity: undefined,
   readTextPermission: true,
+<<<<<<< a2a38130afab762869d7ff348b1bf90b95d68dcf
   isOnConferenceCall: false,
   disableMerge: false,
   hasActionMenu: true,
@@ -676,4 +713,6 @@ ActiveCallItem.defaultProps = {
   showCallDetail: true,
   showMergeCall: false,
   onMergeCall: undefined,
+=======
+>>>>>>> git subrepo commit packages/ringcentral-js-widgets
 };
