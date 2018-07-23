@@ -238,7 +238,7 @@ export default class BasePhone extends RcModule {
 
       if (currentSession
         && routerInteraction.currentPath.indexOf('/conferenceCall/mergeCtrl') === 0) {
-        const mergingPairFromId = conferenceCall.state.mergingPair.from && conferenceCall.state.mergingPair.from.id;
+        const mergingPairFromId = conferenceCall.mergingPair.fromSessionId;
         if (session.id !== mergingPairFromId) {
           routerInteraction.push('/calls/active');
           return;

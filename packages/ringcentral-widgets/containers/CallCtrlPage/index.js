@@ -2,16 +2,16 @@ import { find } from 'ramda';
 import { connect } from 'react-redux';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import sleep from 'ringcentral-integration/lib/sleep';
 import formatNumber from 'ringcentral-integration/lib/formatNumber';
+import calleeTypes from 'ringcentral-integration/enums/calleeTypes';
 import callDirections from 'ringcentral-integration/enums/callDirections';
 import callingModes from 'ringcentral-integration/modules/CallingSettings/callingModes';
 import sessionStatus from 'ringcentral-integration/modules/Webphone/sessionStatus';
-import sleep from 'ringcentral-integration/lib/sleep';
 import withPhone from '../../lib/withPhone';
 import callCtrlLayouts from '../../enums/callCtrlLayouts';
 import CallCtrlPanel from '../../components/CallCtrlPanel';
 import i18n from './i18n';
-import calleeTypes from '../../enums/calleeTypes';
 
 class CallCtrlPage extends Component {
   constructor(props) {
@@ -19,9 +19,8 @@ class CallCtrlPage extends Component {
     this.state = {
       selectedMatcherIndex: 0,
       avatarUrl: null,
-      lastTo: this.props.lastTo || null,
-      mergeDisabled: false,
     };
+
     this.onSelectMatcherName = (option) => {
       const nameMatches = this.props.nameMatches || [];
       let selectedMatcherIndex = nameMatches.findIndex(
@@ -42,6 +41,7 @@ class CallCtrlPage extends Component {
         });
       }
     };
+
     this.onMute = () =>
       this.props.onMute(this.props.session.id);
     this.onUnmute = () =>
@@ -68,15 +68,11 @@ class CallCtrlPage extends Component {
       this.props.onAdd(this.props.session.id);
     this.onMerge = () =>
       this.props.onMerge(this.props.session.id);
-    this.handleLastToTernimated = this::this.handleLastToTernimated;
   }
 
   componentDidMount() {
     this._mounted = true;
     this._updateAvatarAndMatchIndex(this.props);
-    if (this.props.layout === callCtrlLayouts.mergeCtrl) {
-      this.getLastTo();
-    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -84,20 +80,15 @@ class CallCtrlPage extends Component {
       nextProps.layout === callCtrlLayouts.mergeCtrl &&
       nextProps.session.direction === callDirections.inbound
     ) {
-      nextProps.gotoNormalCallCtrl();
+      nextProps.onIncomingCallCaptured();
     }
     if (this.props.session.id !== nextProps.session.id) {
       this._updateAvatarAndMatchIndex(nextProps);
-    }
-    if (nextProps.layout === callCtrlLayouts.mergeCtrl) {
-      this.updateConferenceAvatar(nextProps);
     }
   }
 
   componentWillUnmount() {
     this._mounted = false;
-    // reject the merge from listener
-    this.props.removeOnMergingPairDisconnected('from', this.handleLastToTernimated);
   }
 
   _updateAvatarAndMatchIndex(props) {
@@ -124,136 +115,15 @@ class CallCtrlPage extends Component {
     }
   }
 
-  getLastTo() {
-    const {
-      calls,
-      conferenceCall,
-      conferencePartiesAvatarUrls,
-      onMergingPairDisconnected
-    } = this.props;
-    const mergingPair = conferenceCall.state.mergingPair ? conferenceCall.state.mergingPair : {};
-    if (
-      Object.keys(mergingPair).length
-      && mergingPair.from
-    ) {
-      const lastToSessionId = mergingPair.from.id;
-      onMergingPairDisconnected('from', this.handleLastToTernimated)
-      if (calls.length) {
-        const lastCall = calls.filter(
-          item => (item.webphoneSession ? item.webphoneSession.id === mergingPair.from.id : null)
-        )[0];
-        if (lastCall) {
-          if (conferenceCall.isConferenceSession(lastToSessionId)) {
-            this.setState(() => ({
-              lastTo: {
-                calleeType: calleeTypes.conference,
-                avatarUrl: conferencePartiesAvatarUrls[0],
-                extraNum: conferencePartiesAvatarUrls.length - 1,
-                sessionId: lastToSessionId
-              }
-            }));
-            return;
-          }
-          if (this.checkCalleeType(lastCall) === calleeTypes.contacts) {
-            const lastTo = {
-              avatarUrl: lastCall.toMatches[0].profileImageUrl,
-              name: lastCall.toName,
-              status: lastCall.webphoneSession.callStatus,
-              calleeType: calleeTypes.contacts,
-              sessionId: lastCall.webphoneSession.id,
-              session: lastCall.webphoneSession
-            };
-            this.setState(prev => ({
-              ...prev,
-              lastTo
-            }));
-            // to fetch avatarurl again if the profileimageurl is null
-            if (!lastCall.toMatches[0].profileImageUrl) {
-              this.props.getAvatarUrl(lastCall.toMatches[0]).then((avatarUrl) => {
-                this.setState(prev => ({
-                  ...prev,
-                  lastTo: {
-                    ...prev.lastTo,
-                    avatarUrl
-                  }
-                }));
-              });
-            }
-          } else if (this.checkCalleeType(lastCall) === calleeTypes.unknow) {
-            this.setState(prev => ({
-              ...prev,
-              lastTo: {
-                calleeType: calleeTypes.unknow,
-                avatarUrl: null,
-                sessionId: lastCall.webphoneSession ? lastCall.webphoneSession.id : null,
-                status: lastCall.webphoneSession ? lastCall.webphoneSession.callStatus : null,
-                name: lastCall.to.phoneNumber
-              }
-            }));
-          }
-        }
-      }
-    }
-  }
-  updateConferenceAvatar(nextProps) {
-    if (Object.keys(nextProps.conferenceCall.conferences).length) {
-      const part = this.props.getPartyProfiles();
-      if (!this._mounted) {
-        return;
-      } else if (part.length) {
-        this.setState(prev => ({
-          lastTo: {
-            ...prev.lastTo,
-            extraNum: part.length - 1,
-            avatarUrl: part[0].avatarUrl,
-          }
-        }));
-      }
-    }
-  }
-  async handleLastToTernimated() {
-    const { routerInteraction, webphone, conferenceCall } = this.props;
-    this.setState((prev) => ({
-      ...prev,
-      lastTo: {
-        ...prev.lastTo,
-        status: sessionStatus.finished
-      },
-      mergeDisabled: true
-    }));
-    await sleep(2000);
-    if(!conferenceCall.isConferenceSession(webphone.activeSession.id) || this._mounted) {
-      routerInteraction.push('/calls/active');
-    }
-    this.props.removeOnMergingPairDisconnected('from', this.handleLastToTernimated);
-  }
-
-  checkCalleeType(call) {
-    if (call.toMatches.length) {
-      return calleeTypes.contacts;
-    } else if (call.webphoneSession.to.includes('conf_')) {
-      return calleeTypes.conference;
-    }
-    return calleeTypes.unknow;
-  }
-
   render() {
-    const {
-      session,
-      layout,
-      showSpinner,
-      addDisabled,
-      mergeDisabled,
-      conferenceCallEquipped,
-      hasConferenceCall,
-      getPartyProfiles,
-      conferencePartiesAvatarUrls,
-    } = this.props;
+    const { session } = this.props;
     if (!session.id) {
       return null;
     }
+
     const phoneNumber = session.direction === callDirections.outbound ?
       session.to : session.from;
+
     let fallbackUserName;
     if (session.direction === callDirections.inbound && session.from === 'anonymous') {
       fallbackUserName = i18n.getString('anonymous', this.props.currentLocale);
@@ -311,16 +181,16 @@ class CallCtrlPage extends Component {
         phoneTypeRenderer={this.props.phoneTypeRenderer}
         recipientsContactInfoRenderer={this.props.recipientsContactInfoRenderer}
         recipientsContactPhoneRenderer={this.props.recipientsContactPhoneRenderer}
-        layout={layout}
-        showSpinner={showSpinner}
+        layout={this.props.layout}
+        showSpinner={this.props.showSpinner}
         direction={session.direction}
-        addDisabled={addDisabled}
-        mergeDisabled={mergeDisabled || this.state.mergeDisabled}
-        conferenceCallEquipped={conferenceCallEquipped}
-        hasConferenceCall={hasConferenceCall}
-        getPartyProfiles={getPartyProfiles}
-        lastTo={this.state.lastTo}
-        conferencePartiesAvatarUrls={conferencePartiesAvatarUrls}
+        addDisabled={this.props.addDisabled}
+        mergeDisabled={this.props.mergeDisabled}
+        conferenceCallEquipped={this.props.conferenceCallEquipped}
+        hasConferenceCall={this.props.hasConferenceCall}
+        conferenceCallParties={this.props.conferenceCallParties}
+        lastCallInfo={this.props.lastCallInfo}
+        onLastCallEnded={this.props.onLastCallEnded}
       >
         {this.props.children}
       </CallCtrlPanel>
@@ -369,7 +239,6 @@ CallCtrlPage.propTypes = {
   brand: PropTypes.string.isRequired,
   showContactDisplayPlaceholder: PropTypes.bool.isRequired,
   flipNumbers: PropTypes.array.isRequired,
-  calls: PropTypes.array.isRequired,
   sourceIcons: PropTypes.object,
   searchContactList: PropTypes.array.isRequired,
   searchContact: PropTypes.func.isRequired,
@@ -380,17 +249,12 @@ CallCtrlPage.propTypes = {
   showSpinner: PropTypes.bool,
   addDisabled: PropTypes.bool,
   mergeDisabled: PropTypes.bool,
-  getPartyProfiles: PropTypes.func,
-  gotoNormalCallCtrl: PropTypes.func,
+  conferenceCallParties: PropTypes.array,
   conferenceCallEquipped: PropTypes.bool,
   hasConferenceCall: PropTypes.bool,
-  lastTo: PropTypes.object,
-  conferenceCall: PropTypes.object,
-  conferencePartiesAvatarUrls: PropTypes.arrayOf(PropTypes.string),
-  webphone: PropTypes.object,
-  routerInteraction: PropTypes.object,
-  onMergingPairDisconnected: PropTypes.func,
-  removeOnMergingPairDisconnected: PropTypes.func
+  lastCallInfo: PropTypes.object,
+  onLastCallEnded: PropTypes.func,
+  onIncomingCallCaptured: PropTypes.func,
 };
 
 CallCtrlPage.defaultProps = {
@@ -409,11 +273,10 @@ CallCtrlPage.defaultProps = {
   mergeDisabled: false,
   conferenceCallEquipped: false,
   hasConferenceCall: false,
-  lastTo: { calleeType: calleeTypes.unknow },
-  conferenceCall: null,
-  getPartyProfiles: i => i,
-  gotoNormalCallCtrl: i => i,
-  conferencePartiesAvatarUrls: [],
+  conferenceCallParties: undefined,
+  lastCallInfo: { calleeType: calleeTypes.unknow },
+  onLastCallEnded: undefined,
+  onIncomingCallCaptured: i => i,
 };
 
 function mapToProps(_, {
@@ -424,11 +287,9 @@ function mapToProps(_, {
     regionSettings,
     brand,
     forwardingNumber,
-    callMonitor,
     contactSearch,
     conferenceCall,
     callingSettings,
-    routerInteraction
   },
   layout = callCtrlLayouts.normalCtrl,
 }) {
@@ -438,35 +299,50 @@ function mapToProps(_, {
   const toMatches = (contactMapping && contactMapping[currentSession.to]) || [];
   const nameMatches =
     currentSession.direction === callDirections.outbound ? toMatches : fromMatches;
-  const isOnConference = conferenceCall.isConferenceSession(currentSession.id);
 
-  const conferenceData = Object.values(conferenceCall.conferences)[0];
-
-  /**
-   * button disabled criteria
-   */
   const isWebRTC = callingSettings.callingMode === callingModes.webphone;
   let mergeDisabled = !(currentSession.data && Object.keys(currentSession.data).length)
     || !isWebRTC;
   let addDisabled = !isWebRTC || currentSession.direction === callDirections.inbound;
 
-  if (conferenceData && isWebRTC) {
-    const newVal = conferenceCall.isOverload(conferenceData.conference.id)
-      // in case webphone.activeSession has not been updated yet
-      || !(currentSession.data && Object.keys(currentSession.data).length);
-    // update
-    mergeDisabled = newVal || !(currentSession.data && Object.keys(currentSession.data).length);
-    addDisabled = newVal;
+  let isOnConference = false;
+  let hasConferenceCall = false;
+  let isMerging = false;
+  let lastCallInfo;
+  let conferenceCallParties;
+
+  if (conferenceCall) {
+    isOnConference = conferenceCall.isConferenceSession(currentSession.id);
+    const conferenceData = Object.values(conferenceCall.conferences)[0];
+
+    isMerging = conferenceCall.isMerging && !!(
+      Object
+        .values(conferenceCall.mergingPair)
+        .find(id => id === currentSession.id)
+      || (isOnConference)
+    );
+
+    if (conferenceData && isWebRTC) {
+      const newVal = conferenceCall.isOverload(conferenceData.conference.id)
+        // in case webphone.activeSession has not been updated yet
+        || !(currentSession.data && Object.keys(currentSession.data).length);
+      // update
+      mergeDisabled = newVal || !(currentSession.data && Object.keys(currentSession.data).length);
+      addDisabled = newVal;
+    }
+
+    hasConferenceCall = !!conferenceData;
+    conferenceCallParties = conferenceCall.partyProfiles;
+    lastCallInfo = conferenceCall.lastCallInfo;
+
+    if (
+      layout === callCtrlLayouts.mergeCtrl
+      && (!lastCallInfo || lastCallInfo.status === sessionStatus.finished)
+    ) {
+      mergeDisabled = true;
+    }
   }
 
-  const isMerging = (
-    Object
-      .values(conferenceCall.state.mergingPair)
-      .map(session => session.id)
-      .find(id => id === currentSession.id)
-    || (isOnConference)
-  )
-    && conferenceCall.isMerging;
   layout = isOnConference ? callCtrlLayouts.conferenceCtrl : layout;
   return {
     brand: brand.fullName,
@@ -476,7 +352,6 @@ function mapToProps(_, {
     areaCode: regionSettings.areaCode,
     countryCode: regionSettings.countryCode,
     flipNumbers: forwardingNumber.flipNumbers,
-    calls: callMonitor.calls,
     showBackButton: true, // callMonitor.calls.length > 0,
     searchContactList: contactSearch.sortedResult,
     layout,
@@ -484,17 +359,9 @@ function mapToProps(_, {
     addDisabled,
     mergeDisabled,
     conferenceCallEquipped: !!conferenceCall,
-    hasConferenceCall: !!conferenceData,
-    conferenceCall,
-    webphone,
-    routerInteraction,
-    onMergingPairDisconnected: (...args) => conferenceCall.onMergingPairDisconnected(...args),
-    removeOnMergingPairDisconnected: (...args) => conferenceCall.removeOnMergingPairDisconnected(...args),
-    conferencePartiesAvatarUrls: (
-      conferenceData && conferenceCall
-        .getOnlinePartyProfiles(conferenceData.conference.id)
-        .map(profile => profile.avatarUrl)
-    ) || []
+    hasConferenceCall,
+    conferenceCallParties,
+    lastCallInfo,
   };
 }
 
@@ -544,9 +411,7 @@ function mapToFunctions(_, {
     onAdd(sessionId) {
       const sessionData = find(x => x.id === sessionId, webphone.sessions);
       if (sessionData) {
-        const isConferenceCallSession = conferenceCall.isConferenceSession(sessionId);
-        const session = webphone._sessions.get(sessionId);
-        conferenceCall.setMergeParty({ from: session });
+        conferenceCall.setMergeParty({ fromSessionId: sessionId });
         const outBoundOnholdCalls = callMonitor.activeOnHoldCalls
           .filter(call => call.direction === callDirections.outbound);
         if (outBoundOnholdCalls.length) {
@@ -562,8 +427,8 @@ function mapToFunctions(_, {
       routerInteraction.replace(`${routerInteraction.currentPath}/${sessionId}`);
       const session = webphone._sessions.get(sessionId);
       const isOnhold = session.isOnHold().local;
-      conferenceCall.setMergeParty({ to: session });
-      const sessionToMergeWith = conferenceCall.state.mergingPair.from;
+      conferenceCall.setMergeParty({ toSessionId: sessionId });
+      const sessionToMergeWith = webphone._sessions.get(conferenceCall.mergingPair.fromSessionId);
       const webphoneSessions = sessionToMergeWith
         ? [sessionToMergeWith, session]
         : [session];
@@ -587,16 +452,12 @@ function mapToFunctions(_, {
         routerInteraction.push('/conferenceCall/mergeCtrl');
       }
     },
-    gotoNormalCallCtrl: () => routerInteraction.push('/calls/active'),
-    getPartyProfiles() {
-      const conferenceData = Object.values(conferenceCall.conferences)[0];
-      if (conferenceData) {
-        if (conferenceData.conference.parties.length === 0) {
-          return conferenceData.profiles;
-        }
-        return conferenceCall.getOnlinePartyProfiles(conferenceData.conference.id);
-      }
-      return null;
+    onIncomingCallCaptured() {
+      routerInteraction.push('/calls/active');
+    },
+    async onLastCallEnded() {
+      await sleep(2000);
+      routerInteraction.push('/calls/active');
     },
   };
 }
