@@ -151,7 +151,6 @@ export default class ConferenceCall extends RcModule {
             calleeType: calleeTypes.conference,
             avatarUrl: partiesAvatarUrls[0],
             extraNum: partiesAvatarUrls.length - 1,
-            sessionId: fromSessionId,
           };
         } else if (lastCalleeType === calleeTypes.contacts) {
           _lastCallInfo = {
@@ -159,16 +158,13 @@ export default class ConferenceCall extends RcModule {
             avatarUrl: lastCall.toMatches[0].profileImageUrl,
             name: lastCall.toName,
             status: lastCall.webphoneSession.callStatus,
-            sessionId: lastCall.webphoneSession.id,
-            session: lastCall.webphoneSession,
           };
         } else if (lastCalleeType === calleeTypes.unknow) {
           _lastCallInfo = {
             calleeType: calleeTypes.unknow,
             avatarUrl: null,
-            sessionId: lastCall.webphoneSession ? lastCall.webphoneSession.id : null,
-            status: lastCall.webphoneSession ? lastCall.webphoneSession.callStatus : null,
             name: lastCall.to.phoneNumber,
+            status: lastCall.webphoneSession ? lastCall.webphoneSession.callStatus : null,
           };
         }
 
