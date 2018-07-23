@@ -15,8 +15,6 @@ function mapToProps(_, {
     rolesAndPermissions,
     conferenceCall,
     callingSettings,
-    routerInteraction,
-    webphone,
   },
   showContactDisplayPlaceholder = false,
 }) {
@@ -57,8 +55,6 @@ function mapToProps(_, {
     hasConferenceCall,
     disableMerge,
     conferenceCallParties: conferenceCall ? conferenceCall.partyProfiles : null,
-    showPageTab: !!(conferenceCallEquipped && isWebRTC && webphone.sessions.length),
-    currentPath: routerInteraction.currentPath,
   };
 }
 
@@ -85,9 +81,6 @@ function mapToFunctions(_, {
 }) {
   const isWebRTC = callingSettings.callingMode === callingModes.webphone;
   return {
-    goTo(path) {
-      routerInteraction.push(path);
-    },
     formatPhone(phoneNumber) {
       return formatNumber({
         phoneNumber,
